@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cycliste-backend
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./backend/tmp:/app/tmp
+      - ./backend/uploads:/app/uploads
+      - sqlite-data:/app/database
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+      - HOST=0.0.0.0
+      - LOG_LEVEL=info
+      - APP_KEY=${APP_KEY:-your-secret-app-key-change-in-production}
+      - DB_CONNECTION=sqlite
+    restart: unless-stopped
+    networks:
+      - cycliste-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cycliste-frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:3333
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - cycliste-network
+
+volumes:
+  sqlite-data:
+    driver: local
+
+networks:
+  cycliste-network:
+    driver: bridge
