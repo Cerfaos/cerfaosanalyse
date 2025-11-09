@@ -89,6 +89,70 @@ export default class ActivitiesController {
   }
 
   /**
+   * Créer une activité manuellement (sans fichier)
+   */
+  async create({ auth, request, response }: HttpContext) {
+    const user = auth.user!
+
+    // Valider et récupérer les données
+    const data = request.only([
+      'date',
+      'type',
+      'duration',
+      'distance',
+      'avgHeartRate',
+      'maxHeartRate',
+      'avgSpeed',
+      'maxSpeed',
+      'elevationGain',
+      'calories',
+      'avgCadence',
+      'avgPower',
+      'normalizedPower',
+    ])
+
+    // Convertir la date
+    const activityDate = DateTime.fromISO(data.date)
+
+    // Calculer le TRIMP si FC disponible
+    let trimp = null
+    if (data.avgHeartRate && user.fcMax && user.fcRepos) {
+      trimp = this.calculateTrimp(
+        Number(data.duration),
+        Number(data.avgHeartRate),
+        user.fcMax,
+        user.fcRepos
+      )
+    }
+
+    // Créer l'activité
+    const activity = await Activity.create({
+      userId: user.id,
+      date: activityDate,
+      type: data.type || 'Cyclisme',
+      duration: Number(data.duration),
+      distance: Number(data.distance),
+      avgHeartRate: data.avgHeartRate ? Number(data.avgHeartRate) : null,
+      maxHeartRate: data.maxHeartRate ? Number(data.maxHeartRate) : null,
+      avgSpeed: data.avgSpeed ? Number(data.avgSpeed) : null,
+      maxSpeed: data.maxSpeed ? Number(data.maxSpeed) : null,
+      elevationGain: data.elevationGain ? Number(data.elevationGain) : null,
+      calories: data.calories ? Number(data.calories) : null,
+      avgCadence: data.avgCadence ? Number(data.avgCadence) : null,
+      avgPower: data.avgPower ? Number(data.avgPower) : null,
+      normalizedPower: data.normalizedPower ? Number(data.normalizedPower) : null,
+      trimp,
+      fileName: null, // Pas de fichier pour une activité manuelle
+      gpsData: null,
+    })
+
+    return response.created({
+      message: 'Activité créée avec succès',
+      data: activity,
+    })
+  }
+
+  /**
    * Upload et parser un fichier d'activité
    */
   async upload({ auth, request, response }: HttpContext) {
@@ -174,6 +238,109 @@ export default class ActivitiesController {
 
       return response.created({
         message: 'Activité importée avec succès',
+        data: activity,
+      })
+    } catch (error) {
+      console.error('Erreur parsing fichier:', error)
+      return response.badRequest({
+        message: 'Erreur lors du parsing du fichier',
+        error: error.message,
+      })
+    }
+  }
+
+  /**
+   * Remplacer le fichier d'une activité existante
+   */
+  async replaceFile({ auth, request, response, params }: HttpContext) {
+    const user = auth.user!
+    const activityId = params.id
+
+    // Vérifier que l'activité existe et appartient à l'utilisateur
+    const activity = await Activity.query()
+      .where('id', activityId)
+      .where('user_id', user.id)
+      .first()
+
+    if (!activity) {
+      return response.notFound({
+        message: 'Activité non trouvée',
+      })
+    }
+
+    // Valider le fichier
+    const file = request.file('file', {
+      size: '50mb',
+      extnames: ['fit', 'gpx', 'csv'],
+    })
+
+    if (!file) {
+      return response.badRequest({
+        message: 'Aucun fichier fourni',
+      })
+    }
+
+    if (!file.isValid) {
+      return response.badRequest({
+        message: 'Fichier invalide',
+        errors: file.errors,
+      })
+    }
+
+    try {
+      // Lire le fichier
+      const filePath = file.tmpPath!
+      const fileExtension = file.extname!
+
+      let parsedActivity: ParsedActivity
+
+      // Parser selon le type de fichier
+      if (fileExtension === 'fit') {
+        parsedActivity = await this.parseFitFile(filePath)
+      } else if (fileExtension === 'gpx') {
+        parsedActivity = await this.parseGpxFile(filePath)
+      } else if (fileExtension === 'csv') {
+        parsedActivity = await this.parseCsvFile(filePath)
+      } else {
+        return response.badRequest({
+          message: 'Type de fichier non supporté',
+        })
+      }
+
+      // Calculer le TRIMP si FC disponible
+      if (parsedActivity.avgHeartRate && user.fcMax && user.fcRepos) {
+        parsedActivity.trimp = this.calculateTrimp(
+          parsedActivity.duration,
+          parsedActivity.avgHeartRate,
+          user.fcMax,
+          user.fcRepos
+        )
+      }
+
+      // Mettre à jour l'activité avec les nouvelles données du fichier
+      activity.merge({
+        date: parsedActivity.date,
+        type: parsedActivity.type,
+        duration: parsedActivity.duration,
+        distance: parsedActivity.distance,
+        avgHeartRate: parsedActivity.avgHeartRate,
+        maxHeartRate: parsedActivity.maxHeartRate,
+        avgSpeed: parsedActivity.avgSpeed,
+        maxSpeed: parsedActivity.maxSpeed,
+        elevationGain: parsedActivity.elevationGain,
+        calories: parsedActivity.calories,
+        avgCadence: parsedActivity.avgCadence,
+        avgPower: parsedActivity.avgPower,
+        normalizedPower: parsedActivity.normalizedPower,
+        trimp: parsedActivity.trimp,
+        gpsData: parsedActivity.gpsData ? JSON.stringify(parsedActivity.gpsData) : null,
+        fileName: file.clientName,
+      })
+
+      await activity.save()
+
+      return response.ok({
+        message: 'Fichier remplacé avec succès',
         data: activity,
       })
     } catch (error) {
@@ -385,7 +552,44 @@ export default class ActivitiesController {
       })
     }
 
-    const data = request.only(['type', 'date', 'duration', 'distance', 'notes'])
+    // Récupérer tous les champs modifiables
+    const data: any = request.only([
+      'type',
+      'date',
+      'duration',
+      'distance',
+      'avgHeartRate',
+      'maxHeartRate',
+      'avgSpeed',
+      'maxSpeed',
+      'avgPower',
+      'normalizedPower',
+      'avgCadence',
+      'elevationGain',
+      'calories',
+      'equipmentId',
+      'notes',
+    ])
+
+    // Convertir la date si fournie
+    if (data.date) {
+      data.date = DateTime.fromISO(data.date)
+    }
+
+    // Si FC modifiée et user a fcMax/fcRepos, recalculer TRIMP
+    if (
+      (data.avgHeartRate || activity.avgHeartRate) &&
+      user.fcMax &&
+      user.fcRepos &&
+      data.duration
+    ) {
+      const avgHr = data.avgHeartRate || activity.avgHeartRate
+      const duration = data.duration || activity.duration
+      data.trimp = this.calculateTrimp(duration, avgHr, user.fcMax, user.fcRepos)
+    } else if (data.avgHeartRate && user.fcMax && user.fcRepos) {
+      // Recalculer avec durée existante
+      data.trimp = this.calculateTrimp(activity.duration, data.avgHeartRate, user.fcMax, user.fcRepos)
+    }
 
     activity.merge(data)
     await activity.save()
@@ -440,35 +644,53 @@ export default class ActivitiesController {
     const activities = await query.orderBy('date', 'asc')
 
     // Calculer les statistiques
+    const totalActivities = activities.length
+    const totalDuration = activities.reduce((sum, a) => sum + a.duration, 0)
+    const totalDistance = activities.reduce((sum, a) => sum + a.distance, 0)
+    const totalTrimp = activities.reduce((sum, a) => sum + (a.trimp || 0), 0)
+
     const stats = {
-      count: activities.length,
-      totalDuration: activities.reduce((sum, a) => sum + a.duration, 0),
-      totalDistance: activities.reduce((sum, a) => sum + a.distance, 0),
-      totalTrimp: activities.reduce((sum, a) => sum + (a.trimp || 0), 0),
-      avgDuration: 0,
-      avgDistance: 0,
-      avgTrimp: 0,
-      avgHeartRate: 0,
-      byType: {} as Record<string, number>,
+      totalActivities,
+      totalDuration,
+      totalDistance,
+      totalTrimp,
+      averageDuration: 0,
+      averageDistance: 0,
+      averageHeartRate: null as number | null,
+      byType: [] as Array<{ type: string; count: number; distance: number; duration: number }>,
     }
 
-    if (stats.count > 0) {
-      stats.avgDuration = Math.round(stats.totalDuration / stats.count)
-      stats.avgDistance = Math.round(stats.totalDistance / stats.count)
-      stats.avgTrimp = Math.round(stats.totalTrimp / stats.count)
+    if (totalActivities > 0) {
+      stats.averageDuration = Math.round(totalDuration / totalActivities)
+      stats.averageDistance = Math.round(totalDistance / totalActivities)
 
       const activitiesWithHR = activities.filter((a) => a.avgHeartRate !== null)
       if (activitiesWithHR.length > 0) {
-        stats.avgHeartRate = Math.round(
+        stats.averageHeartRate = Math.round(
           activitiesWithHR.reduce((sum, a) => sum + (a.avgHeartRate || 0), 0) /
             activitiesWithHR.length
         )
       }
 
-      // Grouper par type
+      // Grouper par type avec distance et durée
+      const typeMap = new Map<string, { count: number; distance: number; duration: number }>()
+
       activities.forEach((a) => {
-        stats.byType[a.type] = (stats.byType[a.type] || 0) + 1
+        if (!typeMap.has(a.type)) {
+          typeMap.set(a.type, { count: 0, distance: 0, duration: 0 })
+        }
+        const typeData = typeMap.get(a.type)!
+        typeData.count += 1
+        typeData.distance += a.distance
+        typeData.duration += a.duration
       })
+
+      stats.byType = Array.from(typeMap.entries()).map(([type, data]) => ({
+        type,
+        count: data.count,
+        distance: data.distance,
+        duration: data.duration,
+      }))
     }
 
     return response.ok({

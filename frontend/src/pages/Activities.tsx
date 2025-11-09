@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
@@ -36,6 +36,7 @@ interface ActivityStats {
 
 export default function Activities() {
   const navigate = useNavigate()
+  const formRef = useRef<HTMLDivElement>(null)
   const [activities, setActivities] = useState<Activity[]>([])
   const [stats, setStats] = useState<ActivityStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,6 +46,24 @@ export default function Activities() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [filterType, setFilterType] = useState('')
   const [period, setPeriod] = useState('30')
+  const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload')
+  const [manualFormData, setManualFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    type: 'Cyclisme',
+    hours: '',
+    minutes: '',
+    seconds: '',
+    distance: '',
+    avgHeartRate: '',
+    maxHeartRate: '',
+    avgSpeed: '',
+    maxSpeed: '',
+    elevationGain: '',
+    calories: '',
+    avgCadence: '',
+    avgPower: '',
+    normalizedPower: '',
+  })
 
   useEffect(() => {
     loadData()
@@ -123,6 +142,71 @@ export default function Activities() {
     }
   }
 
+  const handleManualSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    setUploading(true)
+
+    try {
+      // Convertir le temps en secondes
+      const duration =
+        (Number(manualFormData.hours) || 0) * 3600 +
+        (Number(manualFormData.minutes) || 0) * 60 +
+        (Number(manualFormData.seconds) || 0)
+
+      // Convertir la distance en mètres
+      const distance = Number(manualFormData.distance) * 1000
+
+      const payload: any = {
+        date: manualFormData.date,
+        type: manualFormData.type,
+        duration,
+        distance,
+      }
+
+      // Ajouter les champs optionnels seulement s'ils sont remplis
+      if (manualFormData.avgHeartRate) payload.avgHeartRate = Number(manualFormData.avgHeartRate)
+      if (manualFormData.maxHeartRate) payload.maxHeartRate = Number(manualFormData.maxHeartRate)
+      if (manualFormData.avgSpeed) payload.avgSpeed = Number(manualFormData.avgSpeed)
+      if (manualFormData.maxSpeed) payload.maxSpeed = Number(manualFormData.maxSpeed)
+      if (manualFormData.elevationGain) payload.elevationGain = Number(manualFormData.elevationGain)
+      if (manualFormData.calories) payload.calories = Number(manualFormData.calories)
+      if (manualFormData.avgCadence) payload.avgCadence = Number(manualFormData.avgCadence)
+      if (manualFormData.avgPower) payload.avgPower = Number(manualFormData.avgPower)
+      if (manualFormData.normalizedPower)
+        payload.normalizedPower = Number(manualFormData.normalizedPower)
+
+      await api.post('/api/activities/create', payload)
+
+      setSuccess('Activité créée avec succès !')
+      setManualFormData({
+        date: new Date().toISOString().split('T')[0],
+        type: 'Cyclisme',
+        hours: '',
+        minutes: '',
+        seconds: '',
+        distance: '',
+        avgHeartRate: '',
+        maxHeartRate: '',
+        avgSpeed: '',
+        maxSpeed: '',
+        elevationGain: '',
+        calories: '',
+        avgCadence: '',
+        avgPower: '',
+        normalizedPower: '',
+      })
+
+      // Recharger les données
+      loadData()
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Erreur lors de la création de l'activité")
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
@@ -137,11 +221,6 @@ export default function Activities() {
   const formatDistance = (meters: number) => {
     const km = meters / 1000
     return `${km.toFixed(2)} km`
-  }
-
-  const formatSpeed = (kmh: number | null) => {
-    if (!kmh) return '-'
-    return `${kmh.toFixed(1)} km/h`
   }
 
   const getActivityIcon = (type: string) => {
@@ -167,13 +246,38 @@ export default function Activities() {
     }
   }
 
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // Focus sur l'input file pour améliorer l'UX
+      setTimeout(() => {
+        const fileInput = document.getElementById('file-upload')
+        if (fileInput) {
+          fileInput.focus()
+        }
+      }, 500)
+    }
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-dark mb-2">Activités</h1>
-        <p className="text-text-secondary">
-          Importez vos activités et suivez vos performances
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Activités</h1>
+          <p className="text-gray-600">
+            Importez vos activités et suivez vos performances
+          </p>
+        </div>
+        <button
+          onClick={scrollToForm}
+          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap border-2 border-blue-600 hover:border-blue-700"
+          style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#ffffff' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Importer une activité
+        </button>
       </div>
 
       {success && (
@@ -228,56 +332,271 @@ export default function Activities() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Formulaire d'upload */}
-        <div className="lg:col-span-1">
+        {/* Formulaire */}
+        <div ref={formRef} className="lg:col-span-1" id="import-form">
           <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <h2 className="text-xl font-semibold text-text-dark mb-6">
-              Importer une activité
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Nouvelle activité</h2>
 
-            <form onSubmit={handleUpload} className="space-y-4">
-              <div>
-                <label htmlFor="file-upload" className="block text-sm font-medium text-text-body mb-2">
-                  Fichier
-                </label>
-                <input
-                  type="file"
-                  id="file-upload"
-                  accept=".fit,.gpx,.csv"
-                  onChange={handleFileChange}
-                  required
-                  className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                />
-                <p className="text-sm text-text-tertiary mt-2">
-                  Formats acceptés: FIT, GPX, CSV
-                </p>
-              </div>
+            {/* Tabs */}
+            <div className="flex gap-2 mb-6 border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab('upload')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  activeTab === 'upload'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Importer un fichier
+              </button>
+              <button
+                onClick={() => setActiveTab('manual')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  activeTab === 'manual'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Créer manuellement
+              </button>
+            </div>
 
-              {selectedFile && (
-                <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
+            {/* Upload Form */}
+            {activeTab === 'upload' && (
+              <form onSubmit={handleUpload} className="space-y-4">
+                <div>
+                  <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-2">
+                    Fichier
+                  </label>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".fit,.gpx,.csv"
+                    onChange={handleFileChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">Formats acceptés: FIT, GPX, CSV</p>
+                </div>
+
+                {selectedFile && (
+                  <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
+                    <p className="text-sm text-blue-800">
+                      Fichier sélectionné: <strong>{selectedFile.name}</strong>
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      Taille: {(selectedFile.size / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={uploading || !selectedFile}
+                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? 'Import en cours...' : 'Importer'}
+                </button>
+
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
                   <p className="text-sm text-blue-800">
-                    Fichier sélectionné: <strong>{selectedFile.name}</strong>
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Taille: {(selectedFile.size / 1024).toFixed(2)} KB
+                    <strong>💡 Astuce :</strong> Le TRIMP sera calculé automatiquement si votre
+                    activité contient des données de fréquence cardiaque.
                   </p>
                 </div>
-              )}
+              </form>
+            )}
 
-              <button
-                type="submit"
-                disabled={uploading || !selectedFile}
-                className="w-full px-6 py-3 bg-accent-500 text-white rounded-md hover:bg-accent-600 shadow-button hover:shadow-button-hover transition-all font-medium disabled:opacity-50"
-              >
-                {uploading ? 'Import en cours...' : 'Importer'}
-              </button>
-            </form>
+            {/* Manual Form */}
+            {activeTab === 'manual' && (
+              <form onSubmit={handleManualSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label htmlFor="manual-date" className="block text-sm font-medium text-gray-700 mb-2">
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      id="manual-date"
+                      value={manualFormData.date}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, date: e.target.value })
+                      }
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
 
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-sm text-blue-800">
-                <strong>💡 Astuce :</strong> Le TRIMP sera calculé automatiquement si votre activité contient des données de fréquence cardiaque et que vous avez configuré vos FC max et repos dans votre profil.
-              </p>
-            </div>
+                  <div className="col-span-2">
+                    <label htmlFor="manual-type" className="block text-sm font-medium text-gray-700 mb-2">
+                      Type d'activité *
+                    </label>
+                    <select
+                      id="manual-type"
+                      value={manualFormData.type}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, type: e.target.value })
+                      }
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="Cyclisme">Cyclisme</option>
+                      <option value="Course">Course</option>
+                      <option value="Natation">Natation</option>
+                    </select>
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Durée *</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="HH"
+                          value={manualFormData.hours}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, hours: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                        />
+                        <p className="text-xs text-gray-500 text-center mt-1">Heures</p>
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          min="0"
+                          max="59"
+                          placeholder="MM"
+                          value={manualFormData.minutes}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, minutes: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                        />
+                        <p className="text-xs text-gray-500 text-center mt-1">Minutes</p>
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          min="0"
+                          max="59"
+                          placeholder="SS"
+                          value={manualFormData.seconds}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, seconds: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                        />
+                        <p className="text-xs text-gray-500 text-center mt-1">Secondes</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2">
+                    <label htmlFor="manual-distance" className="block text-sm font-medium text-gray-700 mb-2">
+                      Distance (km) *
+                    </label>
+                    <input
+                      type="number"
+                      id="manual-distance"
+                      step="0.01"
+                      min="0"
+                      placeholder="Ex: 42.5"
+                      value={manualFormData.distance}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, distance: e.target.value })
+                      }
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="manual-avgHR" className="block text-sm font-medium text-gray-700 mb-2">
+                      FC moyenne
+                    </label>
+                    <input
+                      type="number"
+                      id="manual-avgHR"
+                      min="0"
+                      placeholder="bpm"
+                      value={manualFormData.avgHeartRate}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, avgHeartRate: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="manual-maxHR" className="block text-sm font-medium text-gray-700 mb-2">
+                      FC max
+                    </label>
+                    <input
+                      type="number"
+                      id="manual-maxHR"
+                      min="0"
+                      placeholder="bpm"
+                      value={manualFormData.maxHeartRate}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, maxHeartRate: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="manual-elevation" className="block text-sm font-medium text-gray-700 mb-2">
+                      Dénivelé (m)
+                    </label>
+                    <input
+                      type="number"
+                      id="manual-elevation"
+                      min="0"
+                      placeholder="Ex: 450"
+                      value={manualFormData.elevationGain}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, elevationGain: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="manual-calories" className="block text-sm font-medium text-gray-700 mb-2">
+                      Calories
+                    </label>
+                    <input
+                      type="number"
+                      id="manual-calories"
+                      min="0"
+                      placeholder="kcal"
+                      value={manualFormData.calories}
+                      onChange={(e) =>
+                        setManualFormData({ ...manualFormData, calories: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={uploading}
+                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? 'Création en cours...' : 'Créer l\'activité'}
+                </button>
+
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-sm text-blue-800">
+                    <strong>💡 Astuce :</strong> Le TRIMP sera calculé automatiquement si vous
+                    renseignez la FC moyenne et que votre profil est configuré.
+                  </p>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 

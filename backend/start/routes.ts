@@ -69,11 +69,13 @@ router
 router
   .group(() => {
     router.get('/', [ActivitiesController, 'index'])
+    router.post('/create', [ActivitiesController, 'create'])
     router.post('/upload', [ActivitiesController, 'upload'])
     router.get('/stats', [ActivitiesController, 'stats'])
     router.get('/training-load', [ActivitiesController, 'trainingLoad'])
     router.get('/:id', [ActivitiesController, 'show'])
     router.patch('/:id', [ActivitiesController, 'update'])
+    router.post('/:id/replace-file', [ActivitiesController, 'replaceFile'])
     router.delete('/:id', [ActivitiesController, 'destroy'])
   })
   .prefix('/api/activities')
