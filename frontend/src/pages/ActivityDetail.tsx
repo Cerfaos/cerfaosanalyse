@@ -6,6 +6,19 @@ import { useAuthStore } from '../store/authStore'
 import api from '../services/api'
 import 'leaflet/dist/leaflet.css'
 
+interface WeatherData {
+  temperature: number
+  feelsLike: number
+  humidity: number
+  pressure: number
+  windSpeed: number
+  windDirection: number
+  description: string
+  icon: string
+  clouds: number
+  visibility: number
+}
+
 interface Activity {
   id: number
   date: string
@@ -24,6 +37,7 @@ interface Activity {
   trimp: number | null
   fileName: string | null
   gpsData: string | null
+  weather: string | null
   createdAt: string
 }
 
@@ -63,6 +77,10 @@ export default function ActivityDetail() {
     avgCadence: '',
     elevationGain: '',
     calories: '',
+    weatherCondition: '',
+    weatherTemperature: '',
+    weatherWindSpeed: '',
+    weatherWindDirection: '',
   })
 
   useEffect(() => {
@@ -105,6 +123,21 @@ export default function ActivityDetail() {
     // Convertir la distance en mètres vers km
     const distanceInKm = (activity.distance / 1000).toFixed(2)
 
+    // Extraire les données météo actuelles si disponibles
+    let currentTemp = ''
+    let currentWindSpeed = ''
+    let currentWindDirection = ''
+    if (activity.weather) {
+      try {
+        const weatherData = JSON.parse(activity.weather)
+        currentTemp = weatherData.temperature?.toString() || ''
+        currentWindSpeed = weatherData.windSpeed?.toString() || ''
+        currentWindDirection = weatherData.windDirection?.toString() || ''
+      } catch (e) {
+        // Ignore parsing errors
+      }
+    }
+
     setEditForm({
       type: activity.type,
       date: new Date(activity.date).toISOString().split('T')[0],
@@ -121,6 +154,10 @@ export default function ActivityDetail() {
       avgCadence: activity.avgCadence?.toString() || '',
       elevationGain: activity.elevationGain?.toString() || '',
       calories: activity.calories?.toString() || '',
+      weatherCondition: '',
+      weatherTemperature: currentTemp,
+      weatherWindSpeed: currentWindSpeed,
+      weatherWindDirection: currentWindDirection,
     })
     setIsEditing(true)
   }
@@ -159,6 +196,20 @@ export default function ActivityDetail() {
       if (editForm.avgCadence) updateData.avgCadence = Number(editForm.avgCadence)
       if (editForm.elevationGain) updateData.elevationGain = Number(editForm.elevationGain)
       if (editForm.calories) updateData.calories = Number(editForm.calories)
+
+      // Ajouter les champs météo si renseignés
+      if (editForm.weatherCondition) {
+        updateData.weatherCondition = editForm.weatherCondition
+        if (editForm.weatherTemperature) {
+          updateData.weatherTemperature = Number(editForm.weatherTemperature)
+        }
+        if (editForm.weatherWindSpeed) {
+          updateData.weatherWindSpeed = Number(editForm.weatherWindSpeed)
+        }
+        if (editForm.weatherWindDirection) {
+          updateData.weatherWindDirection = Number(editForm.weatherWindDirection)
+        }
+      }
 
       await api.patch(`/api/activities/${id}`, updateData)
 
@@ -444,7 +495,8 @@ export default function ActivityDetail() {
                   >
                     <option value="Cyclisme">Cyclisme</option>
                     <option value="Course">Course</option>
-                    <option value="Natation">Natation</option>
+                    <option value="Rameur">Rameur</option>
+                    <option value="Marche">Marche</option>
                     <option value="Autre">Autre</option>
                   </select>
                 </div>
@@ -681,6 +733,83 @@ export default function ActivityDetail() {
               </div>
             </div>
 
+            {/* Section Météo */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 text-gray-800">Météo</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Conditions météo
+                  </label>
+                  <select
+                    value={editForm.weatherCondition}
+                    onChange={(e) => setEditForm({ ...editForm, weatherCondition: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">-- Aucune modification --</option>
+                    <option value="ensoleille">☀️ Ensoleillé</option>
+                    <option value="partiellement-nuageux">⛅ Partiellement nuageux</option>
+                    <option value="nuageux">☁️ Nuageux</option>
+                    <option value="couvert">☁️ Couvert</option>
+                    <option value="pluie-legere">🌦️ Pluie légère</option>
+                    <option value="pluie">🌧️ Pluie</option>
+                    <option value="orage">⛈️ Orage</option>
+                    <option value="neige">❄️ Neige</option>
+                    <option value="brouillard">🌫️ Brouillard</option>
+                    <option value="vent">💨 Venteux</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Température (°C)
+                  </label>
+                  <input
+                    type="number"
+                    value={editForm.weatherTemperature}
+                    onChange={(e) => setEditForm({ ...editForm, weatherTemperature: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="ex: 18"
+                    min="-50"
+                    max="60"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Vitesse du vent (km/h)
+                  </label>
+                  <input
+                    type="number"
+                    value={editForm.weatherWindSpeed}
+                    onChange={(e) => setEditForm({ ...editForm, weatherWindSpeed: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="ex: 15"
+                    min="0"
+                    max="200"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Direction du vent (°)
+                  </label>
+                  <input
+                    type="number"
+                    value={editForm.weatherWindDirection}
+                    onChange={(e) => setEditForm({ ...editForm, weatherWindDirection: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="ex: 180 (Nord=0, Est=90, Sud=180, Ouest=270)"
+                    min="0"
+                    max="359"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                💡 La modification des conditions météo remplacera les données météo existantes pour cette sortie.
+              </p>
+            </div>
+
             {/* Note d'information */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800">
@@ -749,6 +878,65 @@ export default function ActivityDetail() {
           <p className="text-2xl font-bold text-accent-500">{activity.trimp || '-'}</p>
         </div>
       </div>
+
+      {/* Météo */}
+      {activity.weather && (() => {
+        try {
+          const weather: WeatherData = JSON.parse(activity.weather)
+          return (
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200 shadow-card mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                </svg>
+                Météo lors de l'activité
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <div className="flex items-center justify-center mb-2">
+                    <img
+                      src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                      alt={weather.description}
+                      className="w-16 h-16"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-600 text-center capitalize">{weather.description}</p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-gray-600 mb-1">Température</p>
+                  <p className="text-2xl font-bold text-gray-900">{weather.temperature}°C</p>
+                  <p className="text-xs text-gray-500">Ressenti: {weather.feelsLike}°C</p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-gray-600 mb-1">Vent</p>
+                  <p className="text-2xl font-bold text-gray-900">{weather.windSpeed} km/h</p>
+                  <p className="text-xs text-gray-500">Direction: {weather.windDirection}°</p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-gray-600 mb-1">Humidité</p>
+                  <p className="text-2xl font-bold text-gray-900">{weather.humidity}%</p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-gray-600 mb-1">Pression</p>
+                  <p className="text-2xl font-bold text-gray-900">{weather.pressure} hPa</p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-gray-600 mb-1">Nuages</p>
+                  <p className="text-2xl font-bold text-gray-900">{weather.clouds}%</p>
+                </div>
+              </div>
+            </div>
+          )
+        } catch (e) {
+          console.error('Error parsing weather data:', e)
+          return null
+        }
+      })()}
 
       {/* Carte GPS */}
       {gpsData.length > 0 && (

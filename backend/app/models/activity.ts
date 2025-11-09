@@ -80,6 +80,10 @@ export default class Activity extends BaseModel {
   @column()
   declare fileName: string | null
 
+  // Données météo (JSON)
+  @column()
+  declare weather: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

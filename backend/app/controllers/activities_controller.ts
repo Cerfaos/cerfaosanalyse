@@ -7,6 +7,7 @@ import * as FitParserModule from 'fit-file-parser'
 import * as GPXParser from 'gpxparser'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs/promises'
+import WeatherService from '#services/weather_service'
 
 // @ts-ignore - Double default export issue with fit-file-parser
 const FitParser = FitParserModule.default?.default || FitParserModule.default
@@ -111,6 +112,33 @@ export default class ActivitiesController {
       'normalizedPower',
     ])
 
+    // Vérifier s'il y a un fichier GPX pour les données GPS
+    const gpxFile = request.file('gpxFile', {
+      size: '10mb',
+      extnames: ['gpx'],
+    })
+
+    let gpsDataString: string | null = null
+    let parsedGpxData: ParsedActivity | null = null
+
+    // Si un fichier GPX est fourni, le parser pour extraire les données
+    if (gpxFile && gpxFile.isValid) {
+      try {
+        parsedGpxData = await this.parseGpxFile(gpxFile.tmpPath!)
+        gpsDataString = parsedGpxData.gpsData ? JSON.stringify(parsedGpxData.gpsData) : null
+      } catch (error) {
+        console.error('Error parsing GPX file:', error)
+        // Continue sans GPS data si le parsing échoue
+      }
+    }
+
+    // Utiliser les données du GPX si disponibles, sinon utiliser les données du formulaire
+    const finalDistance = parsedGpxData?.distance || Number(data.distance)
+    const finalDuration = parsedGpxData?.duration || Number(data.duration)
+    const finalElevationGain =
+      parsedGpxData?.elevationGain ||
+      (data.elevationGain ? Number(data.elevationGain) : null)
+
     // Convertir la date
     const activityDate = DateTime.fromISO(data.date)
 
@@ -118,32 +146,37 @@ export default class ActivitiesController {
     let trimp = null
     if (data.avgHeartRate && user.fcMax && user.fcRepos) {
       trimp = this.calculateTrimp(
-        Number(data.duration),
+        finalDuration,
         Number(data.avgHeartRate),
         user.fcMax,
         user.fcRepos
       )
     }
 
+    // Récupérer les données météo avec les coordonnées GPS si disponibles
+    const weatherService = new WeatherService()
+    const weatherData = await weatherService.getCurrentWeather(gpsDataString, activityDate)
+
     // Créer l'activité
     const activity = await Activity.create({
       userId: user.id,
       date: activityDate,
       type: data.type || 'Cyclisme',
-      duration: Number(data.duration),
-      distance: Number(data.distance),
+      duration: finalDuration,
+      distance: finalDistance,
       avgHeartRate: data.avgHeartRate ? Number(data.avgHeartRate) : null,
       maxHeartRate: data.maxHeartRate ? Number(data.maxHeartRate) : null,
       avgSpeed: data.avgSpeed ? Number(data.avgSpeed) : null,
       maxSpeed: data.maxSpeed ? Number(data.maxSpeed) : null,
-      elevationGain: data.elevationGain ? Number(data.elevationGain) : null,
+      elevationGain: finalElevationGain,
       calories: data.calories ? Number(data.calories) : null,
       avgCadence: data.avgCadence ? Number(data.avgCadence) : null,
       avgPower: data.avgPower ? Number(data.avgPower) : null,
       normalizedPower: data.normalizedPower ? Number(data.normalizedPower) : null,
       trimp,
-      fileName: null, // Pas de fichier pour une activité manuelle
-      gpsData: null,
+      fileName: gpxFile ? gpxFile.clientName : null,
+      gpsData: gpsDataString,
+      weather: weatherData ? JSON.stringify(weatherData) : null,
     })
 
     return response.created({
@@ -215,6 +248,11 @@ export default class ActivitiesController {
         )
       }
 
+      // Récupérer les données météo
+      const weatherService = new WeatherService()
+      const gpsDataString = parsedActivity.gpsData ? JSON.stringify(parsedActivity.gpsData) : null
+      const weatherData = await weatherService.getCurrentWeather(gpsDataString, parsedActivity.date)
+
       // Créer l'activité en base
       const activity = await Activity.create({
         userId: user.id,
@@ -232,8 +270,9 @@ export default class ActivitiesController {
         avgPower: parsedActivity.avgPower,
         normalizedPower: parsedActivity.normalizedPower,
         trimp: parsedActivity.trimp,
-        gpsData: parsedActivity.gpsData ? JSON.stringify(parsedActivity.gpsData) : null,
+        gpsData: gpsDataString,
         fileName: file.clientName,
+        weather: weatherData ? JSON.stringify(weatherData) : null,
       })
 
       return response.created({
@@ -317,6 +356,11 @@ export default class ActivitiesController {
         )
       }
 
+      // Récupérer les données météo
+      const weatherService = new WeatherService()
+      const gpsDataString = parsedActivity.gpsData ? JSON.stringify(parsedActivity.gpsData) : null
+      const weatherData = await weatherService.getCurrentWeather(gpsDataString, parsedActivity.date)
+
       // Mettre à jour l'activité avec les nouvelles données du fichier
       activity.merge({
         date: parsedActivity.date,
@@ -333,8 +377,9 @@ export default class ActivitiesController {
         avgPower: parsedActivity.avgPower,
         normalizedPower: parsedActivity.normalizedPower,
         trimp: parsedActivity.trimp,
-        gpsData: parsedActivity.gpsData ? JSON.stringify(parsedActivity.gpsData) : null,
+        gpsData: gpsDataString,
         fileName: file.clientName,
+        weather: weatherData ? JSON.stringify(weatherData) : null,
       })
 
       await activity.save()
@@ -444,14 +489,17 @@ export default class ActivitiesController {
     const endTime = DateTime.fromJSDate(new Date(track.points[track.points.length - 1].time))
     const duration = endTime.diff(startTime, 'seconds').seconds
 
+    // Note: GPXParser retourne la distance en mètres
+    const distanceInMeters = track.distance.total
+
     return {
       date: startTime,
       type: 'Cyclisme',
       duration,
-      distance: track.distance.total * 1000, // km -> m
+      distance: distanceInMeters, // déjà en mètres
       avgHeartRate: null,
       maxHeartRate: null,
-      avgSpeed: track.distance.total / (duration / 3600), // km/h
+      avgSpeed: (distanceInMeters / 1000) / (duration / 3600), // km/h
       maxSpeed: null,
       elevationGain: track.elevation.pos || null,
       calories: null,
@@ -569,6 +617,10 @@ export default class ActivitiesController {
       'calories',
       'equipmentId',
       'notes',
+      'weatherCondition',
+      'weatherTemperature',
+      'weatherWindSpeed',
+      'weatherWindDirection',
     ])
 
     // Convertir la date si fournie
@@ -589,6 +641,23 @@ export default class ActivitiesController {
     } else if (data.avgHeartRate && user.fcMax && user.fcRepos) {
       // Recalculer avec durée existante
       data.trimp = this.calculateTrimp(activity.duration, data.avgHeartRate, user.fcMax, user.fcRepos)
+    }
+
+    // Si une condition météo manuelle est fournie, créer les données météo
+    if (data.weatherCondition) {
+      const weatherService = new WeatherService()
+      const weatherData = weatherService.createManualWeather(
+        data.weatherCondition,
+        data.weatherTemperature ? Number(data.weatherTemperature) : undefined,
+        data.weatherWindSpeed ? Number(data.weatherWindSpeed) : undefined,
+        data.weatherWindDirection ? Number(data.weatherWindDirection) : undefined
+      )
+      data.weather = JSON.stringify(weatherData)
+      // Supprimer les champs temporaires
+      delete data.weatherCondition
+      delete data.weatherTemperature
+      delete data.weatherWindSpeed
+      delete data.weatherWindDirection
     }
 
     activity.merge(data)

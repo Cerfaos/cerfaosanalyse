@@ -2,6 +2,19 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
+interface WeatherData {
+  temperature: number
+  feelsLike: number
+  humidity: number
+  pressure: number
+  windSpeed: number
+  windDirection: number
+  description: string
+  icon: string
+  clouds: number
+  visibility: number
+}
+
 interface Activity {
   id: number
   date: string
@@ -19,6 +32,7 @@ interface Activity {
   normalizedPower: number | null
   trimp: number | null
   fileName: string | null
+  weather: string | null
   createdAt: string
 }
 
@@ -44,6 +58,7 @@ export default function Activities() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [manualGpxFile, setManualGpxFile] = useState<File | null>(null)
   const [filterType, setFilterType] = useState('')
   const [period, setPeriod] = useState('30')
   const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload')
@@ -158,26 +173,33 @@ export default function Activities() {
       // Convertir la distance en mètres
       const distance = Number(manualFormData.distance) * 1000
 
-      const payload: any = {
-        date: manualFormData.date,
-        type: manualFormData.type,
-        duration,
-        distance,
-      }
+      const formData = new FormData()
+      formData.append('date', manualFormData.date)
+      formData.append('type', manualFormData.type)
+      formData.append('duration', duration.toString())
+      formData.append('distance', distance.toString())
 
       // Ajouter les champs optionnels seulement s'ils sont remplis
-      if (manualFormData.avgHeartRate) payload.avgHeartRate = Number(manualFormData.avgHeartRate)
-      if (manualFormData.maxHeartRate) payload.maxHeartRate = Number(manualFormData.maxHeartRate)
-      if (manualFormData.avgSpeed) payload.avgSpeed = Number(manualFormData.avgSpeed)
-      if (manualFormData.maxSpeed) payload.maxSpeed = Number(manualFormData.maxSpeed)
-      if (manualFormData.elevationGain) payload.elevationGain = Number(manualFormData.elevationGain)
-      if (manualFormData.calories) payload.calories = Number(manualFormData.calories)
-      if (manualFormData.avgCadence) payload.avgCadence = Number(manualFormData.avgCadence)
-      if (manualFormData.avgPower) payload.avgPower = Number(manualFormData.avgPower)
-      if (manualFormData.normalizedPower)
-        payload.normalizedPower = Number(manualFormData.normalizedPower)
+      if (manualFormData.avgHeartRate) formData.append('avgHeartRate', manualFormData.avgHeartRate)
+      if (manualFormData.maxHeartRate) formData.append('maxHeartRate', manualFormData.maxHeartRate)
+      if (manualFormData.avgSpeed) formData.append('avgSpeed', manualFormData.avgSpeed)
+      if (manualFormData.maxSpeed) formData.append('maxSpeed', manualFormData.maxSpeed)
+      if (manualFormData.elevationGain) formData.append('elevationGain', manualFormData.elevationGain)
+      if (manualFormData.calories) formData.append('calories', manualFormData.calories)
+      if (manualFormData.avgCadence) formData.append('avgCadence', manualFormData.avgCadence)
+      if (manualFormData.avgPower) formData.append('avgPower', manualFormData.avgPower)
+      if (manualFormData.normalizedPower) formData.append('normalizedPower', manualFormData.normalizedPower)
 
-      await api.post('/api/activities/create', payload)
+      // Ajouter le fichier GPX s'il est présent
+      if (manualGpxFile) {
+        formData.append('gpxFile', manualGpxFile)
+      }
+
+      await api.post('/api/activities/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 
       setSuccess('Activité créée avec succès !')
       setManualFormData({
@@ -197,6 +219,11 @@ export default function Activities() {
         avgPower: '',
         normalizedPower: '',
       })
+      setManualGpxFile(null)
+
+      // Reset file input
+      const fileInput = document.getElementById('manual-gpx-file') as HTMLInputElement
+      if (fileInput) fileInput.value = ''
 
       // Recharger les données
       loadData()
@@ -442,7 +469,8 @@ export default function Activities() {
                     >
                       <option value="Cyclisme">Cyclisme</option>
                       <option value="Course">Course</option>
-                      <option value="Natation">Natation</option>
+                      <option value="Rameur">Rameur</option>
+                      <option value="Marche">Marche</option>
                     </select>
                   </div>
 
@@ -512,72 +540,219 @@ export default function Activities() {
                     />
                   </div>
 
-                  <div>
-                    <label htmlFor="manual-avgHR" className="block text-sm font-medium text-gray-700 mb-2">
-                      FC moyenne
-                    </label>
-                    <input
-                      type="number"
-                      id="manual-avgHR"
-                      min="0"
-                      placeholder="bpm"
-                      value={manualFormData.avgHeartRate}
-                      onChange={(e) =>
-                        setManualFormData({ ...manualFormData, avgHeartRate: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
+                  {/* Champs avancés (FC, Dénivelé, Calories) - seulement pour Cyclisme et Course */}
+                  {(manualFormData.type === 'Cyclisme' || manualFormData.type === 'Course') && (
+                    <>
+                      <div>
+                        <label htmlFor="manual-avgHR" className="block text-sm font-medium text-gray-700 mb-2">
+                          FC moyenne
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-avgHR"
+                          min="0"
+                          placeholder="bpm"
+                          value={manualFormData.avgHeartRate}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, avgHeartRate: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
 
-                  <div>
-                    <label htmlFor="manual-maxHR" className="block text-sm font-medium text-gray-700 mb-2">
-                      FC max
-                    </label>
-                    <input
-                      type="number"
-                      id="manual-maxHR"
-                      min="0"
-                      placeholder="bpm"
-                      value={manualFormData.maxHeartRate}
-                      onChange={(e) =>
-                        setManualFormData({ ...manualFormData, maxHeartRate: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
+                      <div>
+                        <label htmlFor="manual-maxHR" className="block text-sm font-medium text-gray-700 mb-2">
+                          FC max
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-maxHR"
+                          min="0"
+                          placeholder="bpm"
+                          value={manualFormData.maxHeartRate}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, maxHeartRate: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
 
-                  <div>
-                    <label htmlFor="manual-elevation" className="block text-sm font-medium text-gray-700 mb-2">
-                      Dénivelé (m)
-                    </label>
-                    <input
-                      type="number"
-                      id="manual-elevation"
-                      min="0"
-                      placeholder="Ex: 450"
-                      value={manualFormData.elevationGain}
-                      onChange={(e) =>
-                        setManualFormData({ ...manualFormData, elevationGain: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
+                      <div>
+                        <label htmlFor="manual-elevation" className="block text-sm font-medium text-gray-700 mb-2">
+                          Dénivelé (m)
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-elevation"
+                          min="0"
+                          placeholder="Ex: 450"
+                          value={manualFormData.elevationGain}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, elevationGain: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
 
-                  <div>
-                    <label htmlFor="manual-calories" className="block text-sm font-medium text-gray-700 mb-2">
-                      Calories
+                      <div>
+                        <label htmlFor="manual-calories" className="block text-sm font-medium text-gray-700 mb-2">
+                          Calories
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-calories"
+                          min="0"
+                          placeholder="kcal"
+                          value={manualFormData.calories}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, calories: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Champ Calories uniquement pour Rameur et Marche */}
+                  {(manualFormData.type === 'Rameur' || manualFormData.type === 'Marche') && (
+                    <div>
+                      <label htmlFor="manual-calories" className="block text-sm font-medium text-gray-700 mb-2">
+                        Calories
+                      </label>
+                      <input
+                        type="number"
+                        id="manual-calories"
+                        min="0"
+                        placeholder="kcal"
+                        value={manualFormData.calories}
+                        onChange={(e) =>
+                          setManualFormData({ ...manualFormData, calories: e.target.value })
+                        }
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  )}
+
+                  {/* Champs spécifiques au Cyclisme et Course */}
+                  {(manualFormData.type === 'Cyclisme' || manualFormData.type === 'Course') && (
+                    <>
+                      <div>
+                        <label htmlFor="manual-avgSpeed" className="block text-sm font-medium text-gray-700 mb-2">
+                          Vitesse moyenne (km/h)
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-avgSpeed"
+                          step="0.1"
+                          min="0"
+                          placeholder="km/h"
+                          value={manualFormData.avgSpeed}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, avgSpeed: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="manual-maxSpeed" className="block text-sm font-medium text-gray-700 mb-2">
+                          Vitesse max (km/h)
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-maxSpeed"
+                          step="0.1"
+                          min="0"
+                          placeholder="km/h"
+                          value={manualFormData.maxSpeed}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, maxSpeed: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="manual-avgCadence" className="block text-sm font-medium text-gray-700 mb-2">
+                          Cadence moyenne (rpm/spm)
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-avgCadence"
+                          min="0"
+                          placeholder="rpm/spm"
+                          value={manualFormData.avgCadence}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, avgCadence: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="manual-avgPower" className="block text-sm font-medium text-gray-700 mb-2">
+                          Puissance moyenne (W)
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-avgPower"
+                          min="0"
+                          placeholder="watts"
+                          value={manualFormData.avgPower}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, avgPower: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="manual-normalizedPower" className="block text-sm font-medium text-gray-700 mb-2">
+                          Puissance normalisée (W)
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-normalizedPower"
+                          min="0"
+                          placeholder="watts"
+                          value={manualFormData.normalizedPower}
+                          onChange={(e) =>
+                            setManualFormData({ ...manualFormData, normalizedPower: e.target.value })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="col-span-2">
+                    <label htmlFor="manual-gpx-file" className="block text-sm font-medium text-gray-700 mb-2">
+                      Fichier GPX (optionnel)
                     </label>
                     <input
-                      type="number"
-                      id="manual-calories"
-                      min="0"
-                      placeholder="kcal"
-                      value={manualFormData.calories}
-                      onChange={(e) =>
-                        setManualFormData({ ...manualFormData, calories: e.target.value })
-                      }
+                      type="file"
+                      id="manual-gpx-file"
+                      accept=".gpx"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setManualGpxFile(e.target.files[0])
+                        }
+                      }}
                       className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
+                    <p className="text-sm text-gray-500 mt-2">
+                      📍 Si vous fournissez un fichier GPX, la distance, la durée et le dénivelé seront extraits automatiquement du fichier et remplaceront les valeurs saisies manuellement. Le fichier permet aussi d'obtenir la météo exacte de votre localisation.
+                    </p>
+                    {manualGpxFile && (
+                      <div className="bg-green-50 border border-green-200 p-3 rounded-md mt-2">
+                        <p className="text-sm text-green-800">
+                          ✓ Fichier sélectionné: <strong>{manualGpxFile.name}</strong>
+                        </p>
+                        <p className="text-xs text-green-700 mt-1">
+                          Les données GPS (distance, durée, dénivelé) du fichier seront utilisées en priorité
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -635,7 +810,8 @@ export default function Activities() {
                   <option value="">Tous les types</option>
                   <option value="Cyclisme">Cyclisme</option>
                   <option value="Course">Course</option>
-                  <option value="Natation">Natation</option>
+                  <option value="Rameur">Rameur</option>
+                  <option value="Marche">Marche</option>
                 </select>
               </div>
             </div>
@@ -694,7 +870,7 @@ export default function Activities() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
                         <div>
                           <p className="text-text-tertiary">Distance</p>
                           <p className="font-medium text-text-dark">
@@ -718,6 +894,36 @@ export default function Activities() {
                           <p className="font-medium text-accent-500">
                             {activity.trimp || '-'}
                           </p>
+                        </div>
+                        <div>
+                          <p className="text-text-tertiary">Météo</p>
+                          {activity.weather && (() => {
+                            try {
+                              const weather: WeatherData = JSON.parse(activity.weather)
+                              return (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1">
+                                    <img
+                                      src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+                                      alt={weather.description}
+                                      className="w-6 h-6"
+                                    />
+                                    <p className="font-medium text-text-dark">
+                                      {Math.round(weather.temperature)}°C
+                                    </p>
+                                  </div>
+                                  <p className="text-xs text-text-tertiary capitalize">
+                                    {weather.description}
+                                  </p>
+                                  <p className="text-xs text-text-tertiary">
+                                    💨 {weather.windSpeed} km/h ({weather.windDirection}°)
+                                  </p>
+                                </div>
+                              )
+                            } catch (e) {
+                              return <p className="font-medium text-text-dark">-</p>
+                            }
+                          })() || <p className="font-medium text-text-dark">-</p>}
                         </div>
                       </div>
                     </div>

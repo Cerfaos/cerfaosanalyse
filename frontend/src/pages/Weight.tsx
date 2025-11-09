@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -23,6 +23,7 @@ interface WeightStats {
 }
 
 export default function Weight() {
+  const formRef = useRef<HTMLDivElement>(null)
   const [weightHistories, setWeightHistories] = useState<WeightEntry[]>([])
   const [stats, setStats] = useState<WeightStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -124,13 +125,38 @@ export default function Weight() {
     return 'text-text-tertiary'
   }
 
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // Focus sur l'input weight pour améliorer l'UX
+      setTimeout(() => {
+        const weightInput = document.getElementById('weight')
+        if (weightInput) {
+          weightInput.focus()
+        }
+      }, 500)
+    }
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-dark mb-2">Suivi du poids</h1>
-        <p className="text-text-secondary">
-          Enregistrez vos pesées et suivez votre évolution
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Suivi du poids</h1>
+          <p className="text-gray-600">
+            Enregistrez vos pesées et suivez votre évolution
+          </p>
+        </div>
+        <button
+          onClick={scrollToForm}
+          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap border-2 border-blue-600 hover:border-blue-700"
+          style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#ffffff' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Enregistrer une pesée
+        </button>
       </div>
 
       {success && (
@@ -183,7 +209,7 @@ export default function Weight() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Formulaire */}
-        <div className="lg:col-span-1">
+        <div ref={formRef} className="lg:col-span-1" id="weight-form">
           <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
             <h2 className="text-xl font-semibold text-text-dark mb-6">
               Nouvelle pesée
@@ -239,7 +265,7 @@ export default function Weight() {
               <button
                 type="submit"
                 disabled={formLoading}
-                className="w-full px-6 py-3 bg-accent-500 text-white rounded-md hover:bg-accent-600 shadow-button hover:shadow-button-hover transition-all font-medium disabled:opacity-50"
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {formLoading ? 'Enregistrement...' : 'Enregistrer'}
               </button>
