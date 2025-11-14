@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import api from '../services/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import api from '../services/api'
+import AppLayout from '../components/layout/AppLayout'
 
 interface WeightEntry {
   id: number
@@ -78,11 +79,9 @@ export default function Weight() {
         weight: '',
         notes: '',
       })
-
-      // Recharger les données
       loadData()
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de l\'enregistrement')
+      setError(err.response?.data?.message || "Erreur lors de l'enregistrement")
     } finally {
       setFormLoading(false)
     }
@@ -119,269 +118,186 @@ export default function Weight() {
   }
 
   const getTrendColor = (trend: number | null) => {
-    if (trend === null) return 'text-text-tertiary'
-    if (trend > 0) return 'text-red-600'
-    if (trend < 0) return 'text-green-600'
-    return 'text-text-tertiary'
+    if (trend === null) return 'text-text-muted'
+    if (trend > 0) return 'text-error'
+    if (trend < 0) return 'text-success'
+    return 'text-text-muted'
   }
 
   const scrollToForm = () => {
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      // Focus sur l'input weight pour améliorer l'UX
       setTimeout(() => {
         const weightInput = document.getElementById('weight')
-        if (weightInput) {
-          weightInput.focus()
-        }
-      }, 500)
+        if (weightInput) weightInput.focus()
+      }, 400)
     }
   }
 
+  const actions = (
+    <button onClick={scrollToForm} className="btn-primary font-display">
+      Enregistrer une pesée
+    </button>
+  )
+
+  if (loading) {
+    return (
+      <AppLayout title="Suivi du poids" description="Chargement des données" actions={actions}>
+        <div className="glass-panel p-6 text-center text-text-secondary">Chargement...</div>
+      </AppLayout>
+    )
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Suivi du poids</h1>
-          <p className="text-gray-600">
-            Enregistrez vos pesées et suivez votre évolution
-          </p>
-        </div>
-        <button
-          onClick={scrollToForm}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap border-2 border-blue-600 hover:border-blue-700"
-          style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#ffffff' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Enregistrer une pesée
-        </button>
-      </div>
+    <AppLayout title="Suivi du poids" description="Enregistrez vos pesées et suivez vos tendances" actions={actions}>
+      <div className="space-y-8">
+        {success && <div className="glass-panel border-success/30 text-success px-4 py-3">{success}</div>}
+        {error && <div className="glass-panel border-error/30 text-error px-4 py-3">{error}</div>}
 
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-6">
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
-          {error}
-        </div>
-      )}
-
-      {/* Statistiques */}
-      {stats && stats.count > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Poids actuel</p>
-            <p className="text-3xl font-bold text-accent-500">
-              {stats.current ? `${stats.current} kg` : '-'}
-            </p>
+        {stats && stats.count > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="glass-panel p-6">
+              <p className="text-sm text-text-secondary mb-1">Poids actuel</p>
+              <p className="text-3xl font-semibold text-brand">{stats.current ? `${stats.current} kg` : '-'}</p>
+            </div>
+            <div className="glass-panel p-6">
+              <p className="text-sm text-text-secondary mb-1">Moyenne</p>
+              <p className="text-3xl font-semibold text-text-dark">{stats.average ? `${stats.average} kg` : '-'}</p>
+              <p className="text-xs text-text-muted mt-1">Min: {stats.min} kg · Max: {stats.max} kg</p>
+            </div>
+            <div className="glass-panel p-6">
+              <p className="text-sm text-text-secondary mb-1">Tendance 30j</p>
+              <p className={`text-3xl font-semibold ${getTrendColor(stats.trend30Days)}`}>{getTrendText(stats.trend30Days)}</p>
+            </div>
+            <div className="glass-panel p-6">
+              <p className="text-sm text-text-secondary mb-1">Tendance 90j</p>
+              <p className={`text-3xl font-semibold ${getTrendColor(stats.trend90Days)}`}>{getTrendText(stats.trend90Days)}</p>
+            </div>
           </div>
+        )}
 
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Moyenne</p>
-            <p className="text-3xl font-bold text-text-dark">
-              {stats.average ? `${stats.average} kg` : '-'}
-            </p>
-            <p className="text-xs text-text-tertiary mt-1">
-              Min: {stats.min} kg · Max: {stats.max} kg
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Tendance 30j</p>
-            <p className={`text-3xl font-bold ${getTrendColor(stats.trend30Days)}`}>
-              {getTrendText(stats.trend30Days)}
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Tendance 90j</p>
-            <p className={`text-3xl font-bold ${getTrendColor(stats.trend90Days)}`}>
-              {getTrendText(stats.trend90Days)}
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Formulaire */}
-        <div ref={formRef} className="lg:col-span-1" id="weight-form">
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <h2 className="text-xl font-semibold text-text-dark mb-6">
-              Nouvelle pesée
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="date" className="block text-sm font-medium text-text-body mb-2">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  required
-                  className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="weight" className="block text-sm font-medium text-text-body mb-2">
-                  Poids (kg)
-                </label>
-                <input
-                  type="number"
-                  id="weight"
-                  step="0.1"
-                  min="30"
-                  max="300"
-                  value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                  required
-                  className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                  placeholder="Ex: 70.5"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-text-body mb-2">
-                  Notes (optionnel)
-                </label>
-                <textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                  placeholder="Commentaires..."
-                />
-              </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div ref={formRef} className="lg:col-span-1" id="weight-form">
+            <div className="glass-panel p-6">
+              <h2 className="text-xl font-semibold text-text-dark mb-6">Nouvelle pesée</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="date" className="block text-sm font-medium text-text-body mb-2">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    id="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    required
+                    className="w-full px-4 py-3 border border-border-base rounded-lg focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="weight" className="block text-sm font-medium text-text-body mb-2">
+                    Poids (kg)
+                  </label>
+                  <input
+                    type="number"
+                    id="weight"
+                    step="0.1"
+                    min="30"
+                    max="300"
+                    value={formData.weight}
+                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                    required
+                    className="w-full px-4 py-3 border border-border-base rounded-lg focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="notes" className="block text-sm font-medium text-text-body mb-2">
+                    Notes
+                  </label>
+                  <textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-border-base rounded-lg focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none"
+                    placeholder="Comment vous sentez-vous ?"
+                  ></textarea>
+                </div>
               <button
                 type="submit"
                 disabled={formLoading}
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full"
               >
-                {formLoading ? 'Enregistrement...' : 'Enregistrer'}
+                {formLoading ? 'Enregistrement...' : 'Ajouter la pesée'}
               </button>
-            </form>
+              </form>
+            </div>
+          </div>
+          <div className="lg:col-span-2">
+            <div className="glass-panel p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-text-dark">Évolution</h2>
+                  <p className="text-sm text-text-muted">Sur vos 30 dernières entrées</p>
+                </div>
+              </div>
+              {weightHistories.length > 0 ? (
+                <div className="h-64 w-full min-w-0">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={240} minHeight={260}>
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                      <XAxis dataKey="date" stroke="#9CA3AF" />
+                      <YAxis domain={['dataMin - 2', 'dataMax + 2']} stroke="#9CA3AF" />
+                      <Tooltip formatter={(value: number) => `${value} kg`} labelFormatter={(label) => `Date: ${label}`} />
+                      <Line type="monotone" dataKey="poids" stroke="#E69875" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-center text-text-muted">Pas encore de données</p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Graphique et liste */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Graphique */}
-          {chartData.length > 0 && (
-            <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-              <h2 className="text-xl font-semibold text-text-dark mb-6">
-                Évolution du poids
-              </h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="date" stroke="#6B7280" style={{ fontSize: '12px' }} />
-                  <YAxis stroke="#6B7280" style={{ fontSize: '12px' }} domain={['dataMin - 2', 'dataMax + 2']} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#fff',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '6px',
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="poids"
-                    stroke="#3B82F6"
-                    strokeWidth={2}
-                    dot={{ fill: '#3B82F6', r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+        <div>
+          <h2 className="text-2xl font-semibold text-text-dark mb-4">Historique des pesées</h2>
+          <div className="glass-panel p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-border-base">
+                <thead className="bg-bg-gray-100">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Poids</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Notes</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-bg-white divide-y divide-border-base">
+                  {weightHistories.map((entry) => (
+                    <tr key={entry.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark">
+                        {new Date(entry.date).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">{entry.weight} kg</td>
+                      <td className="px-6 py-4 text-sm text-text-body">{entry.notes || '—'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onClick={() => handleDelete(entry.id)} className="text-error hover:text-error-dark">
+                          Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
-
-          {/* Liste */}
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <h2 className="text-xl font-semibold text-text-dark mb-6">Historique</h2>
-
-            {loading ? (
-              <p className="text-center text-text-secondary py-8">Chargement...</p>
-            ) : weightHistories.length === 0 ? (
-              <div className="text-center py-12">
-                <svg
-                  className="w-16 h-16 text-text-tertiary mx-auto mb-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-                  />
-                </svg>
-                <p className="text-text-secondary">Aucune pesée enregistrée</p>
-                <p className="text-sm text-text-tertiary mt-2">
-                  Ajoutez votre première pesée pour commencer le suivi
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {weightHistories.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex items-center justify-between p-4 border border-border-base rounded-md hover:bg-bg-gray-50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4">
-                        <p className="font-semibold text-text-dark text-lg">
-                          {entry.weight} kg
-                        </p>
-                        <p className="text-sm text-text-secondary">
-                          {new Date(entry.date).toLocaleDateString('fr-FR', {
-                            day: '2-digit',
-                            month: 'long',
-                            year: 'numeric',
-                          })}
-                        </p>
-                      </div>
-                      {entry.notes && (
-                        <p className="text-sm text-text-tertiary mt-1">{entry.notes}</p>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleDelete(entry.id)}
-                      className="text-red-600 hover:text-red-700 transition-colors p-2"
-                      title="Supprimer"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }

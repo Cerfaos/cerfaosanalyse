@@ -1,5 +1,9 @@
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
+import app from '@adonisjs/core/services/app'
+import { cuid } from '@adonisjs/core/helpers'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 
 export default class UsersController {
   /**
@@ -44,6 +48,7 @@ export default class UsersController {
         fcRepos: user.fcRepos,
         weightCurrent: user.weightCurrent,
         theme: user.theme,
+        avatarUrl: user.avatarUrl,
       },
     })
   }
@@ -106,6 +111,52 @@ export default class UsersController {
         fcRepos: user.fcRepos,
         fcReserve: fcReserve,
         zones: zones,
+      },
+    })
+  }
+
+  async uploadAvatar({ auth, request, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const avatar = request.file('avatar', {
+      size: '5mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'] as const,
+    })
+
+    if (!avatar) {
+      return response.badRequest({ message: 'Aucun fichier détecté' })
+    }
+
+    if (!avatar.isValid) {
+      return response.badRequest({ message: avatar.errors?.[0]?.message || 'Fichier invalide' })
+    }
+
+    const uploadsDir = app.makePath('public/uploads/avatars')
+    await fs.mkdir(uploadsDir, { recursive: true })
+
+    const fileName = `${cuid()}.${avatar.extname}`
+    await avatar.move(uploadsDir, {
+      name: fileName,
+      overwrite: true,
+    })
+
+    const relativePath = `/uploads/avatars/${fileName}`
+
+    if (user.avatarUrl && user.avatarUrl.startsWith('/uploads/avatars/')) {
+      const relative = user.avatarUrl.replace(/^\//, '')
+      try {
+        await fs.unlink(app.makePath('public', relative))
+      } catch (error) {
+        console.warn('Impossible de supprimer l\'ancien avatar:', error)
+      }
+    }
+
+    user.avatarUrl = relativePath
+    await user.save()
+
+    return response.ok({
+      message: 'Avatar mis à jour',
+      data: {
+        avatarUrl: relativePath,
       },
     })
   }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import AppLayout from '../components/layout/AppLayout'
 
 interface ExportStats {
   totalActivities: number
@@ -62,45 +63,45 @@ export default function Export() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Chargement...</div>
-      </div>
+      <AppLayout title="Export de données" description="Préparation des statistiques">
+        <div className="glass-panel p-6 text-center text-text-secondary">Chargement...</div>
+      </AppLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Export de données</h1>
-          <p className="mt-2 text-gray-600">
+    <AppLayout title="Export de données" description="Sauvegardez vos données en JSON ou CSV">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="glass-panel p-6">
+          <h1 className="text-3xl font-bold text-text-dark font-display">Export de données</h1>
+          <p className="mt-2 text-text-body">
             Exportez vos données pour les sauvegarder ou les analyser dans d'autres outils
           </p>
         </div>
 
         {/* Statistiques */}
         {stats && (
-          <div className="bg-white p-6 rounded-lg shadow mb-8">
-            <h2 className="text-xl font-semibold mb-4">Vos données</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-3xl font-bold text-blue-600">{stats.totalActivities}</div>
-                <div className="text-sm text-gray-600 mt-1">Activités</div>
+          <div className="glass-panel p-6 space-y-6">
+            <h2 className="text-xl font-semibold mb-4 font-display">Vos données</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="glass-panel p-4 text-center">
+                <div className="text-3xl font-bold text-cta">{stats.totalActivities}</div>
+                <div className="text-sm text-text-body mt-1">Activités</div>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-3xl font-bold text-green-600">{stats.totalWeightEntries}</div>
-                <div className="text-sm text-gray-600 mt-1">Pesées</div>
+              <div className="glass-panel p-4 text-center">
+                <div className="text-3xl font-bold text-brand">{stats.totalWeightEntries}</div>
+                <div className="text-sm text-text-body mt-1">Pesées</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <div className="text-3xl font-bold text-purple-600">{stats.totalEquipment}</div>
-                <div className="text-sm text-gray-600 mt-1">Équipements</div>
+              <div className="glass-panel p-4 text-center">
+                <div className="text-3xl font-bold text-accent">{stats.totalEquipment}</div>
+                <div className="text-sm text-text-body mt-1">Équipements</div>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="pt-6 border-t border-border-base grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               {stats.firstActivityDate && (
                 <div>
-                  <span className="text-gray-600">Première activité: </span>
+                  <span className="text-text-body">Première activité: </span>
                   <span className="font-medium">
                     {new Date(stats.firstActivityDate).toLocaleDateString('fr-FR')}
                   </span>
@@ -108,14 +109,14 @@ export default function Export() {
               )}
               {stats.lastActivityDate && (
                 <div>
-                  <span className="text-gray-600">Dernière activité: </span>
+                  <span className="text-text-body">Dernière activité: </span>
                   <span className="font-medium">
                     {new Date(stats.lastActivityDate).toLocaleDateString('fr-FR')}
                   </span>
                 </div>
               )}
               <div>
-                <span className="text-gray-600">Membre depuis: </span>
+                <span className="text-text-body">Membre depuis: </span>
                 <span className="font-medium">
                   {new Date(stats.memberSince).toLocaleDateString('fr-FR')}
                 </span>
@@ -125,15 +126,15 @@ export default function Export() {
         )}
 
         {/* Export complet */}
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
+        <div className="glass-panel p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Export complet (JSON)</h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <h3 className="text-lg font-semibold text-text-dark mb-2">Export complet (JSON)</h3>
+              <p className="text-sm text-text-body mb-4">
                 Téléchargez toutes vos données (profil, activités, poids, équipement) dans un
                 fichier JSON unique. Idéal pour les sauvegardes complètes.
               </p>
-              <ul className="text-sm text-gray-500 space-y-1 mb-4">
+              <ul className="text-sm text-text-secondary space-y-1 mb-4">
                 <li>✓ Profil utilisateur</li>
                 <li>✓ Toutes les activités</li>
                 <li>✓ Historique de poids</li>
@@ -143,7 +144,7 @@ export default function Export() {
             <button
               onClick={() => handleDownload('/all', getFileName('export', 'json'))}
               disabled={downloading === '/all'}
-              className="ml-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed whitespace-nowrap"
+              className="btn-primary ml-4 whitespace-nowrap font-display"
             >
               {downloading === '/all' ? 'Téléchargement...' : 'Télécharger JSON'}
             </button>
@@ -151,19 +152,19 @@ export default function Export() {
         </div>
 
         {/* Exports CSV */}
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="glass-panel p-6">
           <h2 className="text-xl font-semibold mb-4">Exports CSV</h2>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-text-body mb-6">
             Exportez vos données au format CSV pour les ouvrir dans Excel, Google Sheets ou d'autres
             outils d'analyse.
           </p>
 
           <div className="space-y-4">
             {/* Activités CSV */}
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between p-4 border border-border-base rounded-lg hover:bg-bg-gray-50 transition-colors">
               <div>
-                <h4 className="font-medium text-gray-900">Activités</h4>
-                <p className="text-sm text-gray-500">
+                <h4 className="font-medium text-text-dark">Activités</h4>
+                <p className="text-sm text-text-secondary">
                   Date, type, durée, distance, FC, vitesse, puissance, TRIMP, etc.
                 </p>
               </div>
@@ -172,39 +173,39 @@ export default function Export() {
                   handleDownload('/activities/csv', getFileName('activities', 'csv'))
                 }
                 disabled={downloading === '/activities/csv'}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
+                className="btn-primary px-6"
               >
                 {downloading === '/activities/csv' ? 'Téléchargement...' : 'CSV'}
               </button>
             </div>
 
             {/* Poids CSV */}
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between p-4 border border-border-base rounded-lg hover:bg-bg-gray-50 transition-colors">
               <div>
-                <h4 className="font-medium text-gray-900">Historique de poids</h4>
-                <p className="text-sm text-gray-500">Date, poids, notes</p>
+                <h4 className="font-medium text-text-dark">Historique de poids</h4>
+                <p className="text-sm text-text-secondary">Date, poids, notes</p>
               </div>
               <button
                 onClick={() => handleDownload('/weight/csv', getFileName('weight', 'csv'))}
                 disabled={downloading === '/weight/csv'}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
+                className="btn-primary px-6"
               >
                 {downloading === '/weight/csv' ? 'Téléchargement...' : 'CSV'}
               </button>
             </div>
 
             {/* Équipement CSV */}
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between p-4 border border-border-base rounded-lg hover:bg-bg-gray-50 transition-colors">
               <div>
-                <h4 className="font-medium text-gray-900">Équipement</h4>
-                <p className="text-sm text-gray-500">
+                <h4 className="font-medium text-text-dark">Équipement</h4>
+                <p className="text-sm text-text-secondary">
                   Nom, type, marque, modèle, kilométrage, dates
                 </p>
               </div>
               <button
                 onClick={() => handleDownload('/equipment/csv', getFileName('equipment', 'csv'))}
                 disabled={downloading === '/equipment/csv'}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
+                className="btn-primary px-6"
               >
                 {downloading === '/equipment/csv' ? 'Téléchargement...' : 'CSV'}
               </button>
@@ -213,9 +214,9 @@ export default function Export() {
         </div>
 
         {/* Informations */}
-        <div className="mt-8 bg-blue-50 p-6 rounded-lg border border-blue-200">
-          <h3 className="font-semibold text-blue-900 mb-3">À propos des exports</h3>
-          <div className="space-y-2 text-sm text-blue-800">
+        <div className="glass-panel p-6 border border-info bg-info-light/70">
+          <h3 className="font-semibold text-text-dark mb-3 font-display">À propos des exports</h3>
+          <div className="space-y-2 text-sm text-info-dark">
             <p>
               <strong>Format JSON :</strong> Contient toutes vos données dans un format structuré.
               Parfait pour les sauvegardes ou l'import dans d'autres applications.
@@ -225,12 +226,12 @@ export default function Export() {
               sont encodés en UTF-8 avec BOM pour une compatibilité maximale.
             </p>
             <p>
-              <strong>Confidentialité :</strong> Vos données ne quittent jamais votre appareil. Les
-              exports sont générés côté serveur et téléchargés directement.
+              <strong>Confidentialité :</strong> Vos données restent hébergées localement. Les exports
+              sont générés côté serveur Cerfao et téléchargés directement.
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3333'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -29,5 +29,16 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+// Fonction utilitaire pour générer l'URL complète d'un avatar
+export const getAvatarUrl = (avatarUrl: string | null | undefined): string => {
+  if (!avatarUrl) return ''
+  // Si l'URL commence par http:// ou https://, c'est déjà une URL complète
+  if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+    return avatarUrl
+  }
+  // Sinon, préfixer avec l'URL du backend
+  return `${API_BASE_URL}${avatarUrl.startsWith('/') ? '' : '/'}${avatarUrl}`
+}
 
 export default api

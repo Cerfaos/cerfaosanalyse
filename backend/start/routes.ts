@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import app from '@adonisjs/core/services/app'
 
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
@@ -24,6 +25,13 @@ router.get('/', async () => {
     version: '1.0.0',
     status: 'running',
   }
+})
+
+// Servir les fichiers statiques (uploads)
+router.get('/uploads/*', async ({ params, response }) => {
+  const filePath = params['*'].join('/')
+  const absolutePath = app.makePath('public', 'uploads', filePath)
+  return response.download(absolutePath)
 })
 
 // Routes d'authentification (publiques)
@@ -48,6 +56,7 @@ router
   .group(() => {
     router.patch('/profile', [UsersController, 'updateProfile'])
     router.get('/hr-zones', [UsersController, 'getHeartRateZones'])
+    router.post('/avatar', [UsersController, 'uploadAvatar'])
   })
   .prefix('/api/users')
   .use(middleware.auth())

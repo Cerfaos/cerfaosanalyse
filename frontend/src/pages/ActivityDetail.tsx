@@ -263,12 +263,25 @@ export default function ActivityDetail() {
   }
 
   const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
+    const totalSeconds = Math.round(seconds)
+    let hours = Math.floor(totalSeconds / 3600)
+    let minutes = Math.floor((totalSeconds % 3600) / 60)
+    let secs = totalSeconds % 60
+
+    if (secs === 60) {
+      secs = 0
+      minutes += 1
+    }
+
+    if (minutes === 60) {
+      minutes = 0
+      hours += 1
+    }
 
     if (hours > 0) {
-      return `${hours}h ${minutes.toString().padStart(2, '0')}min ${secs.toString().padStart(2, '0')}s`
+      return `${hours}h ${minutes.toString().padStart(2, '0')}min ${secs
+        .toString()
+        .padStart(2, '0')}s`
     }
     return `${minutes}min ${secs.toString().padStart(2, '0')}s`
   }
@@ -276,6 +289,11 @@ export default function ActivityDetail() {
   const formatDistance = (meters: number) => {
     const km = meters / 1000
     return `${km.toFixed(2)} km`
+  }
+
+  const formatElevation = (value: number | null | undefined) => {
+    if (value === null || value === undefined) return '-'
+    return `${value.toFixed(2)} m`
   }
 
   const formatSpeed = (kmh: number | null) => {
@@ -358,7 +376,7 @@ export default function ActivityDetail() {
       <div className="mb-8">
         <button
           onClick={() => navigate('/activities')}
-          className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
+          className="text-cta hover:text-cta/80 mb-4 flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -367,21 +385,21 @@ export default function ActivityDetail() {
         </button>
 
         {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-6">
+          <div className="glass-panel border border-success/40 text-success px-4 py-3 mb-6">
             {success}
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
+          <div className="glass-panel border border-danger/40 text-danger px-4 py-3 mb-6">
             {error}
           </div>
         )}
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{activity.type}</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-text-dark mb-2">{activity.type}</h1>
+            <p className="text-text-body">
               {new Date(activity.date).toLocaleDateString('fr-FR', {
                 weekday: 'long',
                 day: 'numeric',
@@ -390,7 +408,7 @@ export default function ActivityDetail() {
               })}
             </p>
             {activity.fileName && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-text-secondary mt-1">
                 Fichier: {activity.fileName}
               </p>
             )}
@@ -399,15 +417,12 @@ export default function ActivityDetail() {
             {activity.fileName && (
               <button
                 onClick={() => setIsReplacingFile(true)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
+                className="btn-secondary"
               >
                 Remplacer le fichier
               </button>
             )}
-            <button
-              onClick={startEditing}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
+            <button onClick={startEditing} className="btn-primary">
               Modifier l'activité
             </button>
           </div>
@@ -417,15 +432,15 @@ export default function ActivityDetail() {
       {/* Modal de remplacement de fichier */}
       {isReplacingFile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Remplacer le fichier</h2>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="glass-panel p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h2 className="text-xl font-semibold text-text-dark mb-4">Remplacer le fichier</h2>
+            <p className="text-sm text-text-body mb-4">
               Le remplacement du fichier mettra à jour toutes les données de l'activité (durée, distance, GPS, etc.) avec les nouvelles données du fichier.
             </p>
 
             <form onSubmit={handleReplaceFile} className="space-y-4">
               <div>
-                <label htmlFor="replacement-file" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="replacement-file" className="block text-sm font-medium text-text-body mb-2">
                   Nouveau fichier
                 </label>
                 <input
@@ -434,17 +449,17 @@ export default function ActivityDetail() {
                   accept=".fit,.gpx,.csv"
                   onChange={handleFileChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-border-base rounded-md focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
                 />
-                <p className="text-sm text-gray-500 mt-2">Formats acceptés: FIT, GPX, CSV</p>
+                <p className="text-sm text-text-secondary mt-2">Formats acceptés: FIT, GPX, CSV</p>
               </div>
 
               {replacementFile && (
-                <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-info-light border border-info p-3 rounded-md">
+                  <p className="text-sm text-info-dark">
                     Fichier sélectionné: <strong>{replacementFile.name}</strong>
                   </p>
-                  <p className="text-xs text-blue-600 mt-1">
+                  <p className="text-xs text-text-muted mt-1">
                     Taille: {(replacementFile.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
@@ -457,14 +472,14 @@ export default function ActivityDetail() {
                     setIsReplacingFile(false)
                     setReplacementFile(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-4 py-2 bg-bg-gray-100 text-text-body rounded-lg hover:bg-bg-gray-200 transition-colors"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={uploadingFile || !replacementFile}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-gradient-sport text-white dark:text-white rounded-lg hover:shadow-glow-green transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {uploadingFile ? 'Remplacement...' : 'Remplacer'}
                 </button>
@@ -476,21 +491,21 @@ export default function ActivityDetail() {
 
       {/* Formulaire d'édition */}
       {isEditing && (
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-lg border border-blue-200">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Modifier l'activité</h2>
+        <div className="mb-8 bg-white p-6 rounded-lg shadow-lg border border-info">
+          <h2 className="text-2xl font-bold mb-4 text-text-dark">Modifier l'activité</h2>
           <form onSubmit={handleSubmitEdit} className="space-y-6">
             {/* Section Informations générales */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Informations générales</h3>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Informations générales</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Type *
                   </label>
                   <select
                     value={editForm.type}
                     onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     required
                   >
                     <option value="Cyclisme">Cyclisme</option>
@@ -502,20 +517,20 @@ export default function ActivityDetail() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Date *
                   </label>
                   <input
                     type="date"
                     value={editForm.date}
                     onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Distance (km) *
                   </label>
                   <input
@@ -523,11 +538,11 @@ export default function ActivityDetail() {
                     step="0.01"
                     value={editForm.distanceKm}
                     onChange={(e) => setEditForm({ ...editForm, distanceKm: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     required
                     min="0"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-text-secondary mt-1">
                     {Number(editForm.distanceKm).toFixed(2)} km = {(Number(editForm.distanceKm) * 1000).toFixed(0)} m
                   </p>
                 </div>
@@ -535,7 +550,7 @@ export default function ActivityDetail() {
 
               {/* Durée en 3 champs séparés */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-body mb-2">
                   Durée (HH:MM:SS) *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -544,41 +559,41 @@ export default function ActivityDetail() {
                       type="number"
                       value={editForm.durationHours}
                       onChange={(e) => setEditForm({ ...editForm, durationHours: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                       placeholder="HH"
                       min="0"
                       max="99"
                     />
-                    <p className="text-xs text-gray-500 text-center mt-1">Heures</p>
+                    <p className="text-xs text-text-secondary text-center mt-1">Heures</p>
                   </div>
                   <div>
                     <input
                       type="number"
                       value={editForm.durationMinutes}
                       onChange={(e) => setEditForm({ ...editForm, durationMinutes: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                       placeholder="MM"
                       min="0"
                       max="59"
                       required
                     />
-                    <p className="text-xs text-gray-500 text-center mt-1">Minutes</p>
+                    <p className="text-xs text-text-secondary text-center mt-1">Minutes</p>
                   </div>
                   <div>
                     <input
                       type="number"
                       value={editForm.durationSeconds}
                       onChange={(e) => setEditForm({ ...editForm, durationSeconds: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                       placeholder="SS"
                       min="0"
                       max="59"
                       required
                     />
-                    <p className="text-xs text-gray-500 text-center mt-1">Secondes</p>
+                    <p className="text-xs text-text-secondary text-center mt-1">Secondes</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-text-secondary mt-2">
                   Total: {formatDuration(
                     (Number(editForm.durationHours) || 0) * 3600 +
                     (Number(editForm.durationMinutes) || 0) * 60 +
@@ -590,31 +605,31 @@ export default function ActivityDetail() {
 
             {/* Section Cardio */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Fréquence cardiaque</h3>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Fréquence cardiaque</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     FC Moyenne (bpm)
                   </label>
                   <input
                     type="number"
                     value={editForm.avgHeartRate}
                     onChange={(e) => setEditForm({ ...editForm, avgHeartRate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                     max="250"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     FC Maximale (bpm)
                   </label>
                   <input
                     type="number"
                     value={editForm.maxHeartRate}
                     onChange={(e) => setEditForm({ ...editForm, maxHeartRate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                     max="250"
                   />
@@ -624,10 +639,10 @@ export default function ActivityDetail() {
 
             {/* Section Vitesse */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Vitesse</h3>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Vitesse</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Vitesse Moyenne (km/h)
                   </label>
                   <input
@@ -635,13 +650,13 @@ export default function ActivityDetail() {
                     step="0.1"
                     value={editForm.avgSpeed}
                     onChange={(e) => setEditForm({ ...editForm, avgSpeed: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Vitesse Maximale (km/h)
                   </label>
                   <input
@@ -649,7 +664,7 @@ export default function ActivityDetail() {
                     step="0.1"
                     value={editForm.maxSpeed}
                     onChange={(e) => setEditForm({ ...editForm, maxSpeed: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
@@ -658,30 +673,30 @@ export default function ActivityDetail() {
 
             {/* Section Puissance */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Puissance</h3>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Puissance</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Puissance Moyenne (W)
                   </label>
                   <input
                     type="number"
                     value={editForm.avgPower}
                     onChange={(e) => setEditForm({ ...editForm, avgPower: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Puissance Normalisée (W)
                   </label>
                   <input
                     type="number"
                     value={editForm.normalizedPower}
                     onChange={(e) => setEditForm({ ...editForm, normalizedPower: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
@@ -690,43 +705,43 @@ export default function ActivityDetail() {
 
             {/* Section Autres données */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Autres données</h3>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Autres données</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Cadence Moyenne (rpm)
                   </label>
                   <input
                     type="number"
                     value={editForm.avgCadence}
                     onChange={(e) => setEditForm({ ...editForm, avgCadence: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Dénivelé (m)
                   </label>
                   <input
                     type="number"
                     value={editForm.elevationGain}
                     onChange={(e) => setEditForm({ ...editForm, elevationGain: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Calories
                   </label>
                   <input
                     type="number"
                     value={editForm.calories}
                     onChange={(e) => setEditForm({ ...editForm, calories: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     min="0"
                   />
                 </div>
@@ -735,16 +750,16 @@ export default function ActivityDetail() {
 
             {/* Section Météo */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Météo</h3>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Météo</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Conditions météo
                   </label>
                   <select
                     value={editForm.weatherCondition}
                     onChange={(e) => setEditForm({ ...editForm, weatherCondition: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                   >
                     <option value="">-- Aucune modification --</option>
                     <option value="ensoleille">☀️ Ensoleillé</option>
@@ -761,14 +776,14 @@ export default function ActivityDetail() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Température (°C)
                   </label>
                   <input
                     type="number"
                     value={editForm.weatherTemperature}
                     onChange={(e) => setEditForm({ ...editForm, weatherTemperature: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     placeholder="ex: 18"
                     min="-50"
                     max="60"
@@ -776,14 +791,14 @@ export default function ActivityDetail() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Vitesse du vent (km/h)
                   </label>
                   <input
                     type="number"
                     value={editForm.weatherWindSpeed}
                     onChange={(e) => setEditForm({ ...editForm, weatherWindSpeed: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     placeholder="ex: 15"
                     min="0"
                     max="200"
@@ -791,45 +806,42 @@ export default function ActivityDetail() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Direction du vent (°)
                   </label>
                   <input
                     type="number"
                     value={editForm.weatherWindDirection}
                     onChange={(e) => setEditForm({ ...editForm, weatherWindDirection: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     placeholder="ex: 180 (Nord=0, Est=90, Sud=180, Ouest=270)"
                     min="0"
                     max="359"
                   />
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-text-secondary mt-2">
                 💡 La modification des conditions météo remplacera les données météo existantes pour cette sortie.
               </p>
             </div>
 
             {/* Note d'information */}
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-800">
+            <div className="bg-info-light p-4 rounded-lg border border-info">
+              <p className="text-sm text-info-dark">
                 <strong>Note :</strong> Si vous modifiez la fréquence cardiaque moyenne ou la durée,
                 le TRIMP sera automatiquement recalculé par le système.
               </p>
             </div>
 
             {/* Boutons d'action */}
-            <div className="flex gap-3 pt-4 border-t border-gray-200">
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
+            <div className="flex gap-3 pt-4 border-t border-border-base">
+              <button type="submit" className="btn-primary font-display">
                 Enregistrer les modifications
               </button>
               <button
                 type="button"
                 onClick={cancelEditing}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                className="btn-secondary text-text-dark"
               >
                 Annuler
               </button>
@@ -840,23 +852,23 @@ export default function ActivityDetail() {
 
       {/* Statistiques principales */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">Distance</p>
           <p className="text-2xl font-bold text-accent-500">{formatDistance(activity.distance)}</p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">Durée</p>
           <p className="text-2xl font-bold text-text-dark">{formatDuration(activity.duration)}</p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">Vitesse moy</p>
           <p className="text-2xl font-bold text-text-dark">{formatSpeed(activity.avgSpeed)}</p>
           <p className="text-xs text-text-tertiary">{formatPace(activity.avgSpeed)}</p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">FC moyenne</p>
           <p className="text-2xl font-bold text-text-dark">
             {activity.avgHeartRate ? `${activity.avgHeartRate} bpm` : '-'}
@@ -866,14 +878,12 @@ export default function ActivityDetail() {
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">Dénivelé</p>
-          <p className="text-2xl font-bold text-text-dark">
-            {activity.elevationGain ? `${activity.elevationGain} m` : '-'}
-          </p>
+          <p className="text-2xl font-bold text-text-dark">{formatElevation(activity.elevationGain)}</p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">TRIMP</p>
           <p className="text-2xl font-bold text-accent-500">{activity.trimp || '-'}</p>
         </div>
@@ -884,15 +894,15 @@ export default function ActivityDetail() {
         try {
           const weather: WeatherData = JSON.parse(activity.weather)
           return (
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200 shadow-card mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <div className="glass-panel border border-info bg-info-light/70 mb-8">
+              <h2 className="text-xl font-semibold text-text-dark mb-4 flex items-center gap-2">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                 </svg>
                 Météo lors de l'activité
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <div className="bg-white p-4 rounded-lg shadow-sm">
+                <div className="glass-panel p-4 rounded-lg shadow-sm">
                   <div className="flex items-center justify-center mb-2">
                     <img
                       src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
@@ -900,34 +910,34 @@ export default function ActivityDetail() {
                       className="w-16 h-16"
                     />
                   </div>
-                  <p className="text-sm text-gray-600 text-center capitalize">{weather.description}</p>
+                  <p className="text-sm text-text-body text-center capitalize">{weather.description}</p>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-gray-600 mb-1">Température</p>
-                  <p className="text-2xl font-bold text-gray-900">{weather.temperature}°C</p>
-                  <p className="text-xs text-gray-500">Ressenti: {weather.feelsLike}°C</p>
+                <div className="glass-panel p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-text-body mb-1">Température</p>
+                  <p className="text-2xl font-bold text-text-dark">{weather.temperature}°C</p>
+                  <p className="text-xs text-text-secondary">Ressenti: {weather.feelsLike}°C</p>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-gray-600 mb-1">Vent</p>
-                  <p className="text-2xl font-bold text-gray-900">{weather.windSpeed} km/h</p>
-                  <p className="text-xs text-gray-500">Direction: {weather.windDirection}°</p>
+                <div className="glass-panel p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-text-body mb-1">Vent</p>
+                  <p className="text-2xl font-bold text-text-dark">{weather.windSpeed} km/h</p>
+                  <p className="text-xs text-text-secondary">Direction: {weather.windDirection}°</p>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-gray-600 mb-1">Humidité</p>
-                  <p className="text-2xl font-bold text-gray-900">{weather.humidity}%</p>
+                <div className="glass-panel p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-text-body mb-1">Humidité</p>
+                  <p className="text-2xl font-bold text-text-dark">{weather.humidity}%</p>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-gray-600 mb-1">Pression</p>
-                  <p className="text-2xl font-bold text-gray-900">{weather.pressure} hPa</p>
+                <div className="glass-panel p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-text-body mb-1">Pression</p>
+                  <p className="text-2xl font-bold text-text-dark">{weather.pressure} hPa</p>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-gray-600 mb-1">Nuages</p>
-                  <p className="text-2xl font-bold text-gray-900">{weather.clouds}%</p>
+                <div className="glass-panel p-4 rounded-lg shadow-sm">
+                  <p className="text-sm text-text-body mb-1">Nuages</p>
+                  <p className="text-2xl font-bold text-text-dark">{weather.clouds}%</p>
                 </div>
               </div>
             </div>
@@ -940,7 +950,7 @@ export default function ActivityDetail() {
 
       {/* Carte GPS */}
       {gpsData.length > 0 && (
-        <div className="bg-white p-6 rounded-lg border border-border-base shadow-card mb-8">
+        <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
           <h2 className="text-xl font-semibold text-text-dark mb-4">Tracé GPS</h2>
           <div className="h-96 rounded-lg overflow-hidden">
             <MapContainer
@@ -954,7 +964,7 @@ export default function ActivityDetail() {
               />
               <Polyline
                 positions={gpsData.map((point) => [point.lat, point.lon])}
-                color="#3B82F6"
+                color="#E69875"
                 weight={3}
               />
             </MapContainer>
@@ -964,7 +974,7 @@ export default function ActivityDetail() {
 
       {/* Graphique d'élévation */}
       {elevationChartData.length > 0 && (
-        <div className="bg-white p-6 rounded-lg border border-border-base shadow-card mb-8">
+        <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
           <h2 className="text-xl font-semibold text-text-dark mb-4">Profil d'élévation</h2>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={elevationChartData}>
@@ -973,9 +983,9 @@ export default function ActivityDetail() {
               <YAxis stroke="#6B7280" style={{ fontSize: '12px' }} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#fff',
+                  backgroundColor: '#fdf7e5',
                   border: '1px solid #E5E7EB',
-                  borderRadius: '6px',
+                  borderRadius: '12px',
                 }}
                 formatter={(value: any) => [`${value} m`, 'Altitude']}
               />
@@ -995,14 +1005,14 @@ export default function ActivityDetail() {
 
       {/* Zones de FC */}
       {hrZonesData && (
-        <div className="bg-white p-6 rounded-lg border border-border-base shadow-card mb-8">
+        <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
           <h2 className="text-xl font-semibold text-text-dark mb-4">Analyse des zones FC</h2>
 
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-800">
+          <div className="mb-6 p-4 bg-info-light border border-info rounded-md">
+            <p className="text-sm text-info-dark">
               <strong>Zone d'entraînement:</strong> {hrZonesData.currentZone.name} ({hrZonesData.currentZone.min}-{hrZonesData.currentZone.max} bpm)
             </p>
-            <p className="text-sm text-blue-800 mt-1">
+            <p className="text-sm text-info-dark mt-1">
               FC moyenne: <strong>{activity.avgHeartRate} bpm</strong> | FC max: <strong>{activity.maxHeartRate} bpm</strong>
             </p>
           </div>
@@ -1014,13 +1024,13 @@ export default function ActivityDetail() {
               <YAxis stroke="#6B7280" style={{ fontSize: '12px' }} label={{ value: 'BPM', angle: -90, position: 'insideLeft' }} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#fff',
+                  backgroundColor: '#fdf7e5',
                   border: '1px solid #E5E7EB',
-                  borderRadius: '6px',
+                  borderRadius: '12px',
                 }}
               />
-              <Bar dataKey="min" fill="#94A3B8" name="Min" />
-              <Bar dataKey="max" fill="#3B82F6" name="Max" />
+              <Bar dataKey="min" fill="#7FBBB3" name="Min" />
+              <Bar dataKey="max" fill="#E69875" name="Max" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -1030,7 +1040,7 @@ export default function ActivityDetail() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Cardio */}
         {(activity.avgHeartRate || activity.maxHeartRate) && (
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
+          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
             <h3 className="text-lg font-semibold text-text-dark mb-4">Cardio</h3>
             <div className="space-y-3">
               {activity.avgHeartRate && (
@@ -1057,7 +1067,7 @@ export default function ActivityDetail() {
 
         {/* Vitesse */}
         {(activity.avgSpeed || activity.maxSpeed) && (
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
+          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
             <h3 className="text-lg font-semibold text-text-dark mb-4">Vitesse</h3>
             <div className="space-y-3">
               {activity.avgSpeed && (
@@ -1084,7 +1094,7 @@ export default function ActivityDetail() {
 
         {/* Puissance */}
         {(activity.avgPower || activity.normalizedPower) && (
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
+          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
             <h3 className="text-lg font-semibold text-text-dark mb-4">Puissance</h3>
             <div className="space-y-3">
               {activity.avgPower && (
@@ -1105,7 +1115,7 @@ export default function ActivityDetail() {
 
         {/* Autres */}
         {(activity.avgCadence || activity.calories) && (
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
+          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
             <h3 className="text-lg font-semibold text-text-dark mb-4">Autres données</h3>
             <div className="space-y-3">
               {activity.avgCadence && (

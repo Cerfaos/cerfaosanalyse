@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import AppLayout from '../components/layout/AppLayout'
+import { Section } from '../components/ui/Section'
+import { Card } from '../components/ui/Card'
 
 interface WeatherData {
   temperature: number
@@ -79,6 +82,11 @@ export default function Activities() {
     avgPower: '',
     normalizedPower: '',
   })
+
+  const inputClass = 'w-full px-4 py-3 rounded-xl border border-border-base bg-bg-white/90 focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none transition'
+  const compactInputClass = 'w-full px-3 py-2 rounded-xl border border-border-base bg-bg-white/90 focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none text-center transition'
+  const labelClass = 'block text-sm font-medium text-text-body mb-2'
+  const primaryActionClass = 'btn-primary w-full font-display'
 
   useEffect(() => {
     loadData()
@@ -235,19 +243,47 @@ export default function Activities() {
   }
 
   const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
+    const totalSeconds = Math.round(seconds)
+    let hours = Math.floor(totalSeconds / 3600)
+    let minutes = Math.floor((totalSeconds % 3600) / 60)
+    let secs = totalSeconds % 60
+
+    if (secs === 60) {
+      secs = 0
+      minutes += 1
+    }
+
+    if (minutes === 60) {
+      minutes = 0
+      hours += 1
+    }
 
     if (hours > 0) {
-      return `${hours}h ${minutes}min`
+      return `${hours}h ${minutes.toString().padStart(2, '0')}min ${secs
+        .toString()
+        .padStart(2, '0')}s`
     }
-    return `${minutes}min ${secs}s`
+    return `${minutes}min ${secs.toString().padStart(2, '0')}s`
   }
 
   const formatDistance = (meters: number) => {
     const km = meters / 1000
     return `${km.toFixed(2)} km`
+  }
+
+  const periodLabel = () => {
+    switch (period) {
+      case '7':
+        return '7 derniers jours'
+      case '30':
+        return '30 derniers jours'
+      case '90':
+        return '90 derniers jours'
+      case '365':
+        return 'Cette année'
+      default:
+        return ''
+    }
   }
 
   const getActivityIcon = (type: string) => {
@@ -286,102 +322,72 @@ export default function Activities() {
     }
   }
 
+  const actions = (
+    <button onClick={scrollToForm} className="btn-primary font-display">
+      Nouvelle importation
+    </button>
+  )
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Activités</h1>
-          <p className="text-gray-600">
-            Importez vos activités et suivez vos performances
-          </p>
-        </div>
-        <button
-          onClick={scrollToForm}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap border-2 border-blue-600 hover:border-blue-700"
-          style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#ffffff' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Importer une activité
-        </button>
-      </div>
+    <AppLayout title="Activités" description="Importez vos fichiers et suivez vos stats" actions={actions}>
+      <div className="space-y-8">
+        <Section eyebrow="Activités" title="Suivi des sorties" description="Importez vos fichiers ou ajoutez vos entraînements manuellement." />
 
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-6">
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
-          {error}
-        </div>
-      )}
-
-      {/* Statistiques */}
-      {stats && stats.count > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Activités</p>
-            <p className="text-3xl font-bold text-accent-500">{stats.count}</p>
-            <p className="text-xs text-text-tertiary mt-1">Sur {period} jours</p>
+        {success && (
+          <div className="glass-panel border-success/30 text-success px-4 py-3">
+            {success}
           </div>
+        )}
 
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Distance totale</p>
-            <p className="text-3xl font-bold text-text-dark">
-              {formatDistance(stats.totalDistance)}
-            </p>
-            <p className="text-xs text-text-tertiary mt-1">
-              Moy: {formatDistance(stats.avgDistance)}
-            </p>
+        {error && (
+          <div className="glass-panel border-error/30 text-error px-4 py-3">
+            {error}
           </div>
+        )}
 
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Temps total</p>
-            <p className="text-3xl font-bold text-text-dark">
-              {formatDuration(stats.totalDuration)}
-            </p>
-            <p className="text-xs text-text-tertiary mt-1">
-              Moy: {formatDuration(stats.avgDuration)}
-            </p>
+        {stats && stats.count > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card title="Activités" description={periodLabel()}>
+              <p className="text-3xl font-bold text-brand">{stats.count}</p>
+              <p className="text-xs text-text-muted">Moyenne: {stats.avgDistance ? formatDistance(stats.avgDistance) : '-'} par sortie</p>
+            </Card>
+            <Card title="Distance totale">
+              <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">{formatDistance(stats.totalDistance)}</p>
+              <p className="text-xs text-text-muted">Moyenne: {formatDistance(stats.avgDistance)}</p>
+            </Card>
+            <Card title="Temps total">
+              <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">{formatDuration(stats.totalDuration)}</p>
+              <p className="text-xs text-text-muted">Moyenne: {formatDuration(stats.avgDuration)}</p>
+            </Card>
+            <Card title="TRIMP total">
+              <p className="text-3xl font-bold text-brand">{stats.totalTrimp}</p>
+              <p className="text-xs text-text-muted">Moyenne: {stats.avgTrimp} / activité</p>
+            </Card>
           </div>
-
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">TRIMP total</p>
-            <p className="text-3xl font-bold text-accent-500">{stats.totalTrimp}</p>
-            <p className="text-xs text-text-tertiary mt-1">
-              Moy: {stats.avgTrimp} / activité
-            </p>
-          </div>
-        </div>
-      )}
+        )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Formulaire */}
         <div ref={formRef} className="lg:col-span-1" id="import-form">
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Nouvelle activité</h2>
+          <Card title="Nouvelle activité">
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-gray-200">
+            <div className="flex gap-3 mb-6">
               <button
                 onClick={() => setActiveTab('upload')}
-                className={`px-4 py-2 font-medium transition-colors ${
+                className={`flex-1 rounded-2xl px-4 py-3 text-lg font-semibold font-display border-4 transition-all ${
                   activeTab === 'upload'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-panel-bg text-text-primary border-panel-border shadow-xl'
+                    : 'text-text-secondary border-dashed border-panel-border hover:bg-panel-bg/30'
                 }`}
               >
                 Importer un fichier
               </button>
               <button
                 onClick={() => setActiveTab('manual')}
-                className={`px-4 py-2 font-medium transition-colors ${
+                className={`flex-1 rounded-2xl px-4 py-3 text-lg font-semibold font-display border-4 transition-all ${
                   activeTab === 'manual'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-panel-bg text-text-primary border-panel-border shadow-xl'
+                    : 'text-text-secondary border-dashed border-panel-border hover:bg-panel-bg/30'
                 }`}
               >
                 Créer manuellement
@@ -392,7 +398,7 @@ export default function Activities() {
             {activeTab === 'upload' && (
               <form onSubmit={handleUpload} className="space-y-4">
                 <div>
-                  <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="file-upload" className={labelClass}>
                     Fichier
                   </label>
                   <input
@@ -401,17 +407,17 @@ export default function Activities() {
                     accept=".fit,.gpx,.csv"
                     onChange={handleFileChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-border-base rounded-xl bg-bg-white/90 focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
                   />
-                  <p className="text-sm text-gray-500 mt-2">Formats acceptés: FIT, GPX, CSV</p>
+                  <p className="text-sm text-text-muted mt-2">Formats acceptés: FIT, GPX, CSV</p>
                 </div>
 
                 {selectedFile && (
-                  <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
-                    <p className="text-sm text-blue-800">
+                  <div className="glass-panel p-3 border border-accent">
+                    <p className="text-sm text-text-body">
                       Fichier sélectionné: <strong>{selectedFile.name}</strong>
                     </p>
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className="text-xs text-text-muted mt-1">
                       Taille: {(selectedFile.size / 1024).toFixed(2)} KB
                     </p>
                   </div>
@@ -420,13 +426,13 @@ export default function Activities() {
                 <button
                   type="submit"
                   disabled={uploading || !selectedFile}
-                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={primaryActionClass}
                 >
                   {uploading ? 'Import en cours...' : 'Importer'}
                 </button>
 
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800">
+                <div className="glass-panel p-4 border border-info bg-info-light/60">
+                  <p className="text-sm text-info-dark">
                     <strong>💡 Astuce :</strong> Le TRIMP sera calculé automatiquement si votre
                     activité contient des données de fréquence cardiaque.
                   </p>
@@ -439,7 +445,7 @@ export default function Activities() {
               <form onSubmit={handleManualSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label htmlFor="manual-date" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="manual-date" className={labelClass}>
                       Date *
                     </label>
                     <input
@@ -450,12 +456,12 @@ export default function Activities() {
                         setManualFormData({ ...manualFormData, date: e.target.value })
                       }
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className={inputClass}
                     />
                   </div>
 
                   <div className="col-span-2">
-                    <label htmlFor="manual-type" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="manual-type" className={labelClass}>
                       Type d'activité *
                     </label>
                     <select
@@ -465,7 +471,7 @@ export default function Activities() {
                         setManualFormData({ ...manualFormData, type: e.target.value })
                       }
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className={inputClass}
                     >
                       <option value="Cyclisme">Cyclisme</option>
                       <option value="Course">Course</option>
@@ -475,7 +481,7 @@ export default function Activities() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Durée *</label>
+                    <label className={labelClass}>Durée *</label>
                     <div className="grid grid-cols-3 gap-2">
                       <div>
                         <input
@@ -486,9 +492,9 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, hours: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                          className={compactInputClass}
                         />
-                        <p className="text-xs text-gray-500 text-center mt-1">Heures</p>
+                        <p className="text-xs text-text-muted text-center mt-1">Heures</p>
                       </div>
                       <div>
                         <input
@@ -500,9 +506,9 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, minutes: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                          className={compactInputClass}
                         />
-                        <p className="text-xs text-gray-500 text-center mt-1">Minutes</p>
+                        <p className="text-xs text-text-muted text-center mt-1">Minutes</p>
                       </div>
                       <div>
                         <input
@@ -514,15 +520,15 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, seconds: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                          className={compactInputClass}
                         />
-                        <p className="text-xs text-gray-500 text-center mt-1">Secondes</p>
+                        <p className="text-xs text-text-muted text-center mt-1">Secondes</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="col-span-2">
-                    <label htmlFor="manual-distance" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="manual-distance" className={labelClass}>
                       Distance (km) *
                     </label>
                     <input
@@ -536,7 +542,7 @@ export default function Activities() {
                         setManualFormData({ ...manualFormData, distance: e.target.value })
                       }
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className={inputClass}
                     />
                   </div>
 
@@ -544,7 +550,7 @@ export default function Activities() {
                   {(manualFormData.type === 'Cyclisme' || manualFormData.type === 'Course') && (
                     <>
                       <div>
-                        <label htmlFor="manual-avgHR" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-avgHR" className={labelClass}>
                           FC moyenne
                         </label>
                         <input
@@ -556,12 +562,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, avgHeartRate: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-maxHR" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-maxHR" className={labelClass}>
                           FC max
                         </label>
                         <input
@@ -573,12 +579,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, maxHeartRate: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-elevation" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-elevation" className={labelClass}>
                           Dénivelé (m)
                         </label>
                         <input
@@ -590,12 +596,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, elevationGain: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-calories" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-calories" className={labelClass}>
                           Calories
                         </label>
                         <input
@@ -607,7 +613,7 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, calories: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
                     </>
@@ -616,7 +622,7 @@ export default function Activities() {
                   {/* Champ Calories uniquement pour Rameur et Marche */}
                   {(manualFormData.type === 'Rameur' || manualFormData.type === 'Marche') && (
                     <div>
-                      <label htmlFor="manual-calories" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="manual-calories" className={labelClass}>
                         Calories
                       </label>
                       <input
@@ -628,7 +634,7 @@ export default function Activities() {
                         onChange={(e) =>
                           setManualFormData({ ...manualFormData, calories: e.target.value })
                         }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className={inputClass}
                       />
                     </div>
                   )}
@@ -637,7 +643,7 @@ export default function Activities() {
                   {(manualFormData.type === 'Cyclisme' || manualFormData.type === 'Course') && (
                     <>
                       <div>
-                        <label htmlFor="manual-avgSpeed" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-avgSpeed" className={labelClass}>
                           Vitesse moyenne (km/h)
                         </label>
                         <input
@@ -650,12 +656,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, avgSpeed: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-maxSpeed" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-maxSpeed" className={labelClass}>
                           Vitesse max (km/h)
                         </label>
                         <input
@@ -668,12 +674,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, maxSpeed: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-avgCadence" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-avgCadence" className={labelClass}>
                           Cadence moyenne (rpm/spm)
                         </label>
                         <input
@@ -685,12 +691,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, avgCadence: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-avgPower" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-avgPower" className={labelClass}>
                           Puissance moyenne (W)
                         </label>
                         <input
@@ -702,12 +708,12 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, avgPower: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="manual-normalizedPower" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="manual-normalizedPower" className={labelClass}>
                           Puissance normalisée (W)
                         </label>
                         <input
@@ -719,14 +725,14 @@ export default function Activities() {
                           onChange={(e) =>
                             setManualFormData({ ...manualFormData, normalizedPower: e.target.value })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className={inputClass}
                         />
                       </div>
                     </>
                   )}
 
                   <div className="col-span-2">
-                    <label htmlFor="manual-gpx-file" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="manual-gpx-file" className={labelClass}>
                       Fichier GPX (optionnel)
                     </label>
                     <input
@@ -738,17 +744,17 @@ export default function Activities() {
                           setManualGpxFile(e.target.files[0])
                         }
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className={inputClass}
                     />
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-sm text-text-muted mt-2">
                       📍 Si vous fournissez un fichier GPX, la distance, la durée et le dénivelé seront extraits automatiquement du fichier et remplaceront les valeurs saisies manuellement. Le fichier permet aussi d'obtenir la météo exacte de votre localisation.
                     </p>
                     {manualGpxFile && (
-                      <div className="bg-green-50 border border-green-200 p-3 rounded-md mt-2">
-                        <p className="text-sm text-green-800">
+                      <div className="glass-panel border border-success/40 bg-success-light/60 p-3 rounded-xl mt-2">
+                        <p className="text-sm text-success">
                           ✓ Fichier sélectionné: <strong>{manualGpxFile.name}</strong>
                         </p>
-                        <p className="text-xs text-green-700 mt-1">
+                        <p className="text-xs text-text-muted mt-1">
                           Les données GPS (distance, durée, dénivelé) du fichier seront utilisées en priorité
                         </p>
                       </div>
@@ -759,26 +765,26 @@ export default function Activities() {
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={primaryActionClass}
                 >
                   {uploading ? 'Création en cours...' : 'Créer l\'activité'}
                 </button>
 
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800">
+                <div className="glass-panel p-4 border border-info bg-info-light/60">
+                  <p className="text-sm text-info-dark">
                     <strong>💡 Astuce :</strong> Le TRIMP sera calculé automatiquement si vous
                     renseignez la FC moyenne et que votre profil est configuré.
                   </p>
                 </div>
               </form>
             )}
-          </div>
+          </Card>
         </div>
 
         {/* Liste et filtres */}
         <div className="lg:col-span-2 space-y-6">
           {/* Filtres */}
-          <div className="bg-white p-4 rounded-lg border border-border-base shadow-card">
+          <div className="glass-panel p-4">
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[200px]">
                 <label htmlFor="period" className="block text-sm font-medium text-text-body mb-2">
@@ -788,7 +794,7 @@ export default function Activities() {
                   id="period"
                   value={period}
                   onChange={(e) => setPeriod(e.target.value)}
-                  className="w-full px-4 py-2 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  className="w-full px-4 py-2 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
                 >
                   <option value="7">7 derniers jours</option>
                   <option value="30">30 derniers jours</option>
@@ -805,7 +811,7 @@ export default function Activities() {
                   id="type"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="w-full px-4 py-2 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  className="w-full px-4 py-2 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
                 >
                   <option value="">Tous les types</option>
                   <option value="Cyclisme">Cyclisme</option>
@@ -818,7 +824,7 @@ export default function Activities() {
           </div>
 
           {/* Liste */}
-          <div className="bg-white p-6 rounded-lg border border-border-base shadow-card">
+          <div className="glass-panel p-6">
             <h2 className="text-xl font-semibold text-text-dark mb-6">Historique</h2>
 
             {loading ? (
@@ -957,6 +963,7 @@ export default function Activities() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

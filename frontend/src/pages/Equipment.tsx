@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
+import AppLayout from '../components/layout/AppLayout'
 
 interface Equipment {
   id: number
@@ -29,6 +30,7 @@ const EQUIPMENT_TYPES = [
 ]
 
 export default function Equipment() {
+  const formRef = useRef<HTMLDivElement>(null)
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -139,6 +141,12 @@ export default function Equipment() {
     })
   }
 
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   const formatDistance = (meters: number) => {
     return (meters / 1000).toFixed(0) + ' km'
   }
@@ -151,63 +159,61 @@ export default function Equipment() {
     return '🔧'
   }
 
+  const actions = (
+    <button
+      onClick={() => {
+        setShowForm(true)
+        setEditingId(null)
+        resetForm()
+        setTimeout(scrollToForm, 200)
+      }}
+      className="btn-primary font-display"
+    >
+      Ajouter un équipement
+    </button>
+  )
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Chargement...</div>
-      </div>
+      <AppLayout title="Équipement" description="Gestion de votre matériel" actions={actions}>
+        <div className="glass-panel p-6 text-center text-text-secondary">Chargement...</div>
+      </AppLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Équipement</h1>
-            <p className="mt-2 text-gray-600">Gérez vos vélos, chaussures et matériel</p>
-          </div>
-          <button
-            onClick={() => {
-              setShowForm(true)
-              setEditingId(null)
-              resetForm()
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            + Ajouter un équipement
-          </button>
-        </div>
+    <AppLayout title="Équipement" description="Suivez l'usure et planifiez vos remplacements" actions={actions}>
+      <div className="space-y-8">
 
         {/* Formulaire */}
         {showForm && (
-          <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <div ref={formRef} className="glass-panel p-6">
             <h2 className="text-xl font-semibold mb-4">
               {editingId ? 'Modifier l\'équipement' : 'Nouvel équipement'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Nom *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Type *
                   </label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                     required
                   >
                     {EQUIPMENT_TYPES.map((type) => (
@@ -219,31 +225,31 @@ export default function Equipment() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Marque
                   </label>
                   <input
                     type="text"
                     value={formData.brand}
                     onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Modèle
                   </label>
                   <input
                     type="text"
                     value={formData.model}
                     onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Kilométrage initial (km)
                   </label>
                   <input
@@ -252,53 +258,50 @@ export default function Equipment() {
                     onChange={(e) =>
                       setFormData({ ...formData, initialDistance: Number(e.target.value) })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                     min="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Alerte de maintenance (km)
                   </label>
                   <input
                     type="number"
                     value={formData.alertDistance}
                     onChange={(e) => setFormData({ ...formData, alertDistance: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                     min="0"
                     placeholder="Ex: 5000"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-text-body mb-1">
                     Date d'achat
                   </label>
                   <input
                     type="date"
                     value={formData.purchaseDate}
                     onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-text-body mb-1">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-forest-blue focus:border-transparent"
                 />
               </div>
 
               <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
+                <button type="submit" className="btn-primary px-6">
                   {editingId ? 'Mettre à jour' : 'Créer'}
                 </button>
                 <button
@@ -308,7 +311,7 @@ export default function Equipment() {
                     setEditingId(null)
                     resetForm()
                   }}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="btn-secondary"
                 >
                   Annuler
                 </button>
@@ -322,39 +325,37 @@ export default function Equipment() {
           {equipment.map((item) => (
             <div
               key={item.id}
-              className={`bg-white p-6 rounded-lg shadow ${
-                !item.isActive ? 'opacity-60' : ''
-              }`}
+              className={`glass-panel p-6 ${!item.isActive ? 'opacity-60' : ''}`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
                   <span className="text-3xl">{getTypeIcon(item.type)}</span>
                   <div>
                     <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-sm text-gray-500">{item.type}</p>
+                    <p className="text-sm text-text-secondary">{item.type}</p>
                   </div>
                 </div>
                 {!item.isActive && (
-                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                  <span className="text-xs bg-bg-gray-200 text-text-body px-2 py-1 rounded">
                     Retraité
                   </span>
                 )}
               </div>
 
               {(item.brand || item.model) && (
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-text-body mb-3">
                   {item.brand} {item.model}
                 </p>
               )}
 
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Distance totale:</span>
+                  <span className="text-text-body">Distance totale:</span>
                   <span className="font-medium">{formatDistance(item.currentDistance)}</span>
                 </div>
                 {item.alertDistance && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Prochain entretien:</span>
+                    <span className="text-text-body">Prochain entretien:</span>
                     <span className="font-medium">
                       {formatDistance(
                         item.alertDistance - (item.currentDistance - item.initialDistance)
@@ -364,7 +365,7 @@ export default function Equipment() {
                 )}
                 {item.purchaseDate && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Acheté le:</span>
+                    <span className="text-text-body">Acheté le:</span>
                     <span className="font-medium">
                       {new Date(item.purchaseDate).toLocaleDateString('fr-FR')}
                     </span>
@@ -375,23 +376,23 @@ export default function Equipment() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(item)}
-                  className="flex-1 bg-blue-50 text-blue-600 px-3 py-1 rounded text-sm hover:bg-blue-100 transition-colors"
+                  className="flex-1 px-3 py-1 rounded-full border border-info text-info-dark bg-info-light/70 text-sm"
                 >
                   Modifier
                 </button>
                 <button
                   onClick={() => toggleActive(item)}
-                  className={`flex-1 px-3 py-1 rounded text-sm transition-colors ${
+                  className={`flex-1 px-3 py-1 rounded-full text-sm border transition-colors ${
                     item.isActive
-                      ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100'
-                      : 'bg-green-50 text-green-600 hover:bg-green-100'
+                      ? 'border-warning text-warning bg-warning-light/80'
+                      : 'border-success text-success bg-success-light/80'
                   }`}
                 >
                   {item.isActive ? 'Retirer' : 'Réactiver'}
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="bg-red-50 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-100 transition-colors"
+                  className="px-3 py-1 rounded-full text-sm border border-danger/40 text-danger"
                 >
                   Supprimer
                 </button>
@@ -401,17 +402,17 @@ export default function Equipment() {
         </div>
 
         {equipment.length === 0 && !showForm && (
-          <div className="bg-white p-12 rounded-lg shadow text-center">
-            <p className="text-gray-500 text-lg mb-4">Aucun équipement enregistré</p>
+          <div className="glass-panel p-12 text-center">
+            <p className="text-text-secondary text-lg mb-4">Aucun équipement enregistré</p>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-primary px-8"
             >
               Ajouter votre premier équipement
             </button>
           </div>
         )}
       </div>
-    </div>
+    </AppLayout>
   )
 }

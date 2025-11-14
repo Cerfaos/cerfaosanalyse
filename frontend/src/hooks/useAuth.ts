@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/authStore'
 import api from '../services/api'
 
 export function useAuth() {
-  const { token, user, setAuth, logout } = useAuthStore()
+  const { token, user, logout } = useAuthStore()
 
   useEffect(() => {
     // Si on a un token mais pas d'utilisateur, charger l'utilisateur

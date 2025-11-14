@@ -41,6 +41,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare theme: 'light' | 'dark'
 
+  @column({ columnName: 'avatar_url' })
+  declare avatarUrl: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

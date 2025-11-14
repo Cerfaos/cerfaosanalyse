@@ -32,12 +32,12 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-bg-bg-gray-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-accent-500 rounded-xl mb-4">
             <svg
-              className="w-12 h-12 text-white"
+              className="w-12 h-12 text-white dark:text-white"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -54,10 +54,10 @@ export default function Register() {
           <p className="text-text-secondary">Commencez à analyser vos performances cyclistes</p>
         </div>
 
-        <div className="bg-white p-8 rounded-lg border border-border-base shadow-card">
+        <div className="glass-panel p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              <div className="glass-panel border border-danger/40 text-danger px-4 py-3">
                 {error}
               </div>
             )}
@@ -71,7 +71,7 @@ export default function Register() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all"
+                className="w-full px-4 py-3 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta transition-all"
                 placeholder="Votre nom"
               />
             </div>
@@ -86,7 +86,7 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all"
+                className="w-full px-4 py-3 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta transition-all"
                 placeholder="vous@exemple.com"
               />
             </div>
@@ -101,23 +101,19 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-border-medium rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all"
+                className="w-full px-4 py-3 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta transition-all"
                 placeholder="••••••••"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-3 bg-accent-500 text-white rounded-md hover:bg-accent-600 shadow-button hover:shadow-button-hover transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Création du compte...' : 'Créer mon compte'}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-text-secondary">
             Déjà un compte ?{' '}
-            <Link to="/login" className="text-accent-500 hover:text-accent-700 font-medium">
+            <Link to="/login" className="text-cta hover:text-cta/80 font-medium">
               Se connecter
             </Link>
           </div>

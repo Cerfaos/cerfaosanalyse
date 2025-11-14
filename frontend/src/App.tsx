@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
 import { useAuth } from './hooks/useAuth'
-import Navbar from './components/Navbar'
+import { useTheme } from './hooks/useTheme'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -23,12 +24,41 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   // Charger automatiquement l'utilisateur si un token existe
   useAuth()
+  // Initialiser le thème
+  useTheme()
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-bg-gray-50">
-        <Navbar />
-        <Routes>
+      <div className="min-h-screen bg-bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
+        {/* Skip navigation pour accessibilité */}
+        <a href="#main-content" className="skip-link">
+          Aller au contenu principal
+        </a>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'var(--toast-bg)',
+              color: 'var(--toast-text)',
+              border: '1px solid var(--toast-border)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#FFFFFF',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#FFFFFF',
+              },
+            },
+          }}
+        />
+        <main id="main-content">
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -97,6 +127,7 @@ function App() {
             }
           />
         </Routes>
+        </main>
       </div>
     </BrowserRouter>
   )

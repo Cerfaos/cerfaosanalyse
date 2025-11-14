@@ -8,6 +8,7 @@ interface User {
   fcRepos: number | null
   weightCurrent: number | null
   theme: 'light' | 'dark'
+  avatarUrl?: string | null
 }
 
 interface AuthState {

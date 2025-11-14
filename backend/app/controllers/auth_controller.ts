@@ -52,6 +52,7 @@ export default class AuthController {
           fcRepos: user.fcRepos,
           weightCurrent: user.weightCurrent,
           theme: user.theme,
+          avatarUrl: user.avatarUrl,
         },
         token: token.value!.release(),
       },
@@ -87,6 +88,7 @@ export default class AuthController {
         fcRepos: user.fcRepos,
         weightCurrent: user.weightCurrent,
         theme: user.theme,
+        avatarUrl: user.avatarUrl,
       },
     })
   }
