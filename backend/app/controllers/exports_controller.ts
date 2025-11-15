@@ -3,6 +3,9 @@ import User from '#models/user'
 import Activity from '#models/activity'
 import WeightHistory from '#models/weight_history'
 import Equipment from '#models/equipment'
+import Goal from '#models/goal'
+import UserBadge from '#models/user_badge'
+import Badge from '#models/badge'
 import { DateTime } from 'luxon'
 
 export default class ExportsController {
@@ -324,5 +327,214 @@ ${trackPoints}
       message: 'Statistiques récupérées',
       data: stats,
     })
+  }
+
+  /**
+   * Créer une sauvegarde complète de toutes les données utilisateur
+   * Pour import/export et restauration en cas de problème
+   */
+  async exportBackup({ auth, response }: HttpContext) {
+    const user = auth.user!
+
+    // Récupérer TOUTES les données de l'utilisateur
+    const [activities, weightHistories, equipment, goals, userBadges] = await Promise.all([
+      Activity.query().where('user_id', user.id).orderBy('date', 'desc'),
+      WeightHistory.query().where('user_id', user.id).orderBy('date', 'desc'),
+      Equipment.query().where('user_id', user.id).orderBy('created_at', 'desc'),
+      Goal.query().where('user_id', user.id).orderBy('created_at', 'desc'),
+      UserBadge.query().where('user_id', user.id).preload('badge'),
+    ])
+
+    const backupData = {
+      version: '1.0.0',
+      exportDate: DateTime.now().toISO(),
+      exportType: 'FULL_BACKUP',
+      user: {
+        email: user.email,
+        fullName: user.fullName,
+        fcMax: user.fcMax,
+        fcRepos: user.fcRepos,
+        weightCurrent: user.weightCurrent,
+        theme: user.theme,
+        avatarUrl: user.avatarUrl,
+      },
+      activities: activities.map((a) => a.toJSON()),
+      weightHistories: weightHistories.map((w) => w.toJSON()),
+      equipment: equipment.map((e) => e.toJSON()),
+      goals: goals.map((g) => g.toJSON()),
+      userBadges: userBadges.map((ub) => ({
+        badgeCode: ub.badge.code,
+        unlockedAt: ub.unlockedAt.toISO(),
+        valueAtUnlock: ub.valueAtUnlock,
+      })),
+      metadata: {
+        totalActivities: activities.length,
+        totalWeightEntries: weightHistories.length,
+        totalEquipment: equipment.length,
+        totalGoals: goals.length,
+        totalBadges: userBadges.length,
+      },
+    }
+
+    // Définir les headers pour le téléchargement
+    response.header('Content-Type', 'application/json')
+    response.header(
+      'Content-Disposition',
+      `attachment; filename="cerfaos-backup-${DateTime.now().toFormat('yyyy-MM-dd-HHmmss')}.json"`
+    )
+
+    return response.json(backupData)
+  }
+
+  /**
+   * Importer et restaurer une sauvegarde complète
+   * ATTENTION: Cette opération va ÉCRASER les données existantes !
+   */
+  async importBackup({ auth, request, response }: HttpContext) {
+    const user = auth.user!
+
+    try {
+      const backupData = request.body()
+
+      // Validation du format
+      if (!backupData.version || backupData.exportType !== 'FULL_BACKUP') {
+        return response.badRequest({
+          message: 'Format de sauvegarde invalide',
+        })
+      }
+
+      // Option: tout supprimer avant d'importer (nettoyage complet)
+      const cleanImport = request.input('clean', false)
+
+      if (cleanImport) {
+        // Supprimer toutes les données existantes
+        await Promise.all([
+          Activity.query().where('user_id', user.id).delete(),
+          WeightHistory.query().where('user_id', user.id).delete(),
+          Equipment.query().where('user_id', user.id).delete(),
+          Goal.query().where('user_id', user.id).delete(),
+          UserBadge.query().where('user_id', user.id).delete(),
+        ])
+      }
+
+      // Importer les données
+      const imported = {
+        activities: 0,
+        weightHistories: 0,
+        equipment: 0,
+        goals: 0,
+        badges: 0,
+      }
+
+      // Importer les activités
+      if (backupData.activities && Array.isArray(backupData.activities)) {
+        for (const activityData of backupData.activities) {
+          // Retirer l'ID pour éviter les conflits
+          const { id, userId, createdAt, updatedAt, ...activityFields } = activityData
+
+          await Activity.create({
+            ...activityFields,
+            userId: user.id,
+            date: DateTime.fromISO(activityData.date),
+          })
+          imported.activities++
+        }
+      }
+
+      // Importer l'historique de poids
+      if (backupData.weightHistories && Array.isArray(backupData.weightHistories)) {
+        for (const weightData of backupData.weightHistories) {
+          const { id, userId, createdAt, updatedAt, ...weightFields } = weightData
+
+          await WeightHistory.create({
+            ...weightFields,
+            userId: user.id,
+            date: DateTime.fromISO(weightData.date),
+          })
+          imported.weightHistories++
+        }
+      }
+
+      // Importer les équipements
+      if (backupData.equipment && Array.isArray(backupData.equipment)) {
+        for (const equipmentData of backupData.equipment) {
+          const { id, userId, createdAt, updatedAt, ...equipmentFields } = equipmentData
+
+          await Equipment.create({
+            ...equipmentFields,
+            userId: user.id,
+            purchaseDate: equipmentData.purchaseDate
+              ? DateTime.fromISO(equipmentData.purchaseDate)
+              : null,
+            retirementDate: equipmentData.retirementDate
+              ? DateTime.fromISO(equipmentData.retirementDate)
+              : null,
+          })
+          imported.equipment++
+        }
+      }
+
+      // Importer les objectifs
+      if (backupData.goals && Array.isArray(backupData.goals)) {
+        for (const goalData of backupData.goals) {
+          const { id, userId, createdAt, updatedAt, ...goalFields } = goalData
+
+          await Goal.create({
+            ...goalFields,
+            userId: user.id,
+            startDate: DateTime.fromISO(goalData.startDate),
+            endDate: DateTime.fromISO(goalData.endDate),
+          })
+          imported.goals++
+        }
+      }
+
+      // Importer les badges débloqués
+      if (backupData.userBadges && Array.isArray(backupData.userBadges)) {
+        for (const badgeData of backupData.userBadges) {
+          // Retrouver le badge par son code
+          const badge = await Badge.query().where('code', badgeData.badgeCode).first()
+
+          if (badge) {
+            // Vérifier si le badge n'est pas déjà débloqué
+            const existing = await UserBadge.query()
+              .where('user_id', user.id)
+              .where('badge_id', badge.id)
+              .first()
+
+            if (!existing) {
+              await UserBadge.create({
+                userId: user.id,
+                badgeId: badge.id,
+                unlockedAt: DateTime.fromISO(badgeData.unlockedAt),
+                valueAtUnlock: badgeData.valueAtUnlock,
+              })
+              imported.badges++
+            }
+          }
+        }
+      }
+
+      // Mettre à jour les infos utilisateur si présentes
+      if (backupData.user) {
+        const { email, ...userFields } = backupData.user
+        await user.merge(userFields).save()
+      }
+
+      return response.ok({
+        message: 'Sauvegarde restaurée avec succès',
+        data: {
+          imported,
+          cleanImport,
+          backupDate: backupData.exportDate,
+        },
+      })
+    } catch (error) {
+      console.error('Erreur lors de l\'import:', error)
+      return response.internalServerError({
+        message: 'Erreur lors de la restauration de la sauvegarde',
+        error: error.message,
+      })
+    }
   }
 }

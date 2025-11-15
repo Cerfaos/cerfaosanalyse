@@ -110,6 +110,8 @@ router
   .group(() => {
     router.get('/stats', [ExportsController, 'stats'])
     router.get('/all', [ExportsController, 'exportAll'])
+    router.get('/backup', [ExportsController, 'exportBackup'])
+    router.post('/restore', [ExportsController, 'importBackup'])
     router.get('/activities/csv', [ExportsController, 'exportActivitiesCsv'])
     router.get('/activities/:id/gpx', [ExportsController, 'exportActivityGpx'])
     router.get('/weight/csv', [ExportsController, 'exportWeightCsv'])
