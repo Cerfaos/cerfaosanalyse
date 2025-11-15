@@ -35,6 +35,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare fcRepos: number | null
 
   @column()
+  declare ftp: number | null // Functional Threshold Power (watts)
+
+  @column()
   declare weightCurrent: number | null
 
   // Préférences UI

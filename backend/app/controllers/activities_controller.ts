@@ -992,6 +992,8 @@ export default class ActivitiesController {
       'calories',
       'equipmentId',
       'notes',
+      'rpe',
+      'feelingNotes',
       'weatherCondition',
       'weatherTemperature',
       'weatherWindSpeed',

@@ -89,6 +89,14 @@ export default class Activity extends BaseModel {
   @column()
   declare trimp: number | null
 
+  // RPE - Rating of Perceived Exertion (1-10)
+  @column()
+  declare rpe: number | null
+
+  // Notes sur les sensations
+  @column()
+  declare feelingNotes: string | null
+
   // Données GPS (JSON)
   @column()
   declare gpsData: string | null

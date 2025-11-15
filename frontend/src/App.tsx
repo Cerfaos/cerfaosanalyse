@@ -1,27 +1,42 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { lazy, Suspense } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import Profile from './pages/Profile'
-import Weight from './pages/Weight'
-import Activities from './pages/Activities'
-import ActivityDetail from './pages/ActivityDetail'
-import TrainingLoad from './pages/TrainingLoad'
-import CyclingStats from './pages/CyclingStats'
-import Equipment from './pages/Equipment'
-import Export from './pages/Export'
-import Badges from './pages/Badges'
-import Goals from './pages/Goals'
+
+// Lazy loading des pages pour réduire le bundle initial
+const Home = lazy(() => import('./pages/Home'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Weight = lazy(() => import('./pages/Weight'))
+const Activities = lazy(() => import('./pages/Activities'))
+const ActivityDetail = lazy(() => import('./pages/ActivityDetail'))
+const TrainingLoad = lazy(() => import('./pages/TrainingLoad'))
+const CyclingStats = lazy(() => import('./pages/CyclingStats'))
+const Equipment = lazy(() => import('./pages/Equipment'))
+const Export = lazy(() => import('./pages/Export'))
+const Badges = lazy(() => import('./pages/Badges'))
+const Goals = lazy(() => import('./pages/Goals'))
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore()
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
+}
+
+// Composant de chargement pour Suspense
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-bg-gray-50 dark:bg-dark-bg">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto"></div>
+        <p className="mt-4 text-text-secondary dark:text-dark-text-secondary">Chargement...</p>
+      </div>
+    </div>
+  )
 }
 
 function App() {
@@ -61,6 +76,7 @@ function App() {
           }}
         />
         <main id="main-content">
+          <Suspense fallback={<LoadingFallback />}>
           <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -154,6 +170,7 @@ function App() {
             }
           />
         </Routes>
+          </Suspense>
         </main>
       </div>
     </BrowserRouter>

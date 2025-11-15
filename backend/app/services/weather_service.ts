@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { DateTime } from 'luxon'
+import env from '#start/env'
 
 interface WeatherData {
   temperature: number
@@ -15,7 +16,7 @@ interface WeatherData {
 }
 
 export default class WeatherService {
-  private apiKey: string = '7cd957de506d224af7028e8d405cdf97'
+  private apiKey: string = env.get('OPENWEATHERMAP_API_KEY', '')
   private baseUrl: string = 'https://api.openweathermap.org/data/2.5'
 
   /**
