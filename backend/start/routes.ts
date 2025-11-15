@@ -58,6 +58,7 @@ router
   .group(() => {
     router.patch('/profile', [UsersController, 'updateProfile'])
     router.get('/hr-zones', [UsersController, 'getHeartRateZones'])
+    router.get('/power-zones', [UsersController, 'getPowerZones'])
     router.post('/avatar', [UsersController, 'uploadAvatar'])
   })
   .prefix('/api/users')

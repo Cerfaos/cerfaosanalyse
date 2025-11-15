@@ -13,7 +13,7 @@ export default class UsersController {
     const user = auth.getUserOrFail()
 
     // Données acceptées pour la mise à jour
-    const data = request.only(['fullName', 'fcMax', 'fcRepos', 'weightCurrent', 'theme'])
+    const data = request.only(['fullName', 'fcMax', 'fcRepos', 'ftp', 'weightCurrent', 'theme'])
 
     // Validation basique
     if (data.fcMax !== undefined && (data.fcMax < 100 || data.fcMax > 220)) {
@@ -22,6 +22,10 @@ export default class UsersController {
 
     if (data.fcRepos !== undefined && (data.fcRepos < 30 || data.fcRepos > 100)) {
       return response.badRequest({ message: 'FC repos doit être entre 30 et 100 bpm' })
+    }
+
+    if (data.ftp !== undefined && data.ftp !== null && (data.ftp < 50 || data.ftp > 600)) {
+      return response.badRequest({ message: 'FTP doit être entre 50 et 600 watts' })
     }
 
     if (data.weightCurrent !== undefined && (data.weightCurrent < 30 || data.weightCurrent > 300)) {
@@ -46,6 +50,7 @@ export default class UsersController {
         fullName: user.fullName,
         fcMax: user.fcMax,
         fcRepos: user.fcRepos,
+        ftp: user.ftp,
         weightCurrent: user.weightCurrent,
         theme: user.theme,
         avatarUrl: user.avatarUrl,
@@ -110,6 +115,97 @@ export default class UsersController {
         fcMax: user.fcMax,
         fcRepos: user.fcRepos,
         fcReserve: fcReserve,
+        zones: zones,
+      },
+    })
+  }
+
+  /**
+   * Calculer les zones de puissance basées sur le FTP
+   */
+  async getPowerZones({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    if (!user.ftp) {
+      return response.badRequest({
+        message: 'FTP est requis pour calculer les zones de puissance',
+      })
+    }
+
+    const zones = [
+      {
+        zone: 1,
+        name: 'Récupération active',
+        min: 0,
+        max: Math.round(user.ftp * 0.55),
+        percentage: '<55%',
+        description: 'Récupération, échauffement léger',
+        color: '#94A3B8', // slate
+      },
+      {
+        zone: 2,
+        name: 'Endurance',
+        min: Math.round(user.ftp * 0.55),
+        max: Math.round(user.ftp * 0.75),
+        percentage: '55-75%',
+        description: 'Sorties longues, base aérobie',
+        color: '#22C55E', // green
+      },
+      {
+        zone: 3,
+        name: 'Tempo',
+        min: Math.round(user.ftp * 0.75),
+        max: Math.round(user.ftp * 0.90),
+        percentage: '75-90%',
+        description: 'Rythme soutenu, tempo',
+        color: '#FACC15', // yellow
+      },
+      {
+        zone: 4,
+        name: 'Seuil lactique',
+        min: Math.round(user.ftp * 0.90),
+        max: Math.round(user.ftp * 1.05),
+        percentage: '90-105%',
+        description: 'Travail au seuil, intervalles longs',
+        color: '#F97316', // orange
+      },
+      {
+        zone: 5,
+        name: 'VO2 max',
+        min: Math.round(user.ftp * 1.05),
+        max: Math.round(user.ftp * 1.20),
+        percentage: '105-120%',
+        description: 'Intervalles courts, efforts intenses',
+        color: '#EF4444', // red
+      },
+      {
+        zone: 6,
+        name: 'Capacité anaérobie',
+        min: Math.round(user.ftp * 1.20),
+        max: Math.round(user.ftp * 1.50),
+        percentage: '120-150%',
+        description: 'Sprints courts, efforts maximaux',
+        color: '#A855F7', // purple
+      },
+      {
+        zone: 7,
+        name: 'Puissance neuromusculaire',
+        min: Math.round(user.ftp * 1.50),
+        max: null,
+        percentage: '>150%',
+        description: 'Sprints explosifs, < 30s',
+        color: '#EC4899', // pink
+      },
+    ]
+
+    // Calcul du ratio W/kg si le poids est disponible
+    const wPerKg = user.weightCurrent ? Math.round((user.ftp / user.weightCurrent) * 100) / 100 : null
+
+    return response.ok({
+      data: {
+        ftp: user.ftp,
+        weight: user.weightCurrent,
+        wPerKg: wPerKg,
         zones: zones,
       },
     })
