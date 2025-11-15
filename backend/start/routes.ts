@@ -43,6 +43,7 @@ router
     router.post('/login', [AuthController, 'login'])
   })
   .prefix('/api/auth')
+  .use([middleware.rateLimit(['handleAuth'])])
 
 // Routes protégées (nécessitent authentification)
 router
@@ -82,13 +83,13 @@ router
   .group(() => {
     router.get('/', [ActivitiesController, 'index'])
     router.post('/create', [ActivitiesController, 'create'])
-    router.post('/upload', [ActivitiesController, 'upload'])
+    router.post('/upload', [ActivitiesController, 'upload']).use([middleware.rateLimit(['handleUpload'])])
     router.get('/stats', [ActivitiesController, 'stats'])
     router.get('/cycling-stats', [ActivitiesController, 'cyclingStats'])
     router.get('/training-load', [ActivitiesController, 'trainingLoad'])
     router.get('/:id', [ActivitiesController, 'show'])
     router.patch('/:id', [ActivitiesController, 'update'])
-    router.post('/:id/replace-file', [ActivitiesController, 'replaceFile'])
+    router.post('/:id/replace-file', [ActivitiesController, 'replaceFile']).use([middleware.rateLimit(['handleUpload'])])
     router.delete('/:id', [ActivitiesController, 'destroy'])
   })
   .prefix('/api/activities')

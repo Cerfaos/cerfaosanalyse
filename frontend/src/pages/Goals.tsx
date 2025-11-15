@@ -180,7 +180,7 @@ export default function Goals() {
 
   if (loading) {
     return (
-      <AppLayout>
+      <AppLayout title="Objectifs" description="Chargement des objectifs">
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-gray-600 dark:text-gray-400">Chargement...</div>
         </div>
@@ -189,7 +189,7 @@ export default function Goals() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout title="Objectifs" description="Définissez et suivez vos objectifs d'entraînement">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
