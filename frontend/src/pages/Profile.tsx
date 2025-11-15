@@ -37,6 +37,7 @@ export default function Profile() {
     fullName: user?.fullName || '',
     fcMax: user?.fcMax || '',
     fcRepos: user?.fcRepos || '',
+    ftp: user?.ftp || '',
     weightCurrent: user?.weightCurrent || '',
     theme: user?.theme || 'light',
   })
@@ -83,6 +84,7 @@ export default function Profile() {
         fullName: formData.fullName.trim() || null,
         fcMax: formData.fcMax && formData.fcMax !== '' ? Number(formData.fcMax) : null,
         fcRepos: formData.fcRepos && formData.fcRepos !== '' ? Number(formData.fcRepos) : null,
+        ftp: formData.ftp && formData.ftp !== '' ? Number(formData.ftp) : null,
         weightCurrent: formData.weightCurrent && formData.weightCurrent !== '' ? Number(formData.weightCurrent) : null,
         theme: formData.theme,
       }
@@ -243,20 +245,44 @@ export default function Profile() {
                 </FormField>
               </div>
 
-              <FormField label="Poids actuel (kg)" htmlFor="weightCurrent" helper="Entre 30 et 300 kg">
-                <input
-                  type="number"
-                  id="weightCurrent"
-                  name="weightCurrent"
-                  value={formData.weightCurrent}
-                  onChange={handleChange}
-                  min="30"
-                  max="300"
-                  step="0.1"
-                  className="w-full px-4 py-3 rounded-lg border border-border-base bg-bg-white focus:border-brand focus:ring-2 focus:ring-brand/30 outline-none"
-                  placeholder="Ex: 70.5"
-                />
-              </FormField>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="FTP (watts)" htmlFor="ftp" helper="Functional Threshold Power">
+                  <input
+                    type="number"
+                    id="ftp"
+                    name="ftp"
+                    value={formData.ftp}
+                    onChange={handleChange}
+                    min="50"
+                    max="600"
+                    className="w-full px-4 py-3 rounded-lg border border-border-base bg-bg-white focus:border-brand focus:ring-2 focus:ring-brand/30 outline-none"
+                    placeholder="Ex: 250"
+                  />
+                </FormField>
+
+                <FormField label="Poids actuel (kg)" htmlFor="weightCurrent" helper="Entre 30 et 300 kg">
+                  <input
+                    type="number"
+                    id="weightCurrent"
+                    name="weightCurrent"
+                    value={formData.weightCurrent}
+                    onChange={handleChange}
+                    min="30"
+                    max="300"
+                    step="0.1"
+                    className="w-full px-4 py-3 rounded-lg border border-border-base bg-bg-white focus:border-brand focus:ring-2 focus:ring-brand/30 outline-none"
+                    placeholder="Ex: 70.5"
+                  />
+                </FormField>
+              </div>
+
+              {formData.ftp && formData.weightCurrent && (
+                <div className="p-4 rounded-lg bg-brand/10 border border-brand/30">
+                  <p className="text-sm font-medium text-brand">
+                    Ratio Puissance/Poids: {(Number(formData.ftp) / Number(formData.weightCurrent)).toFixed(2)} W/kg
+                  </p>
+                </div>
+              )}
 
               <FormField label="Thème de l'interface" htmlFor="theme">
                 <select

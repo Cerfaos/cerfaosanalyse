@@ -41,6 +41,8 @@ interface Activity {
   maxTemperature: number | null
   subSport: string | null
   trimp: number | null
+  rpe: number | null
+  feelingNotes: string | null
   fileName: string | null
   gpsData: string | null
   weather: string | null
@@ -61,8 +63,6 @@ function FitBounds({ positions }: { positions: [number, number][] }) {
   useEffect(() => {
     if (positions.length > 0) {
       const bounds = L.latLngBounds(positions)
-      const sw = bounds.getSouthWest()
-      const ne = bounds.getNorthEast()
 
       // Ajuster la carte pour afficher tous les points
       map.fitBounds(bounds, {
@@ -105,6 +105,8 @@ export default function ActivityDetail() {
     avgCadence: '',
     elevationGain: '',
     calories: '',
+    rpe: '',
+    feelingNotes: '',
     weatherCondition: '',
     weatherTemperature: '',
     weatherWindSpeed: '',
@@ -191,6 +193,8 @@ export default function ActivityDetail() {
       avgCadence: activity.avgCadence?.toString() || '',
       elevationGain: activity.elevationGain?.toString() || '',
       calories: activity.calories?.toString() || '',
+      rpe: activity.rpe?.toString() || '',
+      feelingNotes: activity.feelingNotes || '',
       weatherCondition: '',
       weatherTemperature: currentTemp,
       weatherWindSpeed: currentWindSpeed,
@@ -233,6 +237,12 @@ export default function ActivityDetail() {
       if (editForm.avgCadence) updateData.avgCadence = Number(editForm.avgCadence)
       if (editForm.elevationGain) updateData.elevationGain = Number(editForm.elevationGain)
       if (editForm.calories) updateData.calories = Number(editForm.calories)
+
+      // Ajouter RPE et notes de sensations
+      if (editForm.rpe) updateData.rpe = Number(editForm.rpe)
+      else updateData.rpe = null
+      if (editForm.feelingNotes) updateData.feelingNotes = editForm.feelingNotes
+      else updateData.feelingNotes = null
 
       // Ajouter les champs météo si renseignés
       if (editForm.weatherCondition) {
@@ -924,6 +934,52 @@ export default function ActivityDetail() {
               </p>
             </div>
 
+            {/* Section RPE et Sensations */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 text-text-dark">Ressenti / Sensations</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-body mb-1">
+                    RPE - Effort Perçu (1-10)
+                  </label>
+                  <select
+                    value={editForm.rpe}
+                    onChange={(e) => setEditForm({ ...editForm, rpe: e.target.value })}
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                  >
+                    <option value="">-- Sélectionner --</option>
+                    <option value="1">1 - Très très facile</option>
+                    <option value="2">2 - Très facile</option>
+                    <option value="3">3 - Facile</option>
+                    <option value="4">4 - Modéré</option>
+                    <option value="5">5 - Assez dur</option>
+                    <option value="6">6 - Dur</option>
+                    <option value="7">7 - Très dur</option>
+                    <option value="8">8 - Très très dur</option>
+                    <option value="9">9 - Extrême</option>
+                    <option value="10">10 - Maximum</option>
+                  </select>
+                  <p className="text-xs text-text-secondary mt-1">
+                    Échelle de Borg modifiée : comment avez-vous perçu cet effort ?
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-body mb-1">
+                    Notes sur les sensations
+                  </label>
+                  <textarea
+                    value={editForm.feelingNotes}
+                    onChange={(e) => setEditForm({ ...editForm, feelingNotes: e.target.value })}
+                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    rows={3}
+                    placeholder="Ex: Jambes lourdes, bonne récupération, fatigue générale..."
+                    maxLength={500}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Note d'information */}
             <div className="bg-info-light p-4 rounded-lg border border-info">
               <p className="text-sm text-info-dark">
@@ -990,6 +1046,16 @@ export default function ActivityDetail() {
           <p className="text-2xl font-bold text-accent-500">{activity.trimp || '-'}</p>
         </div>
 
+        {activity.rpe && (
+          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
+            <p className="text-sm text-text-secondary mb-1">RPE (Effort Perçu)</p>
+            <p className="text-2xl font-bold text-text-dark">{activity.rpe}/10</p>
+            <p className="text-xs text-text-tertiary">
+              {activity.rpe <= 3 ? 'Facile' : activity.rpe <= 6 ? 'Modéré' : activity.rpe <= 8 ? 'Difficile' : 'Extrême'}
+            </p>
+          </div>
+        )}
+
         {activity.avgTemperature && (
           <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
             <p className="text-sm text-text-secondary mb-1">Température</p>
@@ -1012,6 +1078,19 @@ export default function ActivityDetail() {
           </div>
         )}
       </div>
+
+      {/* Notes de sensations */}
+      {activity.feelingNotes && (
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card mb-8">
+          <h3 className="text-lg font-semibold text-text-dark mb-2 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Notes sur les sensations
+          </h3>
+          <p className="text-text-body whitespace-pre-wrap">{activity.feelingNotes}</p>
+        </div>
+      )}
 
       {/* Météo */}
       {activity.weather && (() => {

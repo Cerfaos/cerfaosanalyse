@@ -6,6 +6,7 @@ interface User {
   fullName: string | null
   fcMax: number | null
   fcRepos: number | null
+  ftp: number | null
   weightCurrent: number | null
   theme: 'light' | 'dark'
   avatarUrl?: string | null
