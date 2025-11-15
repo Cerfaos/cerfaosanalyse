@@ -13,6 +13,15 @@ import BadgeService from '#services/badge_service'
 // @ts-ignore - Double default export issue with fit-file-parser
 const FitParser = FitParserModule.default?.default || FitParserModule.default
 
+interface ParsedGpsPoint {
+  lat: number
+  lon: number
+  ele?: number
+  time?: string | Date
+  hr?: number | null
+  speed?: number | null
+}
+
 interface ParsedActivity {
   date: DateTime
   type: string
@@ -34,8 +43,19 @@ interface ParsedActivity {
   subSport: string | null
   trimp: number | null
   hrZones?: number[]
-  gpsData?: Array<{ lat: number; lon: number; ele?: number; time?: string }>
+  gpsData?: ParsedGpsPoint[]
 }
+
+interface HeartRateZoneDefinition {
+  zone: number
+  name: string
+  description: string
+  min: number
+  max: number
+  color: string
+}
+
+type ZoneComputationSource = 'samples' | 'average' | 'none'
 
 export default class ActivitiesController {
   /**
@@ -61,7 +81,11 @@ export default class ActivitiesController {
     }
 
     if (endDate) {
-      query = query.where('date', '<=', endDate)
+      // Ajouter 1 jour pour inclure toute la journée de fin (23:59:59)
+      const endDatePlusOne = new Date(endDate)
+      endDatePlusOne.setDate(endDatePlusOne.getDate() + 1)
+      const endDateStr = endDatePlusOne.toISOString().split('T')[0]
+      query = query.where('date', '<', endDateStr)
     }
 
     const activities = await query.paginate(page, limit)
@@ -502,6 +526,8 @@ export default class ActivitiesController {
               lon: r.position_long,
               ele: r.altitude,
               time: r.timestamp,
+              hr: typeof r.heart_rate === 'number' ? r.heart_rate : r.heart_rate ?? null,
+              speed: typeof r.speed === 'number' ? r.speed : r.speed ?? null,
             }))
 
           // Déterminer le type d'activité
@@ -705,6 +731,233 @@ export default class ActivitiesController {
     return Math.round(durationMinutes * zoneCoefficient)
   }
 
+  private buildHeartRateZones(fcMax: number, fcRepos: number): HeartRateZoneDefinition[] {
+    const fcReserve = fcMax - fcRepos
+    const palette = ['#0EA5E9', '#22C55E', '#FACC15', '#F97316', '#EF4444']
+
+    return [
+      {
+        zone: 1,
+        name: 'Z1 - Récupération',
+        description: 'Échauffement et endurance très douce',
+        min: Math.round(fcRepos + 0.5 * fcReserve),
+        max: Math.round(fcRepos + 0.6 * fcReserve),
+        color: palette[0],
+      },
+      {
+        zone: 2,
+        name: 'Z2 - Endurance',
+        description: 'Endurance fondamentale, sorties longues',
+        min: Math.round(fcRepos + 0.6 * fcReserve),
+        max: Math.round(fcRepos + 0.7 * fcReserve),
+        color: palette[1],
+      },
+      {
+        zone: 3,
+        name: 'Z3 - Tempo',
+        description: 'Tempo et intensité modérée',
+        min: Math.round(fcRepos + 0.7 * fcReserve),
+        max: Math.round(fcRepos + 0.8 * fcReserve),
+        color: palette[2],
+      },
+      {
+        zone: 4,
+        name: 'Z4 - Seuil',
+        description: 'Travail au seuil lactique',
+        min: Math.round(fcRepos + 0.8 * fcReserve),
+        max: Math.round(fcRepos + 0.9 * fcReserve),
+        color: palette[3],
+      },
+      {
+        zone: 5,
+        name: 'Z5 - VO2 max',
+        description: 'Efforts très intenses',
+        min: Math.round(fcRepos + 0.9 * fcReserve),
+        max: fcMax,
+        color: palette[4],
+      },
+    ]
+  }
+
+  private resolveZoneIndex(value: number, zones: HeartRateZoneDefinition[]): number {
+    if (!zones.length) {
+      return 0
+    }
+
+    const exactMatch = zones.findIndex((zone) => value >= zone.min && value <= zone.max)
+    if (exactMatch !== -1) {
+      return exactMatch
+    }
+
+    return value < zones[0].min ? 0 : zones.length - 1
+  }
+
+  private parseGpsPointTime(point: ParsedGpsPoint): DateTime | null {
+    if (!point || !point.time) {
+      return null
+    }
+
+    if (point.time instanceof Date) {
+      return DateTime.fromJSDate(point.time)
+    }
+
+    if (typeof point.time === 'number') {
+      return DateTime.fromMillis(point.time)
+    }
+
+    const parsed = DateTime.fromISO(String(point.time))
+    return parsed.isValid ? parsed : null
+  }
+
+  private calculateZoneDurations(
+    activity: Activity,
+    zones: HeartRateZoneDefinition[]
+  ): { durations: number[]; totalSeconds: number; source: ZoneComputationSource } {
+    const durations = zones.map(() => 0)
+    let totalSeconds = 0
+    let source: ZoneComputationSource = 'none'
+
+    if (activity.gpsData) {
+      try {
+        const points = JSON.parse(activity.gpsData) as ParsedGpsPoint[]
+        const hrPoints = points.filter(
+          (point) => typeof point.hr === 'number' && point.hr! > 0 && point.time
+        )
+
+        if (hrPoints.length > 1) {
+          source = 'samples'
+          hrPoints.sort((a, b) => {
+            const at = this.parseGpsPointTime(a)?.toMillis() || 0
+            const bt = this.parseGpsPointTime(b)?.toMillis() || 0
+            return at - bt
+          })
+
+          for (let i = 0; i < hrPoints.length - 1; i++) {
+            const currentTime = this.parseGpsPointTime(hrPoints[i])
+            const nextTime = this.parseGpsPointTime(hrPoints[i + 1])
+
+            if (!currentTime || !nextTime) {
+              continue
+            }
+
+            let delta = nextTime.diff(currentTime, 'seconds').seconds
+            if (!isFinite(delta) || delta <= 0) {
+              continue
+            }
+
+            delta = Math.min(Math.max(delta, 1), 30)
+            const zoneIndex = this.resolveZoneIndex(hrPoints[i].hr || 0, zones)
+            durations[zoneIndex] += delta
+            totalSeconds += delta
+          }
+        }
+      } catch (error) {
+        console.warn('Impossible de parser les données GPS pour les zones FC', {
+          activityId: activity.id,
+          error,
+        })
+      }
+    }
+
+    const activityDuration = activity.duration || 0
+
+    if (source === 'samples' && totalSeconds > 0 && activityDuration > 0) {
+      const scale = activityDuration / totalSeconds
+      if (scale > 0.3 && scale < 3) {
+        for (let i = 0; i < durations.length; i++) {
+          durations[i] = durations[i] * scale
+        }
+        totalSeconds = activityDuration
+      } else {
+        source = 'none'
+        totalSeconds = 0
+        durations.fill(0)
+      }
+    }
+
+    if ((source !== 'samples' || totalSeconds === 0) && activity.avgHeartRate) {
+      source = 'average'
+      const zoneIndex = this.resolveZoneIndex(activity.avgHeartRate, zones)
+
+      // Distribution réaliste: la zone dominante (60%), zones adjacentes (30%), reste (10%)
+      durations[zoneIndex] = activityDuration * 0.6 // 60% dans la zone dominante
+
+      // Zones adjacentes
+      if (zoneIndex > 0) {
+        durations[zoneIndex - 1] = activityDuration * 0.2 // 20% zone inférieure
+      }
+      if (zoneIndex < zones.length - 1) {
+        durations[zoneIndex + 1] = activityDuration * 0.15 // 15% zone supérieure
+      }
+
+      // Reste dispersé (5%)
+      const remainingTime = activityDuration * 0.05
+      for (let i = 0; i < zones.length; i++) {
+        if (i !== zoneIndex && i !== zoneIndex - 1 && i !== zoneIndex + 1) {
+          durations[i] = remainingTime / Math.max(1, zones.length - 3)
+        }
+      }
+
+      totalSeconds = activityDuration
+    }
+
+    return { durations, totalSeconds, source }
+  }
+
+  private buildPolarizationSummary(zoneBuckets: Array<{ zone: number; seconds: number }>) {
+    const totals = {
+      low: zoneBuckets
+        .filter((zone) => zone.zone === 1 || zone.zone === 2)
+        .reduce((sum, zone) => sum + zone.seconds, 0),
+      moderate: zoneBuckets.filter((zone) => zone.zone === 3).reduce((sum, zone) => sum + zone.seconds, 0),
+      high: zoneBuckets
+        .filter((zone) => zone.zone === 4 || zone.zone === 5)
+        .reduce((sum, zone) => sum + zone.seconds, 0),
+    }
+
+    const totalSeconds = totals.low + totals.moderate + totals.high
+    const toPercent = (value: number) => (totalSeconds > 0 ? (value / totalSeconds) * 100 : 0)
+    const percentages = {
+      low: toPercent(totals.low),
+      moderate: toPercent(totals.moderate),
+      high: toPercent(totals.high),
+    }
+
+    const target = { low: 80, moderate: 10, high: 10 }
+    const deviation =
+      Math.abs(percentages.low - target.low) +
+      Math.abs(percentages.moderate - target.moderate) +
+      Math.abs(percentages.high - target.high)
+    const score = Math.max(0, 100 - deviation * 0.8)
+
+    let focus = 'équilibré'
+    if (percentages.low < 70) {
+      focus = 'base insuffisante'
+    } else if (percentages.high < 8) {
+      focus = 'intensité haute manquante'
+    } else if (percentages.high > 20) {
+      focus = 'trop d\'intensité'
+    }
+
+    let message = 'Répartition très proche du 80/10/10, continuez ainsi.'
+    if (focus === 'base insuffisante') {
+      message = 'Augmentez le volume en Z1/Z2 pour consolider votre base aérobie.'
+    } else if (focus === 'intensité haute manquante') {
+      message = 'Ajoutez des blocs en Z4/Z5 pour stimuler votre VO2 max.'
+    } else if (focus === 'trop d\'intensité') {
+      message = 'Surveillez la fatigue : la part haute est très présente.'
+    }
+
+    return {
+      totals,
+      percentages,
+      target,
+      score: Math.round(score * 10) / 10,
+      focus,
+      message,
+    }
+  }
+
   /**
    * Mettre à jour une activité
    */
@@ -887,6 +1140,143 @@ export default class ActivitiesController {
     return response.ok({
       message: 'Statistiques calculées',
       data: stats,
+    })
+  }
+
+  /**
+   * Statistiques détaillées spécifiques au cyclisme (zones cardiaques, polarisation, etc.)
+   */
+  async cyclingStats({ auth, request, response }: HttpContext) {
+    const user = auth.user!
+
+    if (!user.fcMax || !user.fcRepos) {
+      return response.badRequest({
+        message: 'Configurez votre FC max et FC repos pour accéder aux statistiques de cyclisme',
+      })
+    }
+
+    const period = request.input('period', '90')
+    const startDateInput = request.input('startDate')
+    const endDateInput = request.input('endDate')
+    const now = DateTime.now()
+
+    const numericPeriod = Number(period)
+    const computedStart =
+      startDateInput ||
+      (!Number.isNaN(numericPeriod) ? now.minus({ days: numericPeriod }).startOf('day').toSQLDate() : null)
+    const computedEnd = endDateInput || now.toSQLDate()
+
+    let query = Activity.query().where('user_id', user.id).where('type', 'Cyclisme')
+
+    if (computedStart) {
+      query = query.where('date', '>=', computedStart)
+    }
+
+    if (computedEnd) {
+      query = query.where('date', '<=', computedEnd)
+    }
+
+    const activities = await query.orderBy('date', 'desc')
+
+    const heartRateZones = this.buildHeartRateZones(user.fcMax, user.fcRepos)
+    const aggregatedZones = heartRateZones.map((zone) => ({
+      ...zone,
+      seconds: 0,
+    }))
+
+    const perActivity = activities.map((activity) => {
+      const { durations, totalSeconds, source } = this.calculateZoneDurations(activity, heartRateZones)
+
+      durations.forEach((value, idx) => {
+        aggregatedZones[idx].seconds += value
+      })
+
+      const total = totalSeconds || activity.duration || 0
+
+      // Calculer l'index de la zone dominante AVANT de l'utiliser
+      const dominantZoneIndex =
+        durations.reduce((bestIdx, value, idx) => (value > durations[bestIdx] ? idx : bestIdx), 0)
+
+      const zoneDurations = durations.map((value, idx) => ({
+        zone: heartRateZones[idx].zone,
+        label: heartRateZones[idx].name,
+        seconds: Math.round(value),
+        percentage: total > 0 ? Math.round((value / total) * 1000) / 10 : 0,
+        color: heartRateZones[idx].color,
+      }))
+
+      return {
+        id: activity.id,
+        date: activity.date.toISO() || activity.date.toString(),
+        duration: activity.duration,
+        distance: activity.distance,
+        avgHeartRate: activity.avgHeartRate,
+        maxHeartRate: activity.maxHeartRate,
+        trimp: activity.trimp,
+        zoneDurations,
+        dominantZone: heartRateZones[dominantZoneIndex]?.zone || heartRateZones[0].zone,
+        dominantZoneLabel: heartRateZones[dominantZoneIndex]?.name || heartRateZones[0].name,
+        dataSource: source,
+      }
+    })
+
+    const totalDistance = activities.reduce((sum, activity) => sum + (activity.distance || 0), 0)
+    const totalDuration = activities.reduce((sum, activity) => sum + (activity.duration || 0), 0)
+    const totalTrimp = activities.reduce((sum, activity) => sum + (activity.trimp || 0), 0)
+    const hrValues = activities.filter((activity) => activity.avgHeartRate).map((activity) => activity.avgHeartRate!)
+    const avgHeartRate = hrValues.length
+      ? Math.round(hrValues.reduce((sum, value) => sum + value, 0) / hrValues.length)
+      : null
+    const avgSpeed =
+      totalDuration > 0 ? Math.round(((totalDistance / 1000) / (totalDuration / 3600)) * 10) / 10 : null
+
+    const totalZoneSeconds = aggregatedZones.reduce((sum, zone) => sum + zone.seconds, 0)
+    const zoneDistribution = aggregatedZones.map((zone) => ({
+      zone: zone.zone,
+      name: zone.name,
+      description: zone.description,
+      min: zone.min,
+      max: zone.max,
+      color: zone.color,
+      seconds: Math.round(zone.seconds),
+      hours: Math.round((zone.seconds / 3600) * 10) / 10,
+      percentage: totalZoneSeconds > 0 ? Math.round((zone.seconds / totalZoneSeconds) * 1000) / 10 : 0,
+    }))
+
+    const polarization = this.buildPolarizationSummary(aggregatedZones)
+
+    const samplingCount: Record<ZoneComputationSource, number> = {
+      samples: 0,
+      average: 0,
+      none: 0,
+    }
+    perActivity.forEach((activity) => {
+      samplingCount[activity.dataSource] += 1
+    })
+
+    const recentActivities = perActivity.slice(0, 12)
+
+    return response.ok({
+      data: {
+        filters: {
+          period,
+          startDate: computedStart,
+          endDate: computedEnd,
+        },
+        summary: {
+          sessions: activities.length,
+          totalDistance,
+          totalDuration,
+          totalTrimp,
+          avgHeartRate,
+          avgSpeed,
+        },
+        heartRateZones,
+        zoneDistribution,
+        polarization,
+        sampling: samplingCount,
+        activities: recentActivities,
+      },
     })
   }
 

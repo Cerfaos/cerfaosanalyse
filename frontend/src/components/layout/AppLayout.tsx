@@ -14,6 +14,7 @@ type LayoutProps = {
 const navigation = [
   { label: 'Accueil', to: '/', icon: HomeIcon },
   { label: 'Tableau de bord', to: '/dashboard', icon: DashboardIcon },
+  { label: 'Cartographie FC', to: '/cycling', icon: CyclingIcon },
   { label: 'Activités', to: '/activities', icon: ActivitiesIcon },
   { label: 'Badges', to: '/badges', icon: BadgesIcon },
   { label: 'Objectifs', to: '/goals', icon: GoalsIcon },
@@ -180,6 +181,17 @@ function DashboardIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M3 12h7V3H3v9zm11 9h7v-7h-7v7z" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M3 21h7v-6H3v6zm11-9h7V3h-7v9z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function CyclingIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="7" cy="17" r="3" />
+      <circle cx="17" cy="17" r="3" />
+      <path d="M7 17l3-7h4l3 7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 6h4l2 3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

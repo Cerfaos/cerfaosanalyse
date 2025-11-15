@@ -83,6 +83,7 @@ router
     router.post('/create', [ActivitiesController, 'create'])
     router.post('/upload', [ActivitiesController, 'upload'])
     router.get('/stats', [ActivitiesController, 'stats'])
+    router.get('/cycling-stats', [ActivitiesController, 'cyclingStats'])
     router.get('/training-load', [ActivitiesController, 'trainingLoad'])
     router.get('/:id', [ActivitiesController, 'show'])
     router.patch('/:id', [ActivitiesController, 'update'])

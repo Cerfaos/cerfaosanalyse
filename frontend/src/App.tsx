@@ -12,6 +12,7 @@ import Weight from './pages/Weight'
 import Activities from './pages/Activities'
 import ActivityDetail from './pages/ActivityDetail'
 import TrainingLoad from './pages/TrainingLoad'
+import CyclingStats from './pages/CyclingStats'
 import Equipment from './pages/Equipment'
 import Export from './pages/Export'
 import Badges from './pages/Badges'
@@ -69,6 +70,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cycling"
+            element={
+              <ProtectedRoute>
+                <CyclingStats />
               </ProtectedRoute>
             }
           />
