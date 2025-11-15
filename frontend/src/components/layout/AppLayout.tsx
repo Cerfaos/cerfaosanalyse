@@ -16,6 +16,7 @@ const navigation = [
   { label: 'Tableau de bord', to: '/dashboard', icon: DashboardIcon },
   { label: 'Activités', to: '/activities', icon: ActivitiesIcon },
   { label: 'Badges', to: '/badges', icon: BadgesIcon },
+  { label: 'Objectifs', to: '/goals', icon: GoalsIcon },
   { label: 'Poids', to: '/weight', icon: WeightIcon },
   { label: "Charge d'entraînement", to: '/training-load', icon: TrainingIcon },
   { label: 'Équipement', to: '/equipment', icon: EquipmentIcon },
@@ -250,6 +251,16 @@ function BadgesIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M12 2l2.5 7.5H22L16 14l2 7-6-4.5L6 21l2-7-6-4.5h7.5z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function GoalsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" />
     </svg>
   )
 }

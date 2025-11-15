@@ -18,6 +18,7 @@ const ActivitiesController = () => import('#controllers/activities_controller')
 const EquipmentController = () => import('#controllers/equipment_controller')
 const ExportsController = () => import('#controllers/exports_controller')
 const BadgesController = () => import('#controllers/badges_controller')
+const GoalsController = () => import('#controllers/goals_controller')
 
 // Health check
 router.get('/', async () => {
@@ -124,4 +125,16 @@ router
     router.post('/check', [BadgesController, 'check'])
   })
   .prefix('/api/badges')
+  .use(middleware.auth())
+
+// Routes objectifs protégées
+router
+  .group(() => {
+    router.get('/', [GoalsController, 'index'])
+    router.post('/', [GoalsController, 'store'])
+    router.get('/:id', [GoalsController, 'show'])
+    router.patch('/:id', [GoalsController, 'update'])
+    router.delete('/:id', [GoalsController, 'destroy'])
+  })
+  .prefix('/api/goals')
   .use(middleware.auth())
