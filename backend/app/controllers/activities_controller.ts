@@ -1,10 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Activity from '#models/activity'
 import { DateTime } from 'luxon'
-// @ts-ignore
-import * as FitParserModule from 'fit-file-parser'
-// @ts-ignore
-import * as GPXParser from 'gpxparser'
+import FitParserModule from 'fit-file-parser'
+import GPXParser from 'gpxparser'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs/promises'
 import WeatherService from '#services/weather_service'
@@ -13,8 +11,45 @@ import HeartRateZoneService from '#services/heart_rate_zone_service'
 import TrainingLoadService from '#services/training_load_service'
 import type { ParsedGpsPoint, ZoneComputationSource } from '#types/training'
 
-// @ts-ignore - Double default export issue with fit-file-parser
-const FitParser = FitParserModule.default?.default || FitParserModule.default
+// FitParser has double default export that varies by bundler
+const FitParser = (FitParserModule as unknown as { default?: typeof FitParserModule }).default || FitParserModule
+
+interface FitRecord {
+  position_lat?: number
+  position_long?: number
+  altitude?: number
+  timestamp?: Date
+  heart_rate?: number
+  speed?: number
+}
+
+interface FitData {
+  activity?: {
+    sessions?: Array<{
+      sport?: string
+      sub_sport?: string
+      start_time?: Date
+      total_elapsed_time?: number
+      total_timer_time?: number
+      total_distance?: number
+      avg_heart_rate?: number
+      max_heart_rate?: number
+      avg_speed?: number
+      max_speed?: number
+      total_ascent?: number
+      total_descent?: number
+      total_calories?: number
+      avg_cadence?: number
+      avg_power?: number
+      normalized_power?: number
+      avg_temperature?: number
+      max_temperature?: number
+      laps?: Array<{
+        records?: FitRecord[]
+      }>
+    }>
+  }
+}
 
 interface ParsedActivity {
   date: DateTime
@@ -38,6 +73,32 @@ interface ParsedActivity {
   trimp: number | null
   hrZones?: number[]
   gpsData?: ParsedGpsPoint[]
+}
+
+interface ActivityUpdateData {
+  type?: string
+  date?: string | DateTime
+  duration?: number
+  distance?: number
+  avgHeartRate?: number
+  maxHeartRate?: number
+  avgSpeed?: number
+  maxSpeed?: number
+  avgPower?: number
+  normalizedPower?: number
+  avgCadence?: number
+  elevationGain?: number
+  calories?: number
+  equipmentId?: number
+  notes?: string
+  rpe?: number
+  feelingNotes?: string
+  weatherCondition?: string
+  weatherTemperature?: number
+  weatherWindSpeed?: number
+  weatherWindDirection?: number
+  weather?: string
+  trimp?: number
 }
 
 export default class ActivitiesController {
@@ -492,7 +553,7 @@ export default class ActivitiesController {
     const fileBuffer = await fs.readFile(filePath)
 
     return new Promise((resolve, reject) => {
-      fitParser.parse(fileBuffer, (error: any, data: any) => {
+      fitParser.parse(fileBuffer, (error: Error | null, data: FitData) => {
         if (error) {
           reject(error)
           return
@@ -504,10 +565,10 @@ export default class ActivitiesController {
 
           // Extraire les données GPS
           const gpsData = records
-            .filter((r: any) => r.position_lat && r.position_long)
-            .map((r: any) => ({
-              lat: r.position_lat,
-              lon: r.position_long,
+            .filter((r: FitRecord) => r.position_lat && r.position_long)
+            .map((r: FitRecord) => ({
+              lat: r.position_lat!,
+              lon: r.position_long!,
               ele: r.altitude,
               time: r.timestamp,
               hr: typeof r.heart_rate === 'number' ? r.heart_rate : r.heart_rate ?? null,
@@ -526,7 +587,7 @@ export default class ActivitiesController {
             'training': 'Entraînement',
             'transition': 'Transition',
           }
-          const type = sportMap[session.sport] || 'Cyclisme'
+          const type = session.sport ? sportMap[session.sport] || 'Cyclisme' : 'Cyclisme'
 
           // Mapper les sous-types de sport en français
           let subSport = null
@@ -589,8 +650,8 @@ export default class ActivitiesController {
    */
   private async parseGpxFile(filePath: string): Promise<ParsedActivity> {
     const gpxContent = await fs.readFile(filePath, 'utf-8')
-    // @ts-ignore
-    const gpx = new GPXParser.default()
+    const GpxParserClass = (GPXParser as unknown as { default: new () => typeof GPXParser }).default
+    const gpx = new GpxParserClass()
     gpx.parse(gpxContent)
 
     const track = gpx.tracks[0]
@@ -599,7 +660,7 @@ export default class ActivitiesController {
     }
 
     // Extraire les données GPS
-    const gpsData = track.points.map((p: any) => ({
+    const gpsData = track.points.map((p) => ({
       lat: p.lat,
       lon: p.lon,
       ele: p.ele,
@@ -607,8 +668,13 @@ export default class ActivitiesController {
     }))
 
     // Calculer la durée
-    const startTime = DateTime.fromJSDate(new Date(track.points[0].time))
-    const endTime = DateTime.fromJSDate(new Date(track.points[track.points.length - 1].time))
+    const firstPointTime = track.points[0].time
+    const lastPointTime = track.points[track.points.length - 1].time
+    if (!firstPointTime || !lastPointTime) {
+      throw new Error('Les points GPS doivent contenir des timestamps')
+    }
+    const startTime = DateTime.fromJSDate(firstPointTime instanceof Date ? firstPointTime : new Date(firstPointTime))
+    const endTime = DateTime.fromJSDate(lastPointTime instanceof Date ? lastPointTime : new Date(lastPointTime))
     const duration = endTime.diff(startTime, 'seconds').seconds
 
     // Note: GPXParser retourne la distance en mètres
@@ -696,7 +762,7 @@ export default class ActivitiesController {
     }
 
     // Récupérer tous les champs modifiables
-    const data: any = request.only([
+    const data: ActivityUpdateData = request.only([
       'type',
       'date',
       'duration',
@@ -721,7 +787,7 @@ export default class ActivitiesController {
     ])
 
     // Convertir la date si fournie
-    if (data.date) {
+    if (data.date && typeof data.date === 'string') {
       data.date = DateTime.fromISO(data.date)
     }
 
@@ -734,7 +800,7 @@ export default class ActivitiesController {
     ) {
       const avgHr = data.avgHeartRate || activity.avgHeartRate
       const duration = data.duration || activity.duration
-      data.trimp = new TrainingLoadService().calculateTrimp(duration, avgHr, user.fcMax, user.fcRepos)
+      data.trimp = new TrainingLoadService().calculateTrimp(duration, avgHr!, user.fcMax, user.fcRepos)
     } else if (data.avgHeartRate && user.fcMax && user.fcRepos) {
       // Recalculer avec durée existante
       data.trimp = new TrainingLoadService().calculateTrimp(activity.duration, data.avgHeartRate, user.fcMax, user.fcRepos)
@@ -757,7 +823,9 @@ export default class ActivitiesController {
       delete data.weatherWindDirection
     }
 
-    activity.merge(data)
+    // Cast to remove weather fields that are already deleted
+    const mergeData = data as Partial<typeof activity>
+    activity.merge(mergeData)
     await activity.save()
 
     return response.ok({

@@ -15,6 +15,27 @@ interface WeatherData {
   visibility: number
 }
 
+interface OpenWeatherMapResponse {
+  main: {
+    temp: number
+    feels_like: number
+    humidity: number
+    pressure: number
+  }
+  wind: {
+    speed: number
+    deg: number
+  }
+  weather: Array<{
+    description: string
+    icon: string
+  }>
+  clouds: {
+    all: number
+  }
+  visibility: number
+}
+
 export default class WeatherService {
   private apiKey: string = env.get('OPENWEATHERMAP_API_KEY', '')
   private baseUrl: string = 'https://api.openweathermap.org/data/2.5'
@@ -101,7 +122,7 @@ export default class WeatherService {
   /**
    * Formater les données météo (API Current Weather)
    */
-  private formatWeatherData(data: any): WeatherData {
+  private formatWeatherData(data: OpenWeatherMapResponse): WeatherData {
     return {
       temperature: Math.round(data.main.temp),
       feelsLike: Math.round(data.main.feels_like),

@@ -1,9 +1,7 @@
-import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import { cuid } from '@adonisjs/core/helpers'
 import fs from 'node:fs/promises'
-import path from 'node:path'
 
 export default class UsersController {
   /**

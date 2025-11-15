@@ -6,6 +6,7 @@ import Goal from '#models/goal'
 import UserBadge from '#models/user_badge'
 import Badge from '#models/badge'
 import { DateTime } from 'luxon'
+import type { ParsedGpsPoint } from '#types/training'
 
 export default class ExportsController {
   /**
@@ -258,12 +259,12 @@ export default class ExportsController {
   /**
    * Générer un fichier GPX à partir d'une activité
    */
-  private generateGpxFile(activity: Activity, gpsPoints: any[]): string {
+  private generateGpxFile(activity: Activity, gpsPoints: ParsedGpsPoint[]): string {
     const activityName = `${activity.type} - ${activity.date.toFormat('dd/MM/yyyy')}`
     const timeISO = activity.date.toISO()
 
     const trackPoints = gpsPoints
-      .map((point: any) => {
+      .map((point) => {
         const ele = point.ele !== undefined ? `    <ele>${point.ele}</ele>` : ''
         const time = point.time ? `    <time>${point.time}</time>` : ''
 

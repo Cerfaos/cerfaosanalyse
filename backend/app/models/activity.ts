@@ -4,15 +4,6 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
 import Equipment from './equipment.js'
 
-interface GpsPoint {
-  lat: number
-  lng: number
-  time: number
-  hr?: number
-  speed?: number
-  altitude?: number
-}
-
 export default class Activity extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
