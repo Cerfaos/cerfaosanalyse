@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useAuthStore } from '../store/authStore'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
@@ -70,7 +69,6 @@ export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [typeStats, setTypeStats] = useState<ActivityTypeStats[]>([])
   const [recentActivities, setRecentActivities] = useState<Activity[]>([])
-  const [monthlyDataByType, setMonthlyDataByType] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -93,8 +91,6 @@ export default function Dashboard() {
         params: { limit: 5, page: 1 },
       })
       setRecentActivities(activitiesResponse.data.data.data)
-
-      await loadMonthlyDataByType()
     } catch (error) {
       console.error('Erreur lors du chargement du dashboard:', error)
     } finally {
@@ -174,45 +170,6 @@ export default function Dashboard() {
       setTypeStats(statsArray)
     } catch (error) {
       console.error('Erreur lors du chargement des stats par type:', error)
-    }
-  }
-
-  const loadMonthlyDataByType = async () => {
-    try {
-      const response = await api.get('/api/activities', {
-        params: { limit: 1000, page: 1 },
-      })
-      const activities = response.data.data.data
-
-      const monthsMap = new Map<string, Record<string, number>>()
-
-      activities.forEach((activity: Activity) => {
-        const date = new Date(activity.date)
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-
-        if (!monthsMap.has(monthKey)) {
-          monthsMap.set(monthKey, {})
-        }
-
-        const monthData = monthsMap.get(monthKey)!
-        if (!monthData[activity.type]) {
-          monthData[activity.type] = 0
-        }
-        monthData[activity.type] += activity.distance / 1000
-      })
-
-      const monthlyArray = Array.from(monthsMap.entries())
-        .map(([month, types]) => ({
-          month,
-          monthLabel: new Date(month + '-01').toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }),
-          ...types,
-        }))
-        .sort((a, b) => a.month.localeCompare(b.month))
-        .slice(-12)
-
-      setMonthlyDataByType(monthlyArray)
-    } catch (error) {
-      console.error('Erreur lors du chargement des données mensuelles par type:', error)
     }
   }
 
@@ -302,49 +259,22 @@ export default function Dashboard() {
 
             {/* Statistiques par type d'activité */}
             {typeStats.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast mb-4 font-display">
-                  Par type d'activité
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="glass-panel p-8">
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="text-4xl">📊</div>
+                    <h2 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast font-display">
+                      Statistiques par type d'activité
+                    </h2>
+                  </div>
+                  <p className="text-sm text-text-muted dark:text-dark-text-secondary ml-16">
+                    Détail de vos performances pour chaque discipline sur la période sélectionnée
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {typeStats.map((typeData) => (
                     <ActivityTypeCard key={typeData.type} typeData={typeData} formatDistance={formatDistance} formatDuration={formatDuration} />
                   ))}
-                </div>
-              </div>
-            )}
-
-            {/* Évolution mensuelle par type */}
-            {monthlyDataByType.length > 0 && (
-              <div className="glass-panel p-6">
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">Évolution mensuelle par type</h3>
-                  <p className="text-sm text-text-muted dark:text-dark-text-secondary">Distance (km) sur les 12 derniers mois</p>
-                </div>
-                <div className="h-80 w-full min-w-0">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={320}>
-                    <LineChart data={monthlyDataByType}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-gray-700" />
-                      <XAxis dataKey="monthLabel" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                      <Tooltip />
-                      <Legend />
-                      {typeStats.slice(0, 5).map((typeData, index) => {
-                        const colors = ['#3B82F6', '#F97316', '#10B981', '#06B6D4', '#F59E0B']
-                        return (
-                          <Line
-                            key={typeData.type}
-                            type="monotone"
-                            dataKey={typeData.type}
-                            stroke={colors[index]}
-                            strokeWidth={2}
-                            dot={{ r: 3 }}
-                            name={`${typeData.icon} ${typeData.type}`}
-                          />
-                        )
-                      })}
-                    </LineChart>
-                  </ResponsiveContainer>
                 </div>
               </div>
             )}
@@ -411,12 +341,12 @@ function ActivityTypeCard({
   }
 
   return (
-    <div className={`rounded-2xl border-2 border-panel-border p-6 ${config.bgColor} ${config.bgDark} transition-all hover:shadow-lg`}>
-      <div className="flex items-center gap-3 mb-4">
-        <div className="text-4xl">{typeData.icon}</div>
+    <div className={`rounded-2xl border-3 border-panel-border p-7 ${config.bgColor} ${config.bgDark} transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-opacity-80 cursor-default`}>
+      <div className="flex items-center gap-3 mb-5">
+        <div className="text-5xl">{typeData.icon}</div>
         <div>
-          <h3 className={`text-xl font-bold ${config.color} ${config.colorDark}`}>{typeData.type}</h3>
-          <p className="text-sm text-text-muted dark:text-dark-text-secondary">
+          <h3 className={`text-2xl font-bold ${config.color} ${config.colorDark}`}>{typeData.type}</h3>
+          <p className="text-sm font-medium text-text-muted dark:text-dark-text-secondary">
             {typeData.count} sortie{typeData.count > 1 ? 's' : ''}
           </p>
         </div>
