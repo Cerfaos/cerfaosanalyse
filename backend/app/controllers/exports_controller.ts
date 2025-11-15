@@ -1,5 +1,4 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import User from '#models/user'
 import Activity from '#models/activity'
 import WeightHistory from '#models/weight_history'
 import Equipment from '#models/equipment'
@@ -26,8 +25,7 @@ export default class ExportsController {
       exportDate: DateTime.now().toISO(),
       user: {
         email: user.email,
-        name: user.name,
-        age: user.age,
+        fullName: user.fullName,
         fcMax: user.fcMax,
         fcRepos: user.fcRepos,
       },
@@ -47,7 +45,6 @@ export default class ExportsController {
         normalizedPower: a.normalizedPower,
         trimp: a.trimp,
         fileName: a.fileName,
-        notes: a.notes,
       })),
       weightHistories: weightHistories.map((w) => ({
         date: w.date.toISODate(),
@@ -103,7 +100,6 @@ export default class ExportsController {
       'Puissance Moy',
       'Puissance Normalisée',
       'TRIMP',
-      'Notes',
     ].join(',')
 
     const rows = activities.map((a) => {
@@ -122,7 +118,6 @@ export default class ExportsController {
         a.avgPower || '',
         a.normalizedPower || '',
         a.trimp || '',
-        `"${a.notes || ''}"`,
       ].join(',')
     })
 
