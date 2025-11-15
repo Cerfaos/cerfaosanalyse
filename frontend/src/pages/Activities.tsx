@@ -299,47 +299,82 @@ export default function Activities() {
     switch (type) {
       case 'Cyclisme':
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         )
       case 'Course':
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         )
       case 'Marche':
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M12 3v18m0-18l-3 3m3-3l3 3" />
           </svg>
         )
       case 'Rameur':
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         )
       case 'Randonnée':
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l7 18m0 0l7-18M12 21V3" />
           </svg>
         )
       case 'Natation':
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5" />
           </svg>
         )
       default:
         return (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         )
     }
+  }
+
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'Cyclisme':
+        return { bg: 'bg-gradient-to-br from-orange-500 to-amber-600', text: 'text-white', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' }
+      case 'Course':
+        return { bg: 'bg-gradient-to-br from-blue-500 to-indigo-600', text: 'text-white', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' }
+      case 'Marche':
+        return { bg: 'bg-gradient-to-br from-green-500 to-emerald-600', text: 'text-white', badge: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' }
+      case 'Rameur':
+        return { bg: 'bg-gradient-to-br from-cyan-500 to-teal-600', text: 'text-white', badge: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300' }
+      case 'Randonnée':
+        return { bg: 'bg-gradient-to-br from-yellow-500 to-lime-600', text: 'text-white', badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' }
+      case 'Natation':
+        return { bg: 'bg-gradient-to-br from-sky-500 to-blue-600', text: 'text-white', badge: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300' }
+      default:
+        return { bg: 'bg-gradient-to-br from-gray-500 to-slate-600', text: 'text-white', badge: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300' }
+    }
+  }
+
+  const getTrimpColor = (trimp: number | null) => {
+    if (!trimp) return 'text-text-muted'
+    if (trimp < 50) return 'text-green-600 dark:text-green-400'
+    if (trimp < 100) return 'text-yellow-600 dark:text-yellow-400'
+    if (trimp < 200) return 'text-orange-600 dark:text-orange-400'
+    return 'text-red-600 dark:text-red-400'
+  }
+
+  const getTrimpLevel = (trimp: number | null) => {
+    if (!trimp) return null
+    if (trimp < 50) return 'Léger'
+    if (trimp < 100) return 'Modéré'
+    if (trimp < 200) return 'Intense'
+    return 'Très intense'
   }
 
   const scrollToForm = () => {
@@ -380,22 +415,72 @@ export default function Activities() {
 
         {stats && stats.count > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card title="Activités" description={periodLabel()}>
-              <p className="text-3xl font-bold text-brand">{stats.count}</p>
-              <p className="text-xs text-text-muted">Moyenne: {stats.avgDistance ? formatDistance(stats.avgDistance) : '-'} par sortie</p>
-            </Card>
-            <Card title="Distance totale">
-              <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">{formatDistance(stats.totalDistance)}</p>
-              <p className="text-xs text-text-muted">Moyenne: {formatDistance(stats.avgDistance)}</p>
-            </Card>
-            <Card title="Temps total">
-              <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">{formatDuration(stats.totalDuration)}</p>
-              <p className="text-xs text-text-muted">Moyenne: {formatDuration(stats.avgDuration)}</p>
-            </Card>
-            <Card title="TRIMP total">
-              <p className="text-3xl font-bold text-brand">{stats.totalTrimp}</p>
-              <p className="text-xs text-text-muted">Moyenne: {stats.avgTrimp} / activité</p>
-            </Card>
+            <div className="glass-panel p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-text-muted">Activités</p>
+                    <p className="text-xs text-text-tertiary">{periodLabel()}</p>
+                  </div>
+                </div>
+                <p className="text-4xl font-bold text-brand mb-1">{stats.count}</p>
+                <p className="text-sm text-text-muted">Moy: {stats.avgDistance ? formatDistance(stats.avgDistance) : '-'}/sortie</p>
+              </div>
+            </div>
+
+            <div className="glass-panel p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-text-muted">Distance totale</p>
+                </div>
+                <p className="text-4xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">{formatDistance(stats.totalDistance)}</p>
+                <p className="text-sm text-text-muted">Moy: {formatDistance(stats.avgDistance)}</p>
+              </div>
+            </div>
+
+            <div className="glass-panel p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-text-muted">Temps total</p>
+                </div>
+                <p className="text-4xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">{formatDuration(stats.totalDuration)}</p>
+                <p className="text-sm text-text-muted">Moy: {formatDuration(stats.avgDuration)}</p>
+              </div>
+            </div>
+
+            <div className="glass-panel p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-text-muted">TRIMP total</p>
+                </div>
+                <p className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-1">{stats.totalTrimp}</p>
+                <p className="text-sm text-text-muted">Moy: {stats.avgTrimp}/activité</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -900,139 +985,159 @@ export default function Activities() {
             {loading ? (
               <p className="text-center text-text-secondary py-8">Chargement...</p>
             ) : activities.length === 0 ? (
-              <div className="text-center py-12">
-                <svg
-                  className="w-16 h-16 text-text-tertiary mx-auto mb-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <p className="text-text-secondary">Aucune activité enregistrée</p>
-                <p className="text-sm text-text-tertiary mt-2">
-                  Importez votre première activité pour commencer
+              <div className="text-center py-16">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                  <svg
+                    className="w-10 h-10 text-text-tertiary"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                </div>
+                <p className="text-xl font-semibold text-text-secondary mb-2">Aucune activité enregistrée</p>
+                <p className="text-sm text-text-tertiary max-w-sm mx-auto">
+                  Importez votre première activité pour commencer à suivre vos performances
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {activities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center justify-between p-4 border border-border-base rounded-md hover:bg-bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/activities/${activity.id}`)}
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="text-accent-500">
-                          {getActivityIcon(activity.type)}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-text-dark">
-                            {activity.type}
-                          </h3>
-                          <p className="text-sm text-text-secondary">
-                            {new Date(activity.date).toLocaleDateString('fr-FR', {
-                              day: '2-digit',
-                              month: 'long',
-                              year: 'numeric',
-                            })}
-                            {' à '}
-                            {new Date(activity.date).toLocaleTimeString('fr-FR', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
-                        </div>
-                      </div>
+              <div className="space-y-4">
+                {activities.map((activity) => {
+                  const colors = getActivityColor(activity.type)
+                  return (
+                    <div
+                      key={activity.id}
+                      className="group relative bg-white dark:bg-dark-bg-elevated rounded-2xl border border-border-base hover:border-brand/30 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+                      onClick={() => navigate(`/activities/${activity.id}`)}
+                    >
+                      {/* Bande de couleur à gauche */}
+                      <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${colors.bg} opacity-80 group-hover:opacity-100 transition-opacity`} />
 
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
-                        <div>
-                          <p className="text-text-tertiary">Distance</p>
-                          <p className="font-medium text-text-dark">
-                            {formatDistance(activity.distance)}
-                          </p>
+                      <div className="p-5 pl-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            {/* Icône avec fond gradient */}
+                            <div className={`w-14 h-14 rounded-xl ${colors.bg} ${colors.text} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                              {getActivityIcon(activity.type)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-3 mb-1">
+                                <h3 className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                                  {activity.type}
+                                </h3>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}>
+                                  {new Date(activity.date).toLocaleDateString('fr-FR', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                  })}
+                                </span>
+                              </div>
+                              <p className="text-sm text-text-secondary flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {new Date(activity.date).toLocaleTimeString('fr-FR', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                                <span className="text-text-tertiary">•</span>
+                                <span className="text-text-tertiary">
+                                  {new Date(activity.date).toLocaleDateString('fr-FR', {
+                                    weekday: 'long',
+                                  })}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDelete(activity.id)
+                            }}
+                            className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all duration-200"
+                            title="Supprimer"
+                          >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
                         </div>
-                        <div>
-                          <p className="text-text-tertiary">Durée</p>
-                          <p className="font-medium text-text-dark">
-                            {formatDuration(activity.duration)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-text-tertiary">FC moy</p>
-                          <p className="font-medium text-text-dark">
-                            {activity.avgHeartRate ? `${activity.avgHeartRate} bpm` : '-'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-text-tertiary">TRIMP</p>
-                          <p className="font-medium text-accent-500">
-                            {activity.trimp || '-'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-text-tertiary">Météo</p>
-                          {activity.weather && (() => {
-                            try {
-                              const weather: WeatherData = JSON.parse(activity.weather)
-                              return (
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-1">
-                                    <img
-                                      src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
-                                      alt={weather.description}
-                                      className="w-6 h-6"
-                                    />
-                                    <p className="font-medium text-text-dark">
-                                      {Math.round(weather.temperature)}°C
+
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Distance</p>
+                            <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                              {formatDistance(activity.distance)}
+                            </p>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Durée</p>
+                            <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                              {formatDuration(activity.duration)}
+                            </p>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">FC moy</p>
+                            <p className="text-lg font-bold text-red-600 dark:text-red-400">
+                              {activity.avgHeartRate ? `${activity.avgHeartRate}` : '-'}
+                              {activity.avgHeartRate && <span className="text-xs font-normal ml-1">bpm</span>}
+                            </p>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">TRIMP</p>
+                            <p className={`text-lg font-bold ${getTrimpColor(activity.trimp)}`}>
+                              {activity.trimp || '-'}
+                            </p>
+                            {activity.trimp && (
+                              <p className="text-xs text-text-muted mt-0.5">{getTrimpLevel(activity.trimp)}</p>
+                            )}
+                          </div>
+                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3">
+                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1 text-center">Météo</p>
+                            {activity.weather && (() => {
+                              try {
+                                const weather: WeatherData = JSON.parse(activity.weather)
+                                return (
+                                  <div className="flex flex-col items-center">
+                                    <div className="flex items-center gap-1">
+                                      <img
+                                        src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+                                        alt={weather.description}
+                                        className="w-8 h-8"
+                                      />
+                                      <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                                        {Math.round(weather.temperature)}°
+                                      </p>
+                                    </div>
+                                    <p className="text-xs text-text-tertiary truncate max-w-full">
+                                      💨 {weather.windSpeed} km/h
                                     </p>
                                   </div>
-                                  <p className="text-xs text-text-tertiary capitalize">
-                                    {weather.description}
-                                  </p>
-                                  <p className="text-xs text-text-tertiary">
-                                    💨 {weather.windSpeed} km/h ({weather.windDirection}°)
-                                  </p>
-                                </div>
-                              )
-                            } catch (e) {
-                              return <p className="font-medium text-text-dark">-</p>
-                            }
-                          })() || <p className="font-medium text-text-dark">-</p>}
+                                )
+                              } catch {
+                                return <p className="text-lg font-bold text-text-dark text-center">-</p>
+                              }
+                            })() || <p className="text-lg font-bold text-text-dark text-center">-</p>}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDelete(activity.id)
-                      }}
-                      className="text-red-600 hover:text-red-700 transition-colors p-2 ml-4"
-                      title="Supprimer"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+                      {/* Indicateur de navigation */}
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
