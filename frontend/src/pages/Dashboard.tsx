@@ -44,11 +44,12 @@ interface ActivityTypeStats {
   colorDark: string
 }
 
-const periodOptions: { value: '7' | '30' | '90' | '365'; label: string; color: string; colorDark: string }[] = [
+const periodOptions: { value: '7' | '30' | '90' | '365' | 'custom'; label: string; color: string; colorDark: string }[] = [
   { value: '7', label: '7 jours', color: 'bg-blue-100 border-blue-400 text-blue-800', colorDark: 'dark:bg-blue-950/40 dark:border-blue-600 dark:text-blue-200' },
   { value: '30', label: '30 jours', color: 'bg-green-100 border-green-400 text-green-800', colorDark: 'dark:bg-green-950/40 dark:border-green-600 dark:text-green-200' },
   { value: '90', label: '90 jours', color: 'bg-orange-100 border-orange-400 text-orange-800', colorDark: 'dark:bg-orange-950/40 dark:border-orange-600 dark:text-orange-200' },
   { value: '365', label: 'Année', color: 'bg-purple-100 border-purple-400 text-purple-800', colorDark: 'dark:bg-purple-950/40 dark:border-purple-600 dark:text-purple-200' },
+  { value: 'custom', label: 'Personnalisé', color: 'bg-pink-100 border-pink-400 text-pink-800', colorDark: 'dark:bg-pink-950/40 dark:border-pink-600 dark:text-pink-200' },
 ]
 
 const activityTypeConfig: Record<string, { icon: string; color: string; colorDark: string; bgColor: string; bgDark: string }> = {
@@ -65,7 +66,11 @@ const activityTypeConfig: Record<string, { icon: string; color: string; colorDar
 export default function Dashboard() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
-  const [period, setPeriod] = useState<'7' | '30' | '90' | '365'>('30')
+  const [period, setPeriod] = useState<'7' | '30' | '90' | '365' | 'custom'>('30')
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth())
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear())
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [availableTypes, setAvailableTypes] = useState<string[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [typeStats, setTypeStats] = useState<ActivityTypeStats[]>([])
   const [recentActivities, setRecentActivities] = useState<Activity[]>([])
@@ -73,18 +78,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboardData()
-  }, [period])
+  }, [period, selectedMonth, selectedYear, selectedTypes])
 
   const loadDashboardData = async () => {
     try {
       setLoading(true)
 
-      const statsResponse = await api.get('/api/activities/stats', {
-        params: { period },
-      })
-      setStats(statsResponse.data.data)
-
-      // Charger toutes les activités de la période pour calculer les stats par type
+      // Charger toutes les activités et calculer les stats
       await loadTypeStats()
 
       const activitiesResponse = await api.get('/api/activities', {
@@ -105,12 +105,53 @@ export default function Dashboard() {
       })
       const allActivities: Activity[] = response.data.data.data
 
-      // Filtrer par période
-      const periodDays = parseInt(period)
-      const periodDate = new Date()
-      periodDate.setDate(periodDate.getDate() - periodDays)
+      // Extraire tous les types disponibles
+      const types = [...new Set(allActivities.map((a) => a.type))]
+      setAvailableTypes(types)
 
-      const activitiesInPeriod = allActivities.filter((a) => new Date(a.date) >= periodDate)
+      // Filtrer par période
+      let activitiesInPeriod: Activity[] = []
+
+      if (period === 'custom') {
+        // Filtrer par mois et année
+        activitiesInPeriod = allActivities.filter((a) => {
+          const activityDate = new Date(a.date)
+          return activityDate.getMonth() === selectedMonth && activityDate.getFullYear() === selectedYear
+        })
+      } else {
+        // Filtrer par nombre de jours
+        const periodDays = parseInt(period)
+        const periodDate = new Date()
+        periodDate.setDate(periodDate.getDate() - periodDays)
+        activitiesInPeriod = allActivities.filter((a) => new Date(a.date) >= periodDate)
+      }
+
+      // Filtrer par types sélectionnés
+      if (selectedTypes.length > 0) {
+        activitiesInPeriod = activitiesInPeriod.filter((a) => selectedTypes.includes(a.type))
+      }
+
+      // Calculer les statistiques globales
+      const totalActivities = activitiesInPeriod.length
+      const totalDistance = activitiesInPeriod.reduce((sum, a) => sum + a.distance, 0)
+      const totalDuration = activitiesInPeriod.reduce((sum, a) => sum + a.duration, 0)
+      const totalTrimp = Math.round(activitiesInPeriod.reduce((sum, a) => sum + (a.trimp || 0), 0))
+
+      const activitiesWithHR = activitiesInPeriod.filter((a) => a.avgHeartRate)
+      const averageHeartRate = activitiesWithHR.length > 0
+        ? Math.round(activitiesWithHR.reduce((sum, a) => sum + (a.avgHeartRate || 0), 0) / activitiesWithHR.length)
+        : null
+
+      setStats({
+        totalActivities,
+        totalDistance,
+        totalDuration,
+        totalTrimp,
+        averageDistance: totalActivities > 0 ? totalDistance / totalActivities : 0,
+        averageDuration: totalActivities > 0 ? totalDuration / totalActivities : 0,
+        averageHeartRate,
+        byType: [],
+      })
 
       // Grouper par type
       const typeMap = new Map<string, Activity[]>()
@@ -196,6 +237,17 @@ export default function Dashboard() {
         return '90 derniers jours'
       case '365':
         return 'Cette année'
+      case 'custom':
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+        return `${monthNames[selectedMonth]} ${selectedYear}`
+    }
+  }
+
+  const toggleType = (type: string) => {
+    if (selectedTypes.includes(type)) {
+      setSelectedTypes(selectedTypes.filter((t) => t !== type))
+    } else {
+      setSelectedTypes([...selectedTypes, type])
     }
   }
 
@@ -220,21 +272,91 @@ export default function Dashboard() {
       actions={actions}
     >
       <div className="space-y-8">
-        {/* Sélecteur de période */}
-        <div className="flex flex-wrap gap-3">
-          {periodOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setPeriod(option.value)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border-2 ${
-                period === option.value
-                  ? `${option.color} ${option.colorDark} shadow-md transform hover:scale-105`
-                  : 'border-panel-border bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary hover:bg-bg-subtle'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
+        {/* Filtres */}
+        <div className="glass-panel p-6 space-y-6">
+          {/* Sélecteur de période */}
+          <div>
+            <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast mb-3">Période</p>
+            <div className="flex flex-wrap gap-3">
+              {periodOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setPeriod(option.value)}
+                  className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border-2 ${
+                    period === option.value
+                      ? `${option.color} ${option.colorDark} shadow-md transform hover:scale-105`
+                      : 'border-panel-border bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary hover:bg-bg-subtle'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sélecteurs de mois et année (mode personnalisé) */}
+          {period === 'custom' && (
+            <div>
+              <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast mb-3">Sélectionner le mois et l'année</p>
+              <div className="flex flex-wrap gap-3">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                  className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-text-dark dark:text-dark-text-contrast font-medium text-sm focus:outline-none focus:border-brand transition-colors"
+                >
+                  {['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'].map((month, index) => (
+                    <option key={index} value={index}>{month}</option>
+                  ))}
+                </select>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-text-dark dark:text-dark-text-contrast font-medium text-sm focus:outline-none focus:border-brand transition-colors"
+                >
+                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Filtres par type d'activité */}
+          {availableTypes.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast">Types d'activités</p>
+                {selectedTypes.length > 0 && (
+                  <button
+                    onClick={() => setSelectedTypes([])}
+                    className="text-xs text-brand hover:text-brand-dark dark:text-brand dark:hover:text-brand-light font-medium underline"
+                  >
+                    Tout afficher
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {availableTypes.map((type) => {
+                  const config = activityTypeConfig[type] || { icon: '📈', color: 'text-gray-600', colorDark: 'dark:text-gray-400' }
+                  const isSelected = selectedTypes.length === 0 || selectedTypes.includes(type)
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => toggleType(type)}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all border-2 ${
+                        isSelected
+                          ? `border-brand bg-brand/10 ${config.color} ${config.colorDark} shadow-sm hover:shadow-md`
+                          : 'border-panel-border bg-white dark:bg-dark-surface text-text-muted dark:text-dark-text-secondary opacity-50 hover:opacity-100'
+                      }`}
+                    >
+                      <span className="mr-1">{config.icon}</span>
+                      {type}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {stats && stats.totalActivities > 0 ? (
