@@ -8,6 +8,7 @@ import * as GPXParser from 'gpxparser'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs/promises'
 import WeatherService from '#services/weather_service'
+import BadgeService from '#services/badge_service'
 
 // @ts-ignore - Double default export issue with fit-file-parser
 const FitParser = FitParserModule.default?.default || FitParserModule.default
@@ -15,17 +16,22 @@ const FitParser = FitParserModule.default?.default || FitParserModule.default
 interface ParsedActivity {
   date: DateTime
   type: string
-  duration: number // secondes
+  duration: number // secondes (temps total avec pauses)
+  movingTime: number | null // secondes (temps en mouvement sans pauses)
   distance: number // mètres
   avgHeartRate: number | null
   maxHeartRate: number | null
   avgSpeed: number | null
   maxSpeed: number | null
   elevationGain: number | null
+  elevationLoss: number | null
   calories: number | null
   avgCadence: number | null
   avgPower: number | null
   normalizedPower: number | null
+  avgTemperature: number | null
+  maxTemperature: number | null
+  subSport: string | null
   trimp: number | null
   hrZones?: number[]
   gpsData?: Array<{ lat: number; lon: number; ele?: number; time?: string }>
@@ -106,10 +112,15 @@ export default class ActivitiesController {
       'avgSpeed',
       'maxSpeed',
       'elevationGain',
+      'elevationLoss',
       'calories',
       'avgCadence',
       'avgPower',
       'normalizedPower',
+      'avgTemperature',
+      'maxTemperature',
+      'subSport',
+      'movingTime',
     ])
 
     // Vérifier s'il y a un fichier GPX pour les données GPS
@@ -163,37 +174,50 @@ export default class ActivitiesController {
       date: activityDate,
       type: data.type || 'Cyclisme',
       duration: finalDuration,
+      movingTime: data.movingTime ? Number(data.movingTime) : null,
       distance: finalDistance,
       avgHeartRate: data.avgHeartRate ? Number(data.avgHeartRate) : null,
       maxHeartRate: data.maxHeartRate ? Number(data.maxHeartRate) : null,
       avgSpeed: data.avgSpeed ? Number(data.avgSpeed) : null,
       maxSpeed: data.maxSpeed ? Number(data.maxSpeed) : null,
       elevationGain: finalElevationGain,
+      elevationLoss: data.elevationLoss ? Number(data.elevationLoss) : null,
       calories: data.calories ? Number(data.calories) : null,
       avgCadence: data.avgCadence ? Number(data.avgCadence) : null,
       avgPower: data.avgPower ? Number(data.avgPower) : null,
       normalizedPower: data.normalizedPower ? Number(data.normalizedPower) : null,
+      avgTemperature: data.avgTemperature ? Number(data.avgTemperature) : null,
+      maxTemperature: data.maxTemperature ? Number(data.maxTemperature) : null,
+      subSport: data.subSport || null,
       trimp,
       fileName: gpxFile ? gpxFile.clientName : null,
       gpsData: gpsDataString,
       weather: weatherData ? JSON.stringify(weatherData) : null,
     })
 
+    // Vérifier et attribuer les badges
+    const badgeService = new BadgeService()
+    const newBadges = await badgeService.checkAndAwardBadges(user.id)
+
     return response.created({
       message: 'Activité créée avec succès',
-      data: activity,
+      data: {
+        activity,
+        newBadges: newBadges.map(b => ({ id: b.id, name: b.name, icon: b.icon })),
+      },
     })
   }
 
   /**
    * Upload et parser un fichier d'activité
+   * Supporte l'import en 2 étapes : fichier principal (FIT/CSV) + fichier GPX optionnel
    */
   async upload({ auth, request, response }: HttpContext) {
     const user = auth.user!
 
     console.log('Upload request received')
 
-    // Valider le fichier
+    // Valider le fichier principal (métriques)
     const file = request.file('file', {
       size: '50mb',
       extnames: ['fit', 'gpx', 'csv'],
@@ -216,16 +240,25 @@ export default class ActivitiesController {
       })
     }
 
+    // Valider le fichier GPX optionnel (trace GPS)
+    const gpxFile = request.file('gpxFile', {
+      size: '10mb',
+      extnames: ['gpx'],
+    })
+
     console.log('File valid:', file.clientName, file.extname)
+    if (gpxFile) {
+      console.log('GPX file provided:', gpxFile.clientName)
+    }
 
     try {
-      // Lire le fichier
+      // Lire le fichier principal
       const filePath = file.tmpPath!
       const fileExtension = file.extname!
 
       let parsedActivity: ParsedActivity
 
-      // Parser selon le type de fichier
+      // Parser selon le type de fichier principal
       if (fileExtension === 'fit') {
         parsedActivity = await this.parseFitFile(filePath)
       } else if (fileExtension === 'gpx') {
@@ -236,6 +269,27 @@ export default class ActivitiesController {
         return response.badRequest({
           message: 'Type de fichier non supporté',
         })
+      }
+
+      // Si un fichier GPX séparé est fourni, extraire les données GPS
+      if (gpxFile && gpxFile.isValid) {
+        try {
+          console.log('Parsing separate GPX file for GPS data')
+          const gpxData = await this.parseGpxFile(gpxFile.tmpPath!)
+
+          // Remplacer les données GPS par celles du fichier GPX
+          parsedActivity.gpsData = gpxData.gpsData
+
+          // Optionnel : utiliser aussi le dénivelé du GPX s'il n'existe pas dans le fichier principal
+          if (!parsedActivity.elevationGain && gpxData.elevationGain) {
+            parsedActivity.elevationGain = gpxData.elevationGain
+          }
+
+          console.log(`GPS data from separate GPX: ${gpxData.gpsData?.length || 0} points`)
+        } catch (error) {
+          console.error('Error parsing separate GPX file:', error)
+          // Continue sans les données GPS du fichier séparé
+        }
       }
 
       // Calculer le TRIMP si FC disponible
@@ -259,25 +313,37 @@ export default class ActivitiesController {
         date: parsedActivity.date,
         type: parsedActivity.type,
         duration: parsedActivity.duration,
+        movingTime: parsedActivity.movingTime,
         distance: parsedActivity.distance,
         avgHeartRate: parsedActivity.avgHeartRate,
         maxHeartRate: parsedActivity.maxHeartRate,
         avgSpeed: parsedActivity.avgSpeed,
         maxSpeed: parsedActivity.maxSpeed,
         elevationGain: parsedActivity.elevationGain,
+        elevationLoss: parsedActivity.elevationLoss,
         calories: parsedActivity.calories,
         avgCadence: parsedActivity.avgCadence,
         avgPower: parsedActivity.avgPower,
         normalizedPower: parsedActivity.normalizedPower,
+        avgTemperature: parsedActivity.avgTemperature,
+        maxTemperature: parsedActivity.maxTemperature,
+        subSport: parsedActivity.subSport,
         trimp: parsedActivity.trimp,
         gpsData: gpsDataString,
         fileName: file.clientName,
         weather: weatherData ? JSON.stringify(weatherData) : null,
       })
 
+      // Vérifier et attribuer les badges
+      const badgeService = new BadgeService()
+      const newBadges = await badgeService.checkAndAwardBadges(user.id)
+
       return response.created({
         message: 'Activité importée avec succès',
-        data: activity,
+        data: {
+          activity,
+          newBadges: newBadges.map(b => ({ id: b.id, name: b.name, icon: b.icon })),
+        },
       })
     } catch (error) {
       console.error('Erreur parsing fichier:', error)
@@ -366,16 +432,21 @@ export default class ActivitiesController {
         date: parsedActivity.date,
         type: parsedActivity.type,
         duration: parsedActivity.duration,
+        movingTime: parsedActivity.movingTime,
         distance: parsedActivity.distance,
         avgHeartRate: parsedActivity.avgHeartRate,
         maxHeartRate: parsedActivity.maxHeartRate,
         avgSpeed: parsedActivity.avgSpeed,
         maxSpeed: parsedActivity.maxSpeed,
         elevationGain: parsedActivity.elevationGain,
+        elevationLoss: parsedActivity.elevationLoss,
         calories: parsedActivity.calories,
         avgCadence: parsedActivity.avgCadence,
         avgPower: parsedActivity.avgPower,
         normalizedPower: parsedActivity.normalizedPower,
+        avgTemperature: parsedActivity.avgTemperature,
+        maxTemperature: parsedActivity.maxTemperature,
+        subSport: parsedActivity.subSport,
         trimp: parsedActivity.trimp,
         gpsData: gpsDataString,
         fileName: file.clientName,
@@ -434,24 +505,65 @@ export default class ActivitiesController {
             }))
 
           // Déterminer le type d'activité
-          let type = 'Cyclisme'
-          if (session.sport === 'running') type = 'Course'
-          else if (session.sport === 'swimming') type = 'Natation'
+          const sportMap: Record<string, string> = {
+            'cycling': 'Cyclisme',
+            'running': 'Course',
+            'walking': 'Marche',
+            'rowing': 'Rameur',
+            'swimming': 'Natation',
+            'hiking': 'Randonnée',
+            'fitness_equipment': 'Fitness',
+            'training': 'Entraînement',
+            'transition': 'Transition',
+          }
+          const type = sportMap[session.sport] || 'Cyclisme'
+
+          // Mapper les sous-types de sport en français
+          let subSport = null
+          if (session.sub_sport) {
+            const subSportMap: Record<string, string> = {
+              // Cyclisme
+              'road': 'Route',
+              'mountain': 'VTT',
+              'track': 'Piste',
+              'gravel': 'Gravel',
+              'cyclocross': 'Cyclocross',
+              'indoor_cycling': 'Home Trainer',
+              'virtual_activity': 'Virtuel',
+              // Course à pied
+              'treadmill': 'Tapis de course',
+              'trail': 'Trail',
+              'street': 'Route',
+              // Natation
+              'lap_swimming': 'Piscine',
+              'open_water': 'Eau libre',
+              // Rameur
+              'indoor_rowing': 'Rameur intérieur',
+              // Autres
+              'generic': 'Général',
+            }
+            subSport = subSportMap[session.sub_sport] || session.sub_sport
+          }
 
           resolve({
             date: DateTime.fromJSDate(session.start_time || new Date()),
             type,
             duration: session.total_elapsed_time || 0,
+            movingTime: session.total_timer_time || null,
             distance: (session.total_distance || 0) * 1000, // km -> m
             avgHeartRate: session.avg_heart_rate || null,
             maxHeartRate: session.max_heart_rate || null,
             avgSpeed: session.avg_speed || null,
             maxSpeed: session.max_speed || null,
             elevationGain: session.total_ascent || null,
+            elevationLoss: session.total_descent || null,
             calories: session.total_calories || null,
             avgCadence: session.avg_cadence || null,
             avgPower: session.avg_power || null,
             normalizedPower: session.normalized_power || null,
+            avgTemperature: session.avg_temperature || null,
+            maxTemperature: session.max_temperature || null,
+            subSport,
             trimp: null,
             gpsData: gpsData.length > 0 ? gpsData : undefined,
           })
@@ -496,16 +608,21 @@ export default class ActivitiesController {
       date: startTime,
       type: 'Cyclisme',
       duration,
+      movingTime: null, // GPX ne contient pas cette info
       distance: distanceInMeters, // déjà en mètres
       avgHeartRate: null,
       maxHeartRate: null,
       avgSpeed: (distanceInMeters / 1000) / (duration / 3600), // km/h
       maxSpeed: null,
       elevationGain: track.elevation.pos || null,
+      elevationLoss: track.elevation.neg || null,
       calories: null,
       avgCadence: null,
       avgPower: null,
       normalizedPower: null,
+      avgTemperature: null,
+      maxTemperature: null,
+      subSport: null,
       trimp: null,
       gpsData,
     }
@@ -532,16 +649,21 @@ export default class ActivitiesController {
       date: DateTime.fromISO(row.date || row.Date),
       type: row.type || row.Type || 'Cyclisme',
       duration: Number(row.duration || row.Duration || 0),
+      movingTime: row.movingTime || row.MovingTime ? Number(row.movingTime || row.MovingTime) : null,
       distance: Number(row.distance || row.Distance || 0),
       avgHeartRate: row.avgHeartRate || row.AvgHeartRate ? Number(row.avgHeartRate || row.AvgHeartRate) : null,
       maxHeartRate: row.maxHeartRate || row.MaxHeartRate ? Number(row.maxHeartRate || row.MaxHeartRate) : null,
       avgSpeed: row.avgSpeed || row.AvgSpeed ? Number(row.avgSpeed || row.AvgSpeed) : null,
       maxSpeed: row.maxSpeed || row.MaxSpeed ? Number(row.maxSpeed || row.MaxSpeed) : null,
       elevationGain: row.elevationGain || row.ElevationGain ? Number(row.elevationGain || row.ElevationGain) : null,
+      elevationLoss: row.elevationLoss || row.ElevationLoss ? Number(row.elevationLoss || row.ElevationLoss) : null,
       calories: row.calories || row.Calories ? Number(row.calories || row.Calories) : null,
       avgCadence: row.avgCadence || row.AvgCadence ? Number(row.avgCadence || row.AvgCadence) : null,
       avgPower: row.avgPower || row.AvgPower ? Number(row.avgPower || row.AvgPower) : null,
       normalizedPower: row.normalizedPower || row.NormalizedPower ? Number(row.normalizedPower || row.NormalizedPower) : null,
+      avgTemperature: row.avgTemperature || row.AvgTemperature ? Number(row.avgTemperature || row.AvgTemperature) : null,
+      maxTemperature: row.maxTemperature || row.MaxTemperature ? Number(row.maxTemperature || row.MaxTemperature) : null,
+      subSport: row.subSport || row.SubSport || null,
       trimp: null,
     }
   }

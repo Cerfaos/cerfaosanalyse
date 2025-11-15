@@ -40,11 +40,11 @@ interface Activity {
   trimp: number | null
 }
 
-const periodOptions: { value: '7' | '30' | '90' | '365'; label: string }[] = [
-  { value: '7', label: '7 jours' },
-  { value: '30', label: '30 jours' },
-  { value: '90', label: '90 jours' },
-  { value: '365', label: 'Année' },
+const periodOptions: { value: '7' | '30' | '90' | '365'; label: string; color: string; colorDark: string }[] = [
+  { value: '7', label: '7 jours', color: 'bg-blue-100 border-blue-400 text-blue-800', colorDark: 'dark:bg-blue-950/40 dark:border-blue-600 dark:text-blue-200' },
+  { value: '30', label: '30 jours', color: 'bg-green-100 border-green-400 text-green-800', colorDark: 'dark:bg-green-950/40 dark:border-green-600 dark:text-green-200' },
+  { value: '90', label: '90 jours', color: 'bg-orange-100 border-orange-400 text-orange-800', colorDark: 'dark:bg-orange-950/40 dark:border-orange-600 dark:text-orange-200' },
+  { value: '365', label: 'Année', color: 'bg-purple-100 border-purple-400 text-purple-800', colorDark: 'dark:bg-purple-950/40 dark:border-purple-600 dark:text-purple-200' },
 ]
 
 export default function Dashboard() {
@@ -245,10 +245,10 @@ export default function Dashboard() {
             <button
               key={option.value}
               onClick={() => setPeriod(option.value)}
-              className={`px-4 py-2 rounded-full text-sm font-display transition-all border ${
+              className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border-2 ${
                 period === option.value
-                  ? 'bg-cta/20 border-cta/40 text-cta shadow-soft'
-                  : 'border-border-base text-text-secondary hover:border-cta/40 hover:text-text-dark'
+                  ? `${option.color} ${option.colorDark} shadow-md transform hover:scale-105`
+                  : 'border-panel-border bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary hover:bg-bg-subtle'
               }`}
             >
               {option.label}
@@ -373,8 +373,12 @@ function ActivityRow({
   const icons: Record<string, string> = {
     Cyclisme: '🚴',
     Course: '🏃',
-    Rameur: '🚣',
     Marche: '🚶',
+    Rameur: '🚣',
+    Randonnée: '🥾',
+    Natation: '🏊',
+    Fitness: '💪',
+    Entraînement: '🏋️',
   }
 
   return (
@@ -393,6 +397,11 @@ function ActivityRow({
               day: 'numeric',
               month: 'short',
               year: 'numeric',
+            })}
+            {' à '}
+            {new Date(activity.date).toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit',
             })}
           </p>
         </div>

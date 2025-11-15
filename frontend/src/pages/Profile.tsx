@@ -176,11 +176,16 @@ export default function Profile() {
 
   const getZoneColor = (zone: number) => {
     const colors = [
-      'bg-info-light/80 text-info-dark border-info',
-      'bg-success-light/80 text-success border-success/40',
-      'bg-warning-light/80 text-warning border-warning/40',
-      'bg-warning-light/90 text-warning border-warning/40',
-      'bg-error-light/80 text-danger border-danger/40',
+      // Zone 1 - Récupération : Bleu vif
+      'bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/60 dark:to-blue-800/60 text-blue-900 dark:text-blue-100 border-blue-500 dark:border-blue-400',
+      // Zone 2 - Endurance : Vert éclatant
+      'bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900/60 dark:to-emerald-800/60 text-green-900 dark:text-green-100 border-green-500 dark:border-green-400',
+      // Zone 3 - Tempo : Jaune doré
+      'bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900/60 dark:to-yellow-800/60 text-yellow-900 dark:text-yellow-100 border-yellow-500 dark:border-yellow-400',
+      // Zone 4 - Seuil : Orange intense
+      'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/60 dark:to-orange-800/60 text-orange-900 dark:text-orange-100 border-orange-500 dark:border-orange-400',
+      // Zone 5 - Maximum : Rouge vif
+      'bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/60 dark:to-red-800/60 text-red-900 dark:text-red-100 border-red-500 dark:border-red-400',
     ]
     return colors[zone - 1] || colors[0]
   }
@@ -277,32 +282,47 @@ export default function Profile() {
           </Card>
 
           <div className="space-y-6">
-            <Card title="Avatar">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
+            <Card title="Photo de profil">
+              <div className="space-y-5">
+                <div className="flex flex-col items-center">
                   {avatarPreview ? (
-                    <img
-                      src={avatarPreview.startsWith('blob:') ? avatarPreview : getAvatarUrl(avatarPreview)}
-                      alt="Avatar utilisateur"
-                      className="h-20 w-20 rounded-3xl border-4 border-panel-border object-cover"
-                    />
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-brand via-accent to-brand rounded-full blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
+                      <img
+                        src={avatarPreview.startsWith('blob:') ? avatarPreview : getAvatarUrl(avatarPreview)}
+                        alt="Avatar utilisateur"
+                        className="relative h-32 w-32 rounded-full border-4 border-white dark:border-dark-surface object-cover shadow-lg ring-4 ring-brand/20"
+                      />
+                    </div>
                   ) : (
-                    <div className="h-20 w-20 rounded-3xl border-4 border-panel-border bg-panel-bg flex items-center justify-center text-2xl font-semibold">
-                      {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'C'}
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-brand via-accent to-brand rounded-full blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
+                      <div className="relative h-32 w-32 rounded-full border-4 border-white dark:border-dark-surface bg-gradient-to-br from-brand/20 to-accent/20 flex items-center justify-center text-5xl font-bold text-brand shadow-lg ring-4 ring-brand/20">
+                        {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'C'}
+                      </div>
                     </div>
                   )}
-                  <p className="text-sm text-text-secondary">Format recommandé: carré, 2 Mo maximum, formats JPG/PNG.</p>
+                  <p className="text-xs text-center text-text-secondary mt-3 max-w-xs">
+                    Format recommandé: image carrée, 2 Mo max, JPG/PNG
+                  </p>
                 </div>
-                <input type="file" accept="image/*" onChange={handleAvatarChange} className="form-control" />
-                {avatarError && <p className="text-sm text-danger">{avatarError}</p>}
-                <button
-                  type="button"
-                  onClick={handleAvatarUpload}
-                  disabled={avatarUploading || !avatarFile}
-                  className="btn-primary w-full font-display"
-                >
-                  {avatarUploading ? 'Téléversement...' : 'Mettre à jour l’avatar'}
-                </button>
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="form-control text-sm"
+                  />
+                  {avatarError && <p className="text-sm text-danger">{avatarError}</p>}
+                  <button
+                    type="button"
+                    onClick={handleAvatarUpload}
+                    disabled={avatarUploading || !avatarFile}
+                    className="btn-primary w-full font-display"
+                  >
+                    {avatarUploading ? 'Téléversement...' : "Mettre à jour l'avatar"}
+                  </button>
+                </div>
               </div>
             </Card>
 
@@ -336,13 +356,18 @@ export default function Profile() {
           <Card title="Zones de fréquence cardiaque (Karvonen)" description="Vos zones d'entraînement calculées via Karvonen">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {hrZones.zones.map((zone) => (
-                <div key={zone.zone} className={`p-4 rounded-lg border-2 ${getZoneColor(zone.zone)}`}>
+                <div
+                  key={zone.zone}
+                  className={`p-4 rounded-xl border-2 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 ${getZoneColor(zone.zone)}`}
+                >
                   <div className="text-center mb-2">
-                    <span className="text-2xl font-bold">Z{zone.zone}</span>
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-black/20 text-xl font-bold">
+                      {zone.zone}
+                    </span>
                   </div>
-                  <h4 className="font-semibold text-sm mb-2">{zone.name}</h4>
-                  <p className="text-2xl font-bold mb-1">{zone.min}-{zone.max}</p>
-                  <p className="text-xs opacity-75">{zone.description}</p>
+                  <h4 className="font-semibold text-center text-sm mb-2">{zone.name}</h4>
+                  <p className="text-2xl font-bold text-center mb-1 whitespace-nowrap">{zone.min}-{zone.max}</p>
+                  <p className="text-xs text-center opacity-75 leading-snug">{zone.description}</p>
                 </div>
               ))}
             </div>

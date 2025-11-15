@@ -219,6 +219,84 @@ export default class ExportsController {
   }
 
   /**
+   * Exporter une activité en GPX
+   */
+  async exportActivityGpx({ auth, params, response }: HttpContext) {
+    const user = auth.user!
+
+    const activity = await Activity.query()
+      .where('id', params.id)
+      .where('user_id', user.id)
+      .first()
+
+    if (!activity) {
+      return response.notFound({
+        message: 'Activité non trouvée',
+      })
+    }
+
+    if (!activity.gpsData) {
+      return response.badRequest({
+        message: 'Cette activité ne contient pas de données GPS',
+      })
+    }
+
+    // Parser les données GPS
+    const gpsPoints = JSON.parse(activity.gpsData)
+
+    // Générer le fichier GPX
+    const gpxContent = this.generateGpxFile(activity, gpsPoints)
+
+    // Définir les headers pour le téléchargement
+    response.header('Content-Type', 'application/gpx+xml; charset=utf-8')
+    response.header(
+      'Content-Disposition',
+      `attachment; filename="${activity.type.toLowerCase()}-${activity.date.toFormat('yyyy-MM-dd')}.gpx"`
+    )
+
+    return response.send(gpxContent)
+  }
+
+  /**
+   * Générer un fichier GPX à partir d'une activité
+   */
+  private generateGpxFile(activity: Activity, gpsPoints: any[]): string {
+    const activityName = `${activity.type} - ${activity.date.toFormat('dd/MM/yyyy')}`
+    const timeISO = activity.date.toISO()
+
+    const trackPoints = gpsPoints
+      .map((point: any) => {
+        const ele = point.ele !== undefined ? `    <ele>${point.ele}</ele>` : ''
+        const time = point.time ? `    <time>${point.time}</time>` : ''
+
+        return `  <trkpt lat="${point.lat}" lon="${point.lon}">
+${ele}
+${time}
+  </trkpt>`
+      })
+      .join('\n')
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1"
+  creator="Centre d'Analyse Cycliste - Cerfao"
+  xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>${activityName}</name>
+    <time>${timeISO}</time>
+  </metadata>
+  <trk>
+    <name>${activityName}</name>
+    <type>${activity.type}</type>
+    <trkseg>
+${trackPoints}
+    </trkseg>
+  </trk>
+</gpx>`
+  }
+
+  /**
    * Obtenir les statistiques globales
    */
   async stats({ auth, response }: HttpContext) {

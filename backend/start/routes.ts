@@ -17,6 +17,7 @@ const WeightHistoriesController = () => import('#controllers/weight_histories_co
 const ActivitiesController = () => import('#controllers/activities_controller')
 const EquipmentController = () => import('#controllers/equipment_controller')
 const ExportsController = () => import('#controllers/exports_controller')
+const BadgesController = () => import('#controllers/badges_controller')
 
 // Health check
 router.get('/', async () => {
@@ -109,8 +110,18 @@ router
     router.get('/stats', [ExportsController, 'stats'])
     router.get('/all', [ExportsController, 'exportAll'])
     router.get('/activities/csv', [ExportsController, 'exportActivitiesCsv'])
+    router.get('/activities/:id/gpx', [ExportsController, 'exportActivityGpx'])
     router.get('/weight/csv', [ExportsController, 'exportWeightCsv'])
     router.get('/equipment/csv', [ExportsController, 'exportEquipmentCsv'])
   })
   .prefix('/api/exports')
+  .use(middleware.auth())
+
+// Routes badges protégées
+router
+  .group(() => {
+    router.get('/', [BadgesController, 'index'])
+    router.post('/check', [BadgesController, 'check'])
+  })
+  .prefix('/api/badges')
   .use(middleware.auth())

@@ -191,29 +191,51 @@ html {
 }
 
 .page-shell::before {
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
-    linear-gradient(135deg, transparent 25%, rgba(68, 85, 86, 0.08) 25%, rgba(68, 85, 86, 0.08) 50%, transparent 50%),
-    linear-gradient(135deg, rgba(163, 176, 135, 0.06) 25%, transparent 25%),
-    linear-gradient(135deg, transparent 25%, rgba(49, 54, 71, 0.08) 25%, rgba(49, 54, 71, 0.08) 50%, transparent 50%);
-  background-size: 260px 260px, 260px 260px, 180px 180px, 180px 180px;
-  animation: gridScroll 30s linear infinite;
-  opacity: 0.4;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(167, 192, 128, 0.25) 0deg,
+    rgba(127, 187, 179, 0.3) 60deg,
+    rgba(163, 176, 135, 0.2) 120deg,
+    rgba(230, 152, 117, 0.25) 180deg,
+    rgba(127, 187, 179, 0.28) 240deg,
+    rgba(167, 192, 128, 0.25) 300deg,
+    rgba(167, 192, 128, 0.25) 360deg
+  );
+  background-size: 200% 200%;
+  background-position: center;
+  filter: blur(80px);
+  animation: gradientRotate 20s linear infinite;
+  opacity: 0.8;
 }
 
 .dark .page-shell::before {
-  background-image: linear-gradient(135deg, rgba(167, 192, 128, 0.03) 25%, transparent 25%),
-    linear-gradient(135deg, transparent 25%, rgba(127, 187, 179, 0.04) 25%, rgba(127, 187, 179, 0.04) 50%, transparent 50%),
-    linear-gradient(135deg, rgba(45, 56, 48, 0.15) 25%, transparent 25%),
-    linear-gradient(135deg, transparent 25%, rgba(28, 35, 30, 0.1) 25%, rgba(28, 35, 30, 0.1) 50%, transparent 50%);
-  background-size: 260px 260px, 260px 260px, 180px 180px, 180px 180px;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(167, 192, 128, 0.15) 0deg,
+    rgba(127, 187, 179, 0.18) 60deg,
+    rgba(45, 56, 48, 0.2) 120deg,
+    rgba(127, 187, 179, 0.12) 180deg,
+    rgba(167, 192, 128, 0.16) 240deg,
+    rgba(167, 192, 128, 0.15) 300deg,
+    rgba(167, 192, 128, 0.15) 360deg
+  );
+  background-size: 200% 200%;
+  background-position: center;
+  filter: blur(80px);
+  opacity: 0.7;
 }
 
 .page-shell::after {
-  inset: -5% 0 -15% 0;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(49, 54, 71, 0.08));
-  mix-blend-mode: soft-light;
-  animation: gridDrift 40s ease-in-out infinite;
-  opacity: 0.4;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(167, 192, 128, 0.15) 0%,
+    rgba(127, 187, 179, 0.12) 25%,
+    rgba(230, 152, 117, 0.08) 50%,
+    transparent 70%
+  );
+  animation: gradientPulse 15s ease-in-out infinite alternate;
+  opacity: 0.9;
 }
 
 .page-shell > * {
@@ -313,23 +335,25 @@ textarea {
 }
 
 
-@keyframes gridScroll {
+@keyframes gradientRotate {
   0% {
-    background-position: 0 0, 0 0, 0 0, 0 0;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
   }
   100% {
-    background-position: -420px 0, -420px 0, -260px 0, -260px 0;
+    transform: rotate(360deg) scale(1);
   }
 }
 
-@keyframes gridDrift {
+@keyframes gradientPulse {
   0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6%);
+    transform: scale(1);
+    opacity: 0.9;
   }
   100% {
-    transform: translateY(4%);
+    transform: scale(1.2);
+    opacity: 0.7;
   }
 }

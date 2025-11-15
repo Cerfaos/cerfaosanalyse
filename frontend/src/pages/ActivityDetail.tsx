@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import { useAuthStore } from '../store/authStore'
 import api from '../services/api'
+import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 interface WeatherData {
@@ -24,16 +25,21 @@ interface Activity {
   date: string
   type: string
   duration: number
+  movingTime: number | null
   distance: number
   avgHeartRate: number | null
   maxHeartRate: number | null
   avgSpeed: number | null
   maxSpeed: number | null
   elevationGain: number | null
+  elevationLoss: number | null
   calories: number | null
   avgCadence: number | null
   avgPower: number | null
   normalizedPower: number | null
+  avgTemperature: number | null
+  maxTemperature: number | null
+  subSport: string | null
   trimp: number | null
   fileName: string | null
   gpsData: string | null
@@ -46,6 +52,27 @@ interface GpsPoint {
   lon: number
   ele?: number
   time?: string
+}
+
+// Composant pour ajuster automatiquement les limites de la carte
+function FitBounds({ positions }: { positions: [number, number][] }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (positions.length > 0) {
+      const bounds = L.latLngBounds(positions)
+      const sw = bounds.getSouthWest()
+      const ne = bounds.getNorthEast()
+
+      // Ajuster la carte pour afficher tous les points
+      map.fitBounds(bounds, {
+        padding: [50, 50],
+        maxZoom: 16  // Limite le zoom pour ne pas être trop rapproché
+      })
+    }
+  }, [positions, map])
+
+  return null
 }
 
 export default function ActivityDetail() {
@@ -61,6 +88,7 @@ export default function ActivityDetail() {
   const [isReplacingFile, setIsReplacingFile] = useState(false)
   const [replacementFile, setReplacementFile] = useState<File | null>(null)
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [downloadingGpx, setDownloadingGpx] = useState(false)
   const [editForm, setEditForm] = useState({
     type: '',
     date: '',
@@ -99,7 +127,16 @@ export default function ActivityDetail() {
       if (activityData.gpsData) {
         try {
           const parsed = JSON.parse(activityData.gpsData)
-          setGpsData(parsed)
+          // Filtrer les points GPS invalides (lat/lon à 0 ou undefined)
+          const validPoints = parsed.filter((point: GpsPoint) =>
+            point.lat &&
+            point.lon &&
+            point.lat !== 0 &&
+            point.lon !== 0 &&
+            Math.abs(point.lat) <= 90 &&
+            Math.abs(point.lon) <= 180
+          )
+          setGpsData(validPoints)
         } catch (err) {
           console.error('Erreur parsing GPS:', err)
         }
@@ -262,6 +299,38 @@ export default function ActivityDetail() {
     }
   }
 
+  const handleExportGpx = async () => {
+    if (!activity || !activity.gpsData) {
+      setError('Cette activité ne contient pas de données GPS')
+      return
+    }
+
+    try {
+      setDownloadingGpx(true)
+      const response = await api.get(`/api/exports/activities/${id}/gpx`, {
+        responseType: 'blob',
+      })
+
+      // Créer un lien de téléchargement
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      const filename = `${activity.type.toLowerCase()}-${activity.date}.gpx`
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+
+      setSuccess('Fichier GPX téléchargé avec succès !')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erreur lors de l\'export GPX')
+    } finally {
+      setDownloadingGpx(false)
+    }
+  }
+
   const formatDuration = (seconds: number) => {
     const totalSeconds = Math.round(seconds)
     let hours = Math.floor(totalSeconds / 3600)
@@ -398,13 +467,25 @@ export default function ActivityDetail() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-text-dark mb-2">{activity.type}</h1>
+            <h1 className="text-3xl font-bold text-text-dark mb-2">
+              {activity.type}
+              {activity.subSport && (
+                <span className="text-xl text-text-secondary font-normal ml-3">
+                  ({activity.subSport})
+                </span>
+              )}
+            </h1>
             <p className="text-text-body">
               {new Date(activity.date).toLocaleDateString('fr-FR', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
+              })}
+              {' à '}
+              {new Date(activity.date).toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
               })}
             </p>
             {activity.fileName && (
@@ -414,6 +495,20 @@ export default function ActivityDetail() {
             )}
           </div>
           <div className="flex items-center gap-3">
+            {activity.gpsData && (
+              <button
+                onClick={handleExportGpx}
+                disabled={downloadingGpx}
+                className="btn-secondary flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="7 10 12 15 17 10" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="12" y1="15" x2="12" y2="3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {downloadingGpx ? 'Export GPX...' : 'Exporter GPX'}
+              </button>
+            )}
             {activity.fileName && (
               <button
                 onClick={() => setIsReplacingFile(true)}
@@ -510,8 +605,12 @@ export default function ActivityDetail() {
                   >
                     <option value="Cyclisme">Cyclisme</option>
                     <option value="Course">Course</option>
-                    <option value="Rameur">Rameur</option>
                     <option value="Marche">Marche</option>
+                    <option value="Rameur">Rameur</option>
+                    <option value="Randonnée">Randonnée</option>
+                    <option value="Natation">Natation</option>
+                    <option value="Fitness">Fitness</option>
+                    <option value="Entraînement">Entraînement</option>
                     <option value="Autre">Autre</option>
                   </select>
                 </div>
@@ -881,12 +980,37 @@ export default function ActivityDetail() {
         <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">Dénivelé</p>
           <p className="text-2xl font-bold text-text-dark">{formatElevation(activity.elevationGain)}</p>
+          {activity.elevationLoss && (
+            <p className="text-xs text-text-tertiary">Descente: {formatElevation(activity.elevationLoss)}</p>
+          )}
         </div>
 
         <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
           <p className="text-sm text-text-secondary mb-1">TRIMP</p>
           <p className="text-2xl font-bold text-accent-500">{activity.trimp || '-'}</p>
         </div>
+
+        {activity.avgTemperature && (
+          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
+            <p className="text-sm text-text-secondary mb-1">Température</p>
+            <p className="text-2xl font-bold text-text-dark">{activity.avgTemperature}°C</p>
+            {activity.maxTemperature && (
+              <p className="text-xs text-text-tertiary">Max: {activity.maxTemperature}°C</p>
+            )}
+          </div>
+        )}
+
+        {activity.movingTime && (
+          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
+            <p className="text-sm text-text-secondary mb-1">Temps en pause</p>
+            <p className="text-2xl font-bold text-text-dark">
+              {formatDuration(activity.duration - activity.movingTime)}
+            </p>
+            <p className="text-xs text-text-tertiary">
+              En mouvement: {formatDuration(activity.movingTime)}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Météo */}
@@ -951,24 +1075,39 @@ export default function ActivityDetail() {
       {/* Carte GPS */}
       {gpsData.length > 0 && (
         <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
-          <h2 className="text-xl font-semibold text-text-dark mb-4">Tracé GPS</h2>
-          <div className="h-96 rounded-lg overflow-hidden">
+          <h2 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast mb-4 font-display">Tracé GPS</h2>
+          <div className="h-96 rounded-lg overflow-hidden border-4 border-panel-border shadow-lg">
             <MapContainer
               center={[gpsData[0].lat, gpsData[0].lon]}
               zoom={13}
               style={{ height: '100%', width: '100%' }}
+              scrollWheelZoom={true}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              {/* Ajustement automatique des limites de la carte */}
+              <FitBounds positions={gpsData.map((point) => [point.lat, point.lon])} />
+              {/* Ligne d'ombre/bordure noire pour meilleur contraste */}
               <Polyline
                 positions={gpsData.map((point) => [point.lat, point.lon])}
-                color="#E69875"
-                weight={3}
+                color="#000000"
+                weight={8}
+                opacity={0.3}
+              />
+              {/* Ligne principale en rouge vif */}
+              <Polyline
+                positions={gpsData.map((point) => [point.lat, point.lon])}
+                color="#FF3B30"
+                weight={5}
+                opacity={0.9}
               />
             </MapContainer>
           </div>
+          <p className="text-xs text-text-secondary dark:text-dark-text-secondary mt-3">
+            📍 {gpsData.length} points GPS • Distance totale: {activity?.distance.toFixed(2)} km
+          </p>
         </div>
       )}
 

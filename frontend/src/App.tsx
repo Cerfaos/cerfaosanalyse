@@ -14,6 +14,7 @@ import ActivityDetail from './pages/ActivityDetail'
 import TrainingLoad from './pages/TrainingLoad'
 import Equipment from './pages/Equipment'
 import Export from './pages/Export'
+import Badges from './pages/Badges'
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -123,6 +124,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Export />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/badges"
+            element={
+              <ProtectedRoute>
+                <Badges />
               </ProtectedRoute>
             }
           />

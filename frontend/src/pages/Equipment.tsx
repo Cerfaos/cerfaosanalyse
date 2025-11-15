@@ -159,6 +159,22 @@ export default function Equipment() {
     return '🔧'
   }
 
+  const getMaintenanceStatus = (item: Equipment) => {
+    if (!item.alertDistance) return null
+
+    const distanceSinceNew = item.currentDistance - item.initialDistance
+    const remaining = item.alertDistance - distanceSinceNew
+    const percentage = (distanceSinceNew / item.alertDistance) * 100
+
+    if (remaining <= 0) {
+      return { status: 'urgent', label: 'Maintenance urgente !', color: 'bg-danger', percentage: 100 }
+    } else if (remaining <= 500000) { // Moins de 500km
+      return { status: 'soon', label: `Maintenance dans ${formatDistance(remaining)}`, color: 'bg-warning', percentage }
+    } else {
+      return { status: 'ok', label: `Prochain entretien: ${formatDistance(remaining)}`, color: 'bg-success', percentage }
+    }
+  }
+
   const actions = (
     <button
       onClick={() => {
@@ -322,83 +338,128 @@ export default function Equipment() {
 
         {/* Liste des équipements */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {equipment.map((item) => (
-            <div
-              key={item.id}
-              className={`glass-panel p-6 ${!item.isActive ? 'opacity-60' : ''}`}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-3xl">{getTypeIcon(item.type)}</span>
-                  <div>
-                    <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-sm text-text-secondary">{item.type}</p>
+          {equipment.map((item) => {
+            const maintenanceStatus = getMaintenanceStatus(item)
+
+            return (
+              <div
+                key={item.id}
+                className={`glass-panel p-6 ${!item.isActive ? 'opacity-60' : ''} ${
+                  maintenanceStatus?.status === 'urgent' ? 'ring-2 ring-danger' : ''
+                }`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">{getTypeIcon(item.type)}</span>
+                    <div>
+                      <h3 className="font-semibold text-lg text-text-dark dark:text-dark-text-contrast">{item.name}</h3>
+                      <p className="text-sm text-text-secondary dark:text-dark-text-secondary">{item.type}</p>
+                    </div>
                   </div>
+                  {!item.isActive && (
+                    <span className="text-xs bg-bg-subtle text-text-body px-2 py-1 rounded-full border border-panel-border">
+                      Retraité
+                    </span>
+                  )}
                 </div>
-                {!item.isActive && (
-                  <span className="text-xs bg-bg-gray-200 text-text-body px-2 py-1 rounded">
-                    Retraité
-                  </span>
+
+                {(item.brand || item.model) && (
+                  <p className="text-sm text-text-body dark:text-dark-text-secondary mb-3">
+                    {item.brand} {item.model}
+                  </p>
                 )}
-              </div>
 
-              {(item.brand || item.model) && (
-                <p className="text-sm text-text-body mb-3">
-                  {item.brand} {item.model}
-                </p>
-              )}
+                {/* Alerte de maintenance */}
+                {maintenanceStatus && item.isActive && (
+                  <div className={`mb-4 p-3 rounded-xl border-2 ${
+                    maintenanceStatus.status === 'urgent'
+                      ? 'bg-danger/10 border-danger'
+                      : maintenanceStatus.status === 'soon'
+                      ? 'bg-warning/10 border-warning'
+                      : 'bg-success/10 border-success'
+                  }`}>
+                    <p className={`text-sm font-medium mb-2 ${
+                      maintenanceStatus.status === 'urgent'
+                        ? 'text-danger'
+                        : maintenanceStatus.status === 'soon'
+                        ? 'text-warning dark:text-warning'
+                        : 'text-success'
+                    }`}>
+                      {maintenanceStatus.label}
+                    </p>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-text-body">Distance totale:</span>
-                  <span className="font-medium">{formatDistance(item.currentDistance)}</span>
-                </div>
-                {item.alertDistance && (
+                    {/* Barre de progression */}
+                    <div className="w-full bg-bg-subtle rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${
+                          maintenanceStatus.status === 'urgent'
+                            ? 'bg-danger'
+                            : maintenanceStatus.status === 'soon'
+                            ? 'bg-warning'
+                            : 'bg-success'
+                        }`}
+                        style={{ width: `${Math.min(maintenanceStatus.percentage, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-text-body">Prochain entretien:</span>
-                    <span className="font-medium">
-                      {formatDistance(
-                        item.alertDistance - (item.currentDistance - item.initialDistance)
-                      )}
+                    <span className="text-text-body dark:text-dark-text-secondary">Distance totale:</span>
+                    <span className="font-medium text-text-dark dark:text-dark-text-contrast">{formatDistance(item.currentDistance)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-body dark:text-dark-text-secondary">Distance parcourue:</span>
+                    <span className="font-medium text-text-dark dark:text-dark-text-contrast">
+                      {formatDistance(item.currentDistance - item.initialDistance)}
                     </span>
                   </div>
-                )}
-                {item.purchaseDate && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-body">Acheté le:</span>
-                    <span className="font-medium">
-                      {new Date(item.purchaseDate).toLocaleDateString('fr-FR')}
-                    </span>
+                  {item.purchaseDate && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-body dark:text-dark-text-secondary">Acheté le:</span>
+                      <span className="font-medium text-text-dark dark:text-dark-text-contrast">
+                        {new Date(item.purchaseDate).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {item.notes && (
+                  <div className="mb-4 p-3 bg-bg-subtle rounded-xl border border-panel-border">
+                    <p className="text-xs text-text-secondary dark:text-dark-text-secondary italic">
+                      "{item.notes}"
+                    </p>
                   </div>
                 )}
-              </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(item)}
-                  className="flex-1 px-3 py-1 rounded-full border border-info text-info-dark bg-info-light/70 text-sm"
-                >
-                  Modifier
-                </button>
-                <button
-                  onClick={() => toggleActive(item)}
-                  className={`flex-1 px-3 py-1 rounded-full text-sm border transition-colors ${
-                    item.isActive
-                      ? 'border-warning text-warning bg-warning-light/80'
-                      : 'border-success text-success bg-success-light/80'
-                  }`}
-                >
-                  {item.isActive ? 'Retirer' : 'Réactiver'}
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="px-3 py-1 rounded-full text-sm border border-danger/40 text-danger"
-                >
-                  Supprimer
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="flex-1 px-3 py-2 rounded-xl border-2 border-panel-border bg-panel-bg hover:bg-accent/10 text-text-secondary dark:text-dark-text-secondary hover:text-accent transition-all text-sm font-medium"
+                  >
+                    Modifier
+                  </button>
+                  <button
+                    onClick={() => toggleActive(item)}
+                    className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
+                      item.isActive
+                        ? 'border-warning bg-warning/10 text-warning hover:bg-warning/20'
+                        : 'border-success bg-success/10 text-success hover:bg-success/20'
+                    }`}
+                  >
+                    {item.isActive ? 'Retirer' : 'Réactiver'}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="px-3 py-2 rounded-xl text-sm font-medium border-2 border-danger/30 bg-danger/10 text-danger hover:bg-danger/20 transition-all"
+                  >
+                    Supprimer
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {equipment.length === 0 && !showForm && (

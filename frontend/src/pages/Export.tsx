@@ -151,20 +151,19 @@ export default function Export() {
           </div>
         </div>
 
-        {/* Exports CSV */}
+        {/* Exports CSV et GPX */}
         <div className="glass-panel p-6">
-          <h2 className="text-xl font-semibold mb-4">Exports CSV</h2>
-          <p className="text-sm text-text-body mb-6">
-            Exportez vos données au format CSV pour les ouvrir dans Excel, Google Sheets ou d'autres
-            outils d'analyse.
+          <h2 className="text-xl font-semibold mb-4 font-display">Exports de données</h2>
+          <p className="text-sm text-text-body dark:text-dark-text-secondary mb-6">
+            Exportez vos données au format CSV pour l'analyse ou GPX pour les activités avec GPS.
           </p>
 
           <div className="space-y-4">
             {/* Activités CSV */}
-            <div className="flex items-center justify-between p-4 border border-border-base rounded-lg hover:bg-bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between p-4 border-2 border-panel-border rounded-xl hover:bg-bg-subtle transition-colors">
               <div>
-                <h4 className="font-medium text-text-dark">Activités</h4>
-                <p className="text-sm text-text-secondary">
+                <h4 className="font-medium text-text-dark dark:text-dark-text-contrast">Activités (CSV)</h4>
+                <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
                   Date, type, durée, distance, FC, vitesse, puissance, TRIMP, etc.
                 </p>
               </div>
@@ -179,11 +178,27 @@ export default function Export() {
               </button>
             </div>
 
-            {/* Poids CSV */}
-            <div className="flex items-center justify-between p-4 border border-border-base rounded-lg hover:bg-bg-gray-50 transition-colors">
+            {/* Export GPX info */}
+            <div className="flex items-center justify-between p-4 border-2 border-info/40 bg-info/10 rounded-xl">
               <div>
-                <h4 className="font-medium text-text-dark">Historique de poids</h4>
-                <p className="text-sm text-text-secondary">Date, poids, notes</p>
+                <h4 className="font-medium text-info-dark dark:text-info">Activités (GPX)</h4>
+                <p className="text-sm text-info-dark/80 dark:text-info/80">
+                  Export individuel disponible sur chaque activité avec données GPS
+                </p>
+              </div>
+              <button
+                onClick={() => window.location.href = '/activities'}
+                className="px-6 py-2 rounded-xl border-2 border-info bg-info/20 text-info-dark dark:text-info hover:bg-info/30 transition-all font-medium"
+              >
+                Voir activités
+              </button>
+            </div>
+
+            {/* Poids CSV */}
+            <div className="flex items-center justify-between p-4 border-2 border-panel-border rounded-xl hover:bg-bg-subtle transition-colors">
+              <div>
+                <h4 className="font-medium text-text-dark dark:text-dark-text-contrast">Historique de poids (CSV)</h4>
+                <p className="text-sm text-text-secondary dark:text-dark-text-secondary">Date, poids, notes</p>
               </div>
               <button
                 onClick={() => handleDownload('/weight/csv', getFileName('weight', 'csv'))}
@@ -195,10 +210,10 @@ export default function Export() {
             </div>
 
             {/* Équipement CSV */}
-            <div className="flex items-center justify-between p-4 border border-border-base rounded-lg hover:bg-bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between p-4 border-2 border-panel-border rounded-xl hover:bg-bg-subtle transition-colors">
               <div>
-                <h4 className="font-medium text-text-dark">Équipement</h4>
-                <p className="text-sm text-text-secondary">
+                <h4 className="font-medium text-text-dark dark:text-dark-text-contrast">Équipement (CSV)</h4>
+                <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
                   Nom, type, marque, modèle, kilométrage, dates
                 </p>
               </div>
@@ -214,20 +229,24 @@ export default function Export() {
         </div>
 
         {/* Informations */}
-        <div className="glass-panel p-6 border border-info bg-info-light/70">
-          <h3 className="font-semibold text-text-dark mb-3 font-display">À propos des exports</h3>
-          <div className="space-y-2 text-sm text-info-dark">
+        <div className="glass-panel p-6 border-2 border-info bg-info/10">
+          <h3 className="font-semibold text-text-dark dark:text-dark-text-contrast mb-3 font-display">À propos des exports</h3>
+          <div className="space-y-3 text-sm text-text-body dark:text-dark-text-secondary">
             <p>
-              <strong>Format JSON :</strong> Contient toutes vos données dans un format structuré.
-              Parfait pour les sauvegardes ou l'import dans d'autres applications.
+              <strong className="text-text-dark dark:text-dark-text-contrast">Format JSON :</strong> Contient toutes vos données dans un format structuré.
+              Parfait pour les sauvegardes complètes ou l'import dans d'autres applications.
             </p>
             <p>
-              <strong>Format CSV :</strong> Compatible avec Excel et Google Sheets. Les fichiers
-              sont encodés en UTF-8 avec BOM pour une compatibilité maximale.
+              <strong className="text-text-dark dark:text-dark-text-contrast">Format CSV :</strong> Compatible avec Excel et Google Sheets. Les fichiers
+              sont encodés en UTF-8 avec BOM pour une compatibilité maximale. Idéal pour l'analyse de données.
             </p>
             <p>
-              <strong>Confidentialité :</strong> Vos données restent hébergées localement. Les exports
-              sont générés côté serveur Cerfao et téléchargés directement.
+              <strong className="text-text-dark dark:text-dark-text-contrast">Format GPX :</strong> Format standard pour les traces GPS. Compatible avec Strava,
+              Garmin Connect, et la plupart des applications de sport. Export individuel par activité.
+            </p>
+            <p>
+              <strong className="text-text-dark dark:text-dark-text-contrast">Confidentialité :</strong> Vos données restent hébergées localement. Les exports
+              sont générés côté serveur et téléchargés directement sur votre appareil.
             </p>
           </div>
         </div>

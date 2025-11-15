@@ -62,12 +62,29 @@ export default class Activity extends BaseModel {
   @column()
   declare avgCadence: number | null
 
+  // Température
+  @column()
+  declare avgTemperature: number | null
+
+  @column()
+  declare maxTemperature: number | null
+
+  // Sous-type de sport
+  @column()
+  declare subSport: string | null
+
   // Métriques calculées
   @column()
   declare calories: number | null
 
   @column()
   declare elevationGain: number | null
+
+  @column()
+  declare elevationLoss: number | null
+
+  @column()
+  declare movingTime: number | null
 
   @column()
   declare trimp: number | null

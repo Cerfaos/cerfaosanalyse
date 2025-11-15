@@ -47,6 +47,13 @@ export default function TrainingLoad() {
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   }
 
+  const periodOptions: { value: string; label: string; color: string; colorDark: string }[] = [
+    { value: '30', label: '30 jours', color: 'bg-blue-100 border-blue-400 text-blue-800', colorDark: 'dark:bg-blue-950/40 dark:border-blue-600 dark:text-blue-200' },
+    { value: '60', label: '60 jours', color: 'bg-green-100 border-green-400 text-green-800', colorDark: 'dark:bg-green-950/40 dark:border-green-600 dark:text-green-200' },
+    { value: '90', label: '90 jours', color: 'bg-orange-100 border-orange-400 text-orange-800', colorDark: 'dark:bg-orange-950/40 dark:border-orange-600 dark:text-orange-200' },
+    { value: '180', label: '180 jours', color: 'bg-purple-100 border-purple-400 text-purple-800', colorDark: 'dark:bg-purple-950/40 dark:border-purple-600 dark:text-purple-200' },
+  ]
+
   const statusMap: Record<string, { label: string; color: string }> = {
     fresh: { label: 'Très frais', color: 'bg-success/10 text-success border-success/30' },
     rested: { label: 'Reposé', color: 'bg-brand/10 text-brand border-brand/30' },
@@ -67,17 +74,17 @@ export default function TrainingLoad() {
     <AppLayout title="Charge d'entraînement" description="Comprenez votre forme et votre fatigue">
       <div className="space-y-8">
         <div className="flex flex-wrap gap-3">
-          {['30', '60', '90', '180'].map((days) => (
+          {periodOptions.map((option) => (
             <button
-              key={days}
-              onClick={() => setPeriod(days)}
-              className={`px-4 py-2 rounded-full text-sm font-display transition-all border ${
-                period === days
-                  ? 'bg-cta/20 border-cta/40 text-cta shadow-soft'
-                  : 'border-border-base text-text-secondary hover:border-cta/40'
+              key={option.value}
+              onClick={() => setPeriod(option.value)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border-2 ${
+                period === option.value
+                  ? `${option.color} ${option.colorDark} shadow-md`
+                  : 'border-panel-border bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary hover:bg-bg-subtle'
               }`}
             >
-              {days} jours
+              {option.label}
             </button>
           ))}
         </div>

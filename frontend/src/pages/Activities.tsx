@@ -61,12 +61,13 @@ export default function Activities() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedGpxFile, setSelectedGpxFile] = useState<File | null>(null)
   const [manualGpxFile, setManualGpxFile] = useState<File | null>(null)
   const [filterType, setFilterType] = useState('')
   const [period, setPeriod] = useState('30')
   const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload')
   const [manualFormData, setManualFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().slice(0, 16),
     type: 'Cyclisme',
     hours: '',
     minutes: '',
@@ -131,6 +132,11 @@ export default function Activities() {
       const formData = new FormData()
       formData.append('file', selectedFile)
 
+      // Ajouter le fichier GPX s'il est présent
+      if (selectedGpxFile) {
+        formData.append('gpxFile', selectedGpxFile)
+      }
+
       await api.post('/api/activities/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -139,10 +145,13 @@ export default function Activities() {
 
       setSuccess('Activité importée avec succès !')
       setSelectedFile(null)
+      setSelectedGpxFile(null)
 
-      // Reset file input
+      // Reset file inputs
       const fileInput = document.getElementById('file-upload') as HTMLInputElement
+      const gpxInput = document.getElementById('gpx-upload') as HTMLInputElement
       if (fileInput) fileInput.value = ''
+      if (gpxInput) gpxInput.value = ''
 
       // Recharger les données
       loadData()
@@ -300,6 +309,30 @@ export default function Activities() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         )
+      case 'Marche':
+        return (
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M12 3v18m0-18l-3 3m3-3l3 3" />
+          </svg>
+        )
+      case 'Rameur':
+        return (
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )
+      case 'Randonnée':
+        return (
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l7 18m0 0l7-18M12 21V3" />
+          </svg>
+        )
+      case 'Natation':
+        return (
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5" />
+          </svg>
+        )
       default:
         return (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -399,26 +432,55 @@ export default function Activities() {
               <form onSubmit={handleUpload} className="space-y-4">
                 <div>
                   <label htmlFor="file-upload" className={labelClass}>
-                    Fichier
+                    Fichier FIT/CSV *
                   </label>
                   <input
                     type="file"
                     id="file-upload"
-                    accept=".fit,.gpx,.csv"
+                    accept=".fit,.csv"
                     onChange={handleFileChange}
                     required
                     className="w-full px-4 py-3 border border-border-base rounded-xl bg-bg-white/90 focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
                   />
-                  <p className="text-sm text-text-muted mt-2">Formats acceptés: FIT, GPX, CSV</p>
+                  <p className="text-sm text-text-muted mt-2">📊 Fichier contenant les métriques (durée, FC, puissance...)</p>
                 </div>
 
                 {selectedFile && (
                   <div className="glass-panel p-3 border border-accent">
                     <p className="text-sm text-text-body">
-                      Fichier sélectionné: <strong>{selectedFile.name}</strong>
+                      Fichier métrique: <strong>{selectedFile.name}</strong>
                     </p>
                     <p className="text-xs text-text-muted mt-1">
                       Taille: {(selectedFile.size / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="gpx-upload" className={labelClass}>
+                    Fichier GPX (optionnel)
+                  </label>
+                  <input
+                    type="file"
+                    id="gpx-upload"
+                    accept=".gpx"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setSelectedGpxFile(e.target.files[0])
+                      }
+                    }}
+                    className="w-full px-4 py-3 border border-border-base rounded-xl bg-bg-white/90 focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                  />
+                  <p className="text-sm text-text-muted mt-2">📍 Fichier pour la trace GPS complète</p>
+                </div>
+
+                {selectedGpxFile && (
+                  <div className="glass-panel p-3 border border-success/40 bg-success-light/60">
+                    <p className="text-sm text-success">
+                      ✓ Fichier GPS: <strong>{selectedGpxFile.name}</strong>
+                    </p>
+                    <p className="text-xs text-text-muted mt-1">
+                      Taille: {(selectedGpxFile.size / 1024).toFixed(2)} KB
                     </p>
                   </div>
                 )}
@@ -433,9 +495,13 @@ export default function Activities() {
 
                 <div className="glass-panel p-4 border border-info bg-info-light/60">
                   <p className="text-sm text-info-dark">
-                    <strong>💡 Astuce :</strong> Le TRIMP sera calculé automatiquement si votre
-                    activité contient des données de fréquence cardiaque.
+                    <strong>💡 Import en 2 étapes :</strong>
                   </p>
+                  <ul className="text-sm text-info-dark mt-2 space-y-1 list-disc list-inside">
+                    <li>Le fichier FIT/CSV fournit les métriques (durée, FC, puissance, etc.)</li>
+                    <li>Le fichier GPX (optionnel) fournit la trace GPS complète</li>
+                    <li>Le TRIMP est calculé automatiquement si FC disponible</li>
+                  </ul>
                 </div>
               </form>
             )}
@@ -446,10 +512,10 @@ export default function Activities() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <label htmlFor="manual-date" className={labelClass}>
-                      Date *
+                      Date et heure *
                     </label>
                     <input
-                      type="date"
+                      type="datetime-local"
                       id="manual-date"
                       value={manualFormData.date}
                       onChange={(e) =>
@@ -475,8 +541,12 @@ export default function Activities() {
                     >
                       <option value="Cyclisme">Cyclisme</option>
                       <option value="Course">Course</option>
-                      <option value="Rameur">Rameur</option>
                       <option value="Marche">Marche</option>
+                      <option value="Rameur">Rameur</option>
+                      <option value="Randonnée">Randonnée</option>
+                      <option value="Natation">Natation</option>
+                      <option value="Fitness">Fitness</option>
+                      <option value="Entraînement">Entraînement</option>
                     </select>
                   </div>
 
@@ -871,6 +941,11 @@ export default function Activities() {
                               day: '2-digit',
                               month: 'long',
                               year: 'numeric',
+                            })}
+                            {' à '}
+                            {new Date(activity.date).toLocaleTimeString('fr-FR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
                             })}
                           </p>
                         </div>
