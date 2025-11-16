@@ -389,25 +389,30 @@ export default class AnalyticsService {
     })
 
     for (const [type, activities] of Object.entries(byType)) {
-      // Objectif de distance
+      // Objectif de distance (seulement si des distances sont enregistrées)
       const totalDistance = activities.reduce((sum, a) => sum + (a.distance || 0), 0)
       const avgDistancePerMonth = totalDistance / 30 * 30 // projection mensuelle
 
-      suggestions.push({
-        type: `${type.toLowerCase()}_distance`,
-        target: Math.round((avgDistancePerMonth * 1.1) / 1000), // +10%
-        unit: 'km',
-        timeframe: 'mois',
-        difficulty: 'moderate',
-        basedOn: `Basé sur ${activities.length} activités récentes`,
-        confidence: Math.min(90, 60 + activities.length * 3),
-      })
+      if (totalDistance > 0) {
+        suggestions.push({
+          type: `${type.toLowerCase()}_distance`,
+          target: Math.round((avgDistancePerMonth * 1.1) / 1000) || 1, // +10%, minimum 1
+          unit: 'km',
+          timeframe: 'mois',
+          difficulty: 'moderate',
+          basedOn: `Basé sur ${activities.length} activités récentes`,
+          confidence: Math.min(90, 60 + activities.length * 3),
+        })
+      }
 
       // Objectif de fréquence
       const currentFrequency = activities.length
+      const targetFrequency = Math.ceil(currentFrequency * 1.15)
+      // S'assurer que la valeur est un nombre valide
+      const safeTargetFrequency = Number.isFinite(targetFrequency) && targetFrequency > 0 ? targetFrequency : 1
       suggestions.push({
         type: `${type.toLowerCase()}_frequency`,
-        target: Math.ceil(currentFrequency * 1.15), // +15%
+        target: safeTargetFrequency,
         unit: 'activités',
         timeframe: 'mois',
         difficulty: 'moderate',
@@ -415,17 +420,21 @@ export default class AnalyticsService {
         confidence: 85,
       })
 
-      // Objectif de distance max
-      const maxDistance = Math.max(...activities.map((a) => a.distance || 0))
-      suggestions.push({
-        type: `${type.toLowerCase()}_longest`,
-        target: Math.round((maxDistance * 1.2) / 1000), // +20%
-        unit: 'km',
-        timeframe: 'prochain trimestre',
-        difficulty: 'challenging',
-        basedOn: `Record actuel: ${Math.round(maxDistance / 1000)} km`,
-        confidence: 75,
-      })
+      // Objectif de distance max (seulement si des distances sont enregistrées)
+      const distances = activities.map((a) => a.distance || 0).filter((d) => d > 0)
+      if (distances.length > 0) {
+        const maxDistance = Math.max(...distances)
+        const targetDistance = Math.round((maxDistance * 1.2) / 1000)
+        suggestions.push({
+          type: `${type.toLowerCase()}_longest`,
+          target: targetDistance > 0 ? targetDistance : 1, // +20%, minimum 1
+          unit: 'km',
+          timeframe: 'prochain trimestre',
+          difficulty: 'challenging',
+          basedOn: `Record actuel: ${Math.round(maxDistance / 1000)} km`,
+          confidence: 75,
+        })
+      }
     }
 
     // Objectif global de TRIMP

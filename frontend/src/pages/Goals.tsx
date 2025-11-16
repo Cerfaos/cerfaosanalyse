@@ -35,7 +35,7 @@ const GOAL_TYPES = [
   { value: 'distance', label: 'Distance', unit: 'km', icon: '📏' },
   { value: 'duration', label: 'Durée', unit: 'heures', icon: '⏱️' },
   { value: 'trimp', label: 'TRIMP', unit: 'points', icon: '💪' },
-  { value: 'activities_count', label: 'Nombre d\'activités', unit: 'activités', icon: '🚴' },
+  { value: 'activities_count', label: 'Nombre d\'activités', unit: 'activités', icon: '🎯' },
 ]
 
 const PERIODS = [
@@ -44,6 +44,28 @@ const PERIODS = [
   { value: 'yearly', label: 'Annuel', icon: '🗓️' },
   { value: 'custom', label: 'Personnalisé', icon: '🎯' },
 ]
+
+// Fonction pour détecter l'icône d'activité depuis le titre
+const getActivityIconFromTitle = (title: string): string | null => {
+  const activityIcons: Record<string, string> = {
+    cyclisme: '🚴',
+    course: '🏃',
+    marche: '🚶',
+    natation: '🏊',
+    rameur: '🚣',
+    musculation: '💪',
+    randonnée: '🥾',
+    vtt: '🚵',
+  }
+
+  const lowerTitle = title.toLowerCase()
+  for (const [activity, icon] of Object.entries(activityIcons)) {
+    if (lowerTitle.includes(activity)) {
+      return icon
+    }
+  }
+  return null
+}
 
 export default function Goals() {
   const [goals, setGoals] = useState<Goal[]>([])
@@ -531,6 +553,10 @@ function GoalCard({
     return gradients[type] || 'from-gray-500 to-slate-600'
   }
 
+  // Détecter l'icône d'activité depuis le titre
+  const activityIcon = getActivityIconFromTitle(goal.title)
+  const displayIcon = activityIcon || goalType?.icon
+
   return (
     <div className={`glass-panel p-6 relative overflow-hidden group hover:shadow-xl transition-all duration-300 ${
       isCompleted ? 'ring-2 ring-green-500/50' : isActive ? 'ring-2 ring-blue-500/30' : 'opacity-75 hover:opacity-100'
@@ -542,7 +568,7 @@ function GoalCard({
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-4">
             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${getTypeGradient(goal.type)} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-              {goalType?.icon}
+              {displayIcon}
             </div>
             <div>
               <h3 className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
