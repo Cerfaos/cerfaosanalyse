@@ -1071,26 +1071,26 @@ export default function Activities() {
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Distance</p>
                             <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
                               {formatDistance(activity.distance)}
                             </p>
                           </div>
-                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Durée</p>
                             <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
                               {formatDuration(activity.duration)}
                             </p>
                           </div>
-                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">FC moy</p>
                             <p className="text-lg font-bold text-red-600 dark:text-red-400">
                               {activity.avgHeartRate ? `${activity.avgHeartRate}` : '-'}
                               {activity.avgHeartRate && <span className="text-xs font-normal ml-1">bpm</span>}
                             </p>
                           </div>
-                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3 text-center">
+                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">TRIMP</p>
                             <p className={`text-lg font-bold ${getTrimpColor(activity.trimp)}`}>
                               {activity.trimp || '-'}
@@ -1099,7 +1099,7 @@ export default function Activities() {
                               <p className="text-xs text-text-muted mt-0.5">{getTrimpLevel(activity.trimp)}</p>
                             )}
                           </div>
-                          <div className="bg-gray-50 dark:bg-dark-bg-base rounded-xl p-3">
+                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1 text-center">Météo</p>
                             {activity.weather && (() => {
                               try {
