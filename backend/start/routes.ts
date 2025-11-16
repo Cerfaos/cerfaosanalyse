@@ -20,6 +20,7 @@ const ExportsController = () => import('#controllers/exports_controller')
 const BadgesController = () => import('#controllers/badges_controller')
 const GoalsController = () => import('#controllers/goals_controller')
 const PersonalRecordsController = () => import('#controllers/personal_records_controller')
+const AnalyticsController = () => import('#controllers/analytics_controller')
 
 // Health check
 router.get('/', async () => {
@@ -156,4 +157,15 @@ router
     router.get('/history/:type/:activityType', [PersonalRecordsController, 'history'])
   })
   .prefix('/api/records')
+  .use(middleware.auth())
+
+// Routes analytics (analyse intelligente)
+router
+  .group(() => {
+    router.get('/activities/:id/similar', [AnalyticsController, 'similarActivities'])
+    router.post('/predict-performance', [AnalyticsController, 'predictPerformance'])
+    router.get('/fatigue', [AnalyticsController, 'fatigueAnalysis'])
+    router.get('/suggest-goals', [AnalyticsController, 'suggestGoals'])
+  })
+  .prefix('/api/analytics')
   .use(middleware.auth())

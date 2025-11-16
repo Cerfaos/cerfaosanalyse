@@ -6,6 +6,8 @@ import { useAuthStore } from '../store/authStore'
 import api from '../services/api'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import MetricInfo from '../components/ui/MetricInfo'
+import { useActivityExport } from '../hooks/useActivityExport'
 
 interface WeatherData {
   temperature: number
@@ -79,6 +81,7 @@ export default function ActivityDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  const { exportActivity } = useActivityExport()
   const [activity, setActivity] = useState<Activity | null>(null)
   const [gpsData, setGpsData] = useState<GpsPoint[]>([])
   const [loading, setLoading] = useState(true)
@@ -89,6 +92,7 @@ export default function ActivityDetail() {
   const [replacementFile, setReplacementFile] = useState<File | null>(null)
   const [uploadingFile, setUploadingFile] = useState(false)
   const [downloadingGpx, setDownloadingGpx] = useState(false)
+  const [exportingImage, setExportingImage] = useState(false)
   const [editForm, setEditForm] = useState({
     type: '',
     date: '',
@@ -341,6 +345,23 @@ export default function ActivityDetail() {
     }
   }
 
+  const handleExportImage = async (format: 'png' | 'pdf') => {
+    if (!activity) return
+
+    try {
+      setExportingImage(true)
+      const dateStr = new Date(activity.date).toISOString().split('T')[0]
+      const fileName = `${activity.type.toLowerCase()}-${dateStr}`
+      await exportActivity('activity-content', { fileName, format })
+      setSuccess(`Export ${format.toUpperCase()} réussi !`)
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err: any) {
+      setError(err.message || `Erreur lors de l'export ${format.toUpperCase()}`)
+    } finally {
+      setExportingImage(false)
+    }
+  }
+
   const formatDuration = (seconds: number) => {
     const totalSeconds = Math.round(seconds)
     let hours = Math.floor(totalSeconds / 3600)
@@ -574,6 +595,35 @@ export default function ActivityDetail() {
             <button onClick={startEditing} className="btn-primary">
               Modifier l'activité
             </button>
+            <div className="relative group">
+              <button
+                disabled={exportingImage}
+                className="btn-secondary flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                {exportingImage ? 'Export...' : 'Exporter'}
+              </button>
+              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-dark-surface rounded-lg shadow-lg border border-border-base dark:border-dark-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <button
+                  onClick={() => handleExportImage('png')}
+                  disabled={exportingImage}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-bg-gray-100 dark:hover:bg-dark-border rounded-t-lg"
+                >
+                  Exporter en PNG
+                </button>
+                <button
+                  onClick={() => handleExportImage('pdf')}
+                  disabled={exportingImage}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-bg-gray-100 dark:hover:bg-dark-border rounded-b-lg"
+                >
+                  Exporter en PDF
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1049,6 +1099,8 @@ export default function ActivityDetail() {
         </div>
       )}
 
+      {/* Contenu exportable */}
+      <div id="activity-content" className="bg-white dark:bg-dark-bg p-4 rounded-xl">
       {/* Statistiques principales */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
         <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
@@ -1109,7 +1161,10 @@ export default function ActivityDetail() {
           <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
           <div className="relative z-10">
             <div className="text-2xl mb-2">💪</div>
-            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">TRIMP</p>
+            <div className="flex items-center gap-1 mb-1">
+              <p className="text-sm text-text-secondary dark:text-dark-text-secondary">TRIMP</p>
+              <MetricInfo metric="trimp" />
+            </div>
             <p className={`text-2xl font-bold ${getTrimpColor(activity.trimp)}`}>{activity.trimp || '-'}</p>
           </div>
         </div>
@@ -1458,6 +1513,7 @@ export default function ActivityDetail() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   )

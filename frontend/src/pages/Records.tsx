@@ -8,6 +8,7 @@ interface PersonalRecord {
   id: number
   recordType: string
   recordTypeName: string
+  activityType: string
   value: number
   unit: string
   achievedAt: string

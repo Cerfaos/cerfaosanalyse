@@ -2,33 +2,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&family=Bricolage+Grotesque:wght@500;600;700&display=swap');
 
 :root {
-  --bg-default: #A3B087;
-  --bg-elevated: #FFF8D4;
-  --bg-subtle: #C4CC9F;
-  --border-color: #313647;
-  --panel-border: #313647;
-  --panel-bg: #FFF8D4;
-  --sidebar-bg: #A3B087;
-  --shadow-color: #313647;
-  --text-primary: #1f232d;
-  --text-secondary: #435663;
-  --accent: #435663;
-  --accent-strong: #313647;
-  --success: #4b7d5d;
-  --warning: #d8a348;
-  --danger: #b84f45;
-  --highlight: #435663;
+  --bg-default: #F7F7F5;
+  --bg-elevated: #FFFFFF;
+  --bg-subtle: #EEEEEC;
+  --border-color: #2D3A30;
+  --panel-border: #3D4D40;
+  --panel-bg: #FFFFFF;
+  --sidebar-bg: #374151;
+  --sidebar-text: #F3F4F6;
+  --sidebar-text-muted: #9CA3AF;
+  --shadow-color: rgba(45, 58, 48, 0.25);
+  --text-primary: #1A1F1C;
+  --text-secondary: #3D4840;
+  --accent: #991B1B;
+  --accent-strong: #7F1D1D;
+  --success: #059669;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --highlight: #991B1B;
 
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
 
-  --shadow-soft: 0 18px 45px rgba(47, 56, 48, 0.12);
-  --shadow-hard: 0 35px 80px rgba(47, 56, 48, 0.22);
+  --shadow-soft: 0 4px 16px rgba(45, 58, 48, 0.12);
+  --shadow-hard: 0 12px 32px rgba(45, 58, 48, 0.2);
 
-  --toast-bg: #fdf7e5;
-  --toast-text: #2f3830;
-  --toast-border: rgba(124, 141, 115, 0.25);
+  --toast-bg: #FFFFFF;
+  --toast-text: #1A1F1C;
+  --toast-border: rgba(61, 77, 64, 0.3);
 }
 
 .dark {
@@ -61,7 +63,10 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #A3B087 0%, #B8C495 45%, #FFF8D4 100%);
+  background: #E5E5E5;
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.03) 0%, transparent 50%);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
@@ -145,10 +150,15 @@ html {
 
 .glass-panel {
   background: var(--panel-bg);
-  border: 3px solid var(--panel-border);
+  border: 2px solid var(--panel-border);
   border-radius: 18px;
-  box-shadow: 10px 10px 0 var(--shadow-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
   transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dark .glass-panel {
+  border: 3px solid var(--panel-border);
+  box-shadow: 10px 10px 0 var(--shadow-color);
 }
 
 .glass-panel:hover {
@@ -177,8 +187,15 @@ html {
 .page-shell {
   position: relative;
   min-height: 100vh;
-  background: var(--bg-default);
+  background:
+    radial-gradient(ellipse at 50% 0%, #F0F0F0 0%, #E5E5E5 40%, #D8D8D8 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, transparent 30%, rgba(0, 0, 0, 0.05) 100%);
+  background-blend-mode: normal;
   overflow: hidden;
+}
+
+.dark .page-shell {
+  background: var(--bg-default);
 }
 
 .page-shell::before,
@@ -191,21 +208,13 @@ html {
 }
 
 .page-shell::before {
-  background: conic-gradient(
-    from 0deg at 50% 50%,
-    rgba(167, 192, 128, 0.25) 0deg,
-    rgba(127, 187, 179, 0.3) 60deg,
-    rgba(163, 176, 135, 0.2) 120deg,
-    rgba(230, 152, 117, 0.25) 180deg,
-    rgba(127, 187, 179, 0.28) 240deg,
-    rgba(167, 192, 128, 0.25) 300deg,
-    rgba(167, 192, 128, 0.25) 360deg
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.08) 100%
   );
-  background-size: 200% 200%;
-  background-position: center;
-  filter: blur(80px);
-  animation: gradientRotate 20s linear infinite;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .dark .page-shell::before {
@@ -227,15 +236,8 @@ html {
 
 .page-shell::after {
   inset: 0;
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    rgba(167, 192, 128, 0.15) 0%,
-    rgba(127, 187, 179, 0.12) 25%,
-    rgba(230, 152, 117, 0.08) 50%,
-    transparent 70%
-  );
-  animation: gradientPulse 15s ease-in-out infinite alternate;
-  opacity: 0.9;
+  background: transparent;
+  opacity: 0;
 }
 
 .page-shell > * {
@@ -249,17 +251,27 @@ html {
   justify-content: center;
   padding: 0.75rem 1.5rem;
   border-radius: 20px;
-  border: 3px solid var(--panel-border);
+  border: 2px solid var(--panel-border);
   background: var(--accent);
   color: #fff;
   font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
   font-weight: 600;
   letter-spacing: 0.02em;
-  box-shadow: 6px 6px 0 var(--shadow-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.dark .btn-primary {
+  border: 3px solid var(--panel-border);
+  box-shadow: 6px 6px 0 var(--shadow-color);
+}
+
 .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.dark .btn-primary:hover {
   transform: translate(-2px, -2px);
   box-shadow: 10px 10px 0 var(--shadow-color);
 }

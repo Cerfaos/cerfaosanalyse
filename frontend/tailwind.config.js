@@ -8,31 +8,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        'bg-white': '#FDF6E3',
-        'bg-gray-50': '#F4F0D9',
-        'bg-gray-100': '#EFE9D1',
-        'bg-gray-200': '#E6E2CC',
-        'bg-gray-300': '#D8D3C5',
+        'bg-white': '#FFFFFF',
+        'bg-gray-50': '#F7F7F5',
+        'bg-gray-100': '#EEEEEC',
+        'bg-gray-200': '#E0E0DE',
+        'bg-gray-300': '#D0D0CE',
 
-        'text-dark': '#3C4841',
-        'text-body': '#4F5B58',
-        'text-secondary': '#5C6A72',
-        'text-muted': '#708089',
-        'text-tertiary': '#8B958A',
-        'text-disabled': '#A3B0A0',
+        'text-dark': '#1A1F1C',
+        'text-body': '#2D3330',
+        'text-secondary': '#3D4840',
+        'text-muted': '#5A635C',
+        'text-tertiary': '#6B746D',
+        'text-disabled': '#9CA39E',
 
-        'border-base': '#E6E2CC',
-        'border-strong': '#CCC7B0',
+        'border-base': '#3D4D40',
+        'border-strong': '#2D3A30',
 
-        brand: '#A7C080',
-        'brand-dark': '#859C64',
-        accent: '#7FBBB3',
-        'accent-500': '#7FBBB3',
-        'accent-700': '#557875',
-        success: '#83C092',
-        warning: '#DBBC7F',
-        error: '#E67E80',
-        cta: '#E69875',
+        brand: '#059669',
+        'brand-dark': '#047857',
+        accent: '#991B1B',
+        'accent-500': '#991B1B',
+        'accent-700': '#7F1D1D',
+        success: '#059669',
+        warning: '#D97706',
+        error: '#DC2626',
+        cta: '#991B1B',
 
         info: '#7FBBB3',
         'info-dark': '#33504C',
@@ -52,6 +52,13 @@ export default {
         'forest-blue': '#7FBBB3',
         'forest-orange': '#E69875',
         'forest-purple': '#D699B6',
+
+        // Couleurs bois/terreuses
+        'wood-light': '#D4C4A8',
+        'wood-medium': '#B8A080',
+        'wood-dark': '#8B7355',
+        'earth-warm': '#C9B99A',
+        'earth-cool': '#A8B094',
       },
       spacing: {
         '0.5': '0.125rem',   // 2px

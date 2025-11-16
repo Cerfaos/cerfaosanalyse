@@ -14,6 +14,7 @@ type LayoutProps = {
 const navigation = [
   { label: 'Accueil', to: '/', icon: HomeIcon },
   { label: 'Tableau de bord', to: '/dashboard', icon: DashboardIcon },
+  { label: 'Insights', to: '/insights', icon: InsightsIcon },
   { label: 'Cartographie FC', to: '/cycling', icon: CyclingIcon },
   { label: 'Activités', to: '/activities', icon: ActivitiesIcon },
   { label: 'Records', to: '/records', icon: RecordsIcon },
@@ -41,17 +42,18 @@ export default function AppLayout({ title, description, actions, children }: Lay
     <div className="page-shell min-h-screen w-full text-text-dark dark:text-dark-text-contrast">
       <div className="flex">
         <aside
-          className={`sidebar-shell font-display fixed inset-y-0 left-0 z-40 w-80 rounded-r-3xl shadow-lg flex flex-col transition-transform duration-300 lg:static lg:rounded-none lg:shadow-none lg:border-r lg:translate-x-0 ${
+          className={`sidebar-shell font-display fixed inset-y-0 left-0 z-40 w-80 rounded-r-3xl shadow-2xl flex flex-col transition-transform duration-300 lg:static lg:rounded-none lg:shadow-none lg:border-r lg:translate-x-0 ${
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
+          style={{ backgroundColor: 'var(--sidebar-bg)', color: 'var(--sidebar-text)' }}
         >
-          <div className="px-8 py-8 flex items-center justify-between border-b-4 border-panel-border">
+          <div className="px-8 py-8 flex items-center justify-between border-b-2 border-white/10">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-text-muted dark:text-dark-text-secondary">Cerfao</p>
-              <p className="text-3xl font-bold">Centre Cycliste</p>
+              <p className="text-sm uppercase tracking-[0.35em] opacity-60">Cerfao</p>
+              <p className="text-3xl font-bold text-white">Centre Cycliste</p>
             </div>
             <button
-              className="lg:hidden text-text-muted"
+              className="lg:hidden opacity-60 hover:opacity-100"
               onClick={() => setIsSidebarOpen(false)}
               aria-label="Fermer le menu"
             >
@@ -65,33 +67,33 @@ export default function AppLayout({ title, description, actions, children }: Lay
               const itemStyle = active
                 ? {
                     backgroundColor: 'var(--accent)',
-                    color: 'var(--bg-elevated)',
-                    borderColor: 'var(--panel-border)',
-                    boxShadow: '10px 10px 0 var(--shadow-color)',
+                    color: '#FFFFFF',
+                    borderColor: 'var(--accent)',
+                    boxShadow: '0 8px 24px rgba(153, 27, 27, 0.4)',
                   }
                 : {
-                    backgroundColor: 'var(--panel-bg)',
-                    color: 'var(--text-secondary)',
-                    borderColor: 'var(--panel-border)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    color: 'var(--sidebar-text)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                   }
               const iconStyle = active
                 ? {
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     color: 'inherit',
-                    borderColor: 'var(--bg-elevated)',
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
                   }
                 : {
                     backgroundColor: 'transparent',
                     color: 'inherit',
-                    borderColor: 'var(--panel-border)',
+                    borderColor: 'rgba(255, 255, 255, 0.15)',
                   }
               return (
                 <NavLink
                   key={to}
                   to={to}
                   onClick={() => setIsSidebarOpen(false)}
-                  className={`flex items-center gap-4 rounded-2xl px-5 py-4 text-xl font-semibold tracking-wide transition-all border-4 ${
-                    active ? 'hover:-translate-y-1' : 'hover:-translate-y-1'
+                  className={`flex items-center gap-4 rounded-2xl px-5 py-4 text-lg font-semibold tracking-wide transition-all border-2 hover:bg-white/10 ${
+                    active ? 'hover:-translate-y-1' : 'hover:-translate-y-0.5'
                   }`}
                   style={itemStyle}
                 >
@@ -107,18 +109,28 @@ export default function AppLayout({ title, description, actions, children }: Lay
             })}
           </nav>
 
-          <div className="px-8 py-6 border-t-4 border-panel-border mt-6">
+          <div className="px-8 py-6 border-t-2 border-white/10 mt-6">
             <div className="text-sm mb-4">
-              <p className="font-semibold text-text-dark dark:text-dark-text-contrast">{user?.fullName || 'Athlète'}</p>
-              <p className="text-text-muted dark:text-dark-text-secondary text-xs">{user?.email}</p>
+              <p className="font-semibold text-white">{user?.fullName || 'Athlète'}</p>
+              <p className="opacity-60 text-xs">{user?.email}</p>
             </div>
             <div className="flex items-center justify-between gap-3 mb-4">
-              <span className="text-xs text-text-muted dark:text-dark-text-secondary">Thème</span>
+              <span className="text-xs opacity-60">Thème</span>
               <ThemeToggle />
             </div>
             <button
+              onClick={() => {
+                const event = new CustomEvent('toggle-shortcuts-help')
+                window.dispatchEvent(event)
+              }}
+              className="w-full px-4 py-2 rounded-xl border-2 border-white/20 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-all duration-200 text-sm font-medium mb-3 flex items-center justify-center gap-2"
+            >
+              <kbd className="px-1.5 py-0.5 text-xs bg-white/10 rounded">?</kbd>
+              <span>Raccourcis clavier</span>
+            </button>
+            <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 rounded-xl border-2 border-panel-border bg-panel-bg hover:bg-danger/10 hover:border-danger/30 text-text-secondary hover:text-danger dark:text-dark-text-secondary dark:hover:text-danger transition-all duration-200 text-sm font-medium"
+              className="w-full px-4 py-2 rounded-xl border-2 border-white/20 bg-white/5 hover:bg-red-500/20 hover:border-red-500/40 text-white/80 hover:text-red-400 transition-all duration-200 text-sm font-medium"
             >
               Déconnexion
             </button>
@@ -285,6 +297,17 @@ function RecordsIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function InsightsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 21h6" strokeLinecap="round" />
+      <path d="M12 6v4" strokeLinecap="round" />
+      <path d="M10 10h4" strokeLinecap="round" />
     </svg>
   )
 }

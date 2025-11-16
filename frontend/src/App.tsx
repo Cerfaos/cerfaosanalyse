@@ -4,6 +4,8 @@ import { lazy, Suspense } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './hooks/useTheme'
+import GlobalShortcuts from './components/GlobalShortcuts'
+import GlobalSearch from './components/GlobalSearch'
 
 // Lazy loading des pages pour réduire le bundle initial
 const Home = lazy(() => import('./pages/Home'))
@@ -21,6 +23,7 @@ const Export = lazy(() => import('./pages/Export'))
 const Badges = lazy(() => import('./pages/Badges'))
 const Goals = lazy(() => import('./pages/Goals'))
 const Records = lazy(() => import('./pages/Records'))
+const Insights = lazy(() => import('./pages/Insights'))
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -49,6 +52,10 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
+        {/* Raccourcis clavier globaux */}
+        <GlobalShortcuts />
+        {/* Recherche globale */}
+        <GlobalSearch />
         {/* Skip navigation pour accessibilité */}
         <a href="#main-content" className="skip-link">
           Aller au contenu principal
@@ -175,6 +182,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Records />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/insights"
+            element={
+              <ProtectedRoute>
+                <Insights />
               </ProtectedRoute>
             }
           />

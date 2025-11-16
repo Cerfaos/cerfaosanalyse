@@ -4,6 +4,10 @@ import { Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, T
 import { useAuthStore } from '../store/authStore'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import ActivityHeatmap from '../components/ActivityHeatmap'
+import YearComparison from '../components/YearComparison'
+import ZoneProgressionChart from '../components/ZoneProgressionChart'
+import GPSTracesMap from '../components/GPSTracesMap'
 
 interface Stats {
   totalActivities: number
@@ -587,6 +591,42 @@ export default function Dashboard() {
                 </div>
               </div>
             )}
+
+            {/* Heatmap calendrier */}
+            <div className="glass-panel p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">Calendrier d'activités</h3>
+                <p className="text-sm text-text-muted">Visualisez votre régularité d'entraînement</p>
+              </div>
+              <ActivityHeatmap />
+            </div>
+
+            {/* Comparaison année vs année */}
+            <div className="glass-panel p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">Comparaison annuelle</h3>
+                <p className="text-sm text-text-muted">Comparez vos performances avec l'année précédente</p>
+              </div>
+              <YearComparison />
+            </div>
+
+            {/* Progression par zones d'effort */}
+            <div className="glass-panel p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">Distribution des zones d'effort</h3>
+                <p className="text-sm text-text-muted">Analysez la répartition de votre entraînement par zone cardiaque</p>
+              </div>
+              <ZoneProgressionChart />
+            </div>
+
+            {/* Carte des traces GPS */}
+            <div className="glass-panel p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">Carte des parcours</h3>
+                <p className="text-sm text-text-muted">Visualisez vos traces GPS superposées</p>
+              </div>
+              <GPSTracesMap />
+            </div>
 
             {/* Dernières activités */}
             <div className="glass-panel p-6">

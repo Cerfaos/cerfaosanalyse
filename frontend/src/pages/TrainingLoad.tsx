@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import MetricInfo from '../components/ui/MetricInfo'
 
 interface TrainingLoadData {
   date: string
@@ -114,13 +115,14 @@ export default function TrainingLoad() {
         {currentLoad && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <MetricCard label="CTL - Forme" value={currentLoad.ctl.toString()} helper="Charge chronique (42 j)" />
-              <MetricCard label="ATL - Fatigue" value={currentLoad.atl.toString()} helper="Charge aiguë (7 j)" />
+              <MetricCard label="CTL - Forme" value={currentLoad.ctl.toString()} helper="Charge chronique (42 j)" metric="ctl" />
+              <MetricCard label="ATL - Fatigue" value={currentLoad.atl.toString()} helper="Charge aiguë (7 j)" metric="atl" />
               <MetricCard
                 label="TSB - Équilibre"
                 value={`${currentLoad.tsb > 0 ? '+' : ''}${currentLoad.tsb}`}
                 helper="CTL - ATL"
                 accent={currentLoad.tsb > 0 ? 'text-success' : 'text-error'}
+                metric="tsb"
               />
               <div className="glass-panel p-5 border">
                 <p className="text-sm text-text-muted mb-2">Statut</p>
@@ -160,10 +162,13 @@ export default function TrainingLoad() {
   )
 }
 
-function MetricCard({ label, value, helper, accent }: { label: string; value: string; helper?: string; accent?: string }) {
+function MetricCard({ label, value, helper, accent, metric }: { label: string; value: string; helper?: string; accent?: string; metric?: string }) {
   return (
     <div className="glass-panel p-5 border">
-      <p className="text-sm text-text-muted mb-1">{label}</p>
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-sm text-text-muted">{label}</p>
+        {metric && <MetricInfo metric={metric} />}
+      </div>
       <p className={`text-3xl font-semibold ${accent || 'text-text-dark dark:text-dark-text-contrast'}`}>{value}</p>
       {helper && <p className="text-xs text-text-muted mt-1">{helper}</p>}
     </div>
