@@ -399,7 +399,13 @@ export default function Activities() {
   return (
     <AppLayout title="Activités" description="Importez vos fichiers et suivez vos stats" actions={actions}>
       <div className="space-y-8">
-        <Section eyebrow="Activités" title="Suivi des sorties" description="Importez vos fichiers ou ajoutez vos entraînements manuellement." />
+        <Section
+          eyebrow="Activités"
+          title="Suivi des sorties"
+          description="Importez vos fichiers ou ajoutez vos entraînements manuellement."
+          icon="🚴"
+          gradient="from-orange-500 to-amber-600"
+        />
 
         {success && (
           <div className="glass-panel border-success/30 text-success px-4 py-3">
@@ -1031,14 +1037,14 @@ export default function Activities() {
                                 <h3 className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
                                   {activity.type}
                                 </h3>
-                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}>
+                                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-700 text-white dark:bg-gray-600 shadow-sm">
                                   {new Date(activity.date).toLocaleDateString('fr-FR', {
                                     day: '2-digit',
                                     month: 'short',
                                   })}
                                 </span>
                               </div>
-                              <p className="text-sm text-text-secondary flex items-center gap-2">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2 font-medium">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -1046,8 +1052,8 @@ export default function Activities() {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })}
-                                <span className="text-text-tertiary">•</span>
-                                <span className="text-text-tertiary">
+                                <span className="text-gray-400 dark:text-gray-500">•</span>
+                                <span className="text-gray-500 dark:text-gray-400">
                                   {new Date(activity.date).toLocaleDateString('fr-FR', {
                                     weekday: 'long',
                                   })}
@@ -1071,26 +1077,26 @@ export default function Activities() {
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
+                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Distance</p>
                             <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
                               {formatDistance(activity.distance)}
                             </p>
                           </div>
-                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
+                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Durée</p>
                             <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
                               {formatDuration(activity.duration)}
                             </p>
                           </div>
-                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
+                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">FC moy</p>
                             <p className="text-lg font-bold text-red-600 dark:text-red-400">
                               {activity.avgHeartRate ? `${activity.avgHeartRate}` : '-'}
                               {activity.avgHeartRate && <span className="text-xs font-normal ml-1">bpm</span>}
                             </p>
                           </div>
-                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3 text-center">
+                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">TRIMP</p>
                             <p className={`text-lg font-bold ${getTrimpColor(activity.trimp)}`}>
                               {activity.trimp || '-'}
@@ -1099,7 +1105,7 @@ export default function Activities() {
                               <p className="text-xs text-text-muted mt-0.5">{getTrimpLevel(activity.trimp)}</p>
                             )}
                           </div>
-                          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-3">
+                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 border border-gray-200/80 dark:border-white/10 shadow-sm">
                             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1 text-center">Météo</p>
                             {activity.weather && (() => {
                               try {

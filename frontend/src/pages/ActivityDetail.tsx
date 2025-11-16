@@ -1176,51 +1176,78 @@ export default function ActivityDetail() {
       {activity.weather && (() => {
         try {
           const weather: WeatherData = JSON.parse(activity.weather)
+
+          const getWindDirection = (degrees: number) => {
+            const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO']
+            const index = Math.round(degrees / 45) % 8
+            return directions[index]
+          }
+
           return (
-            <div className="glass-panel border border-info bg-info-light/70 mb-8">
-              <h2 className="text-xl font-semibold text-text-dark mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                </svg>
-                Météo lors de l'activité
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <div className="glass-panel p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center justify-center mb-2">
+            <div className="glass-panel p-6 mb-8 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-500/5" />
+              <div className="relative z-10">
+                <h2 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-xl">
+                    🌤️
+                  </div>
+                  Météo lors de l'activité
+                </h2>
+
+                {/* Carte principale avec icône et condition */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="glass-panel p-6 rounded-xl shadow-sm flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 border border-sky-200/50 dark:border-sky-800/30">
                     <img
                       src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
                       alt={weather.description}
-                      className="w-16 h-16"
+                      className="w-20 h-20"
                     />
+                    <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast capitalize mt-2">{weather.description}</p>
                   </div>
-                  <p className="text-sm text-text-body text-center capitalize">{weather.description}</p>
+
+                  <div className="glass-panel p-6 rounded-xl shadow-sm relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-orange-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+                    <div className="relative z-10">
+                      <div className="text-3xl mb-3">🌡️</div>
+                      <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Température</p>
+                      <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">{weather.temperature}°C</p>
+                      <p className="text-sm text-text-muted dark:text-dark-text-muted mt-2">
+                        Ressenti <span className="font-semibold">{weather.feelsLike}°C</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="glass-panel p-6 rounded-xl shadow-sm relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+                    <div className="relative z-10">
+                      <div className="text-3xl mb-3">💨</div>
+                      <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Vent</p>
+                      <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">{weather.windSpeed} km/h</p>
+                      <p className="text-sm text-text-muted dark:text-dark-text-muted mt-2">
+                        Direction <span className="font-semibold">{getWindDirection(weather.windDirection)} ({weather.windDirection}°)</span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="glass-panel p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-text-body mb-1">Température</p>
-                  <p className="text-2xl font-bold text-text-dark">{weather.temperature}°C</p>
-                  <p className="text-xs text-text-secondary">Ressenti: {weather.feelsLike}°C</p>
-                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-center">
+                    <div className="text-2xl mb-2">💧</div>
+                    <p className="text-xs text-text-muted dark:text-dark-text-muted uppercase tracking-wide">Humidité</p>
+                    <p className="text-xl font-bold text-text-dark dark:text-dark-text-contrast mt-1">{weather.humidity}%</p>
+                  </div>
 
-                <div className="glass-panel p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-text-body mb-1">Vent</p>
-                  <p className="text-2xl font-bold text-text-dark">{weather.windSpeed} km/h</p>
-                  <p className="text-xs text-text-secondary">Direction: {weather.windDirection}°</p>
-                </div>
+                  <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-center">
+                    <div className="text-2xl mb-2">🌡️</div>
+                    <p className="text-xs text-text-muted dark:text-dark-text-muted uppercase tracking-wide">Pression</p>
+                    <p className="text-xl font-bold text-text-dark dark:text-dark-text-contrast mt-1">{weather.pressure} hPa</p>
+                  </div>
 
-                <div className="glass-panel p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-text-body mb-1">Humidité</p>
-                  <p className="text-2xl font-bold text-text-dark">{weather.humidity}%</p>
-                </div>
-
-                <div className="glass-panel p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-text-body mb-1">Pression</p>
-                  <p className="text-2xl font-bold text-text-dark">{weather.pressure} hPa</p>
-                </div>
-
-                <div className="glass-panel p-4 rounded-lg shadow-sm">
-                  <p className="text-sm text-text-body mb-1">Nuages</p>
-                  <p className="text-2xl font-bold text-text-dark">{weather.clouds}%</p>
+                  <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-center">
+                    <div className="text-2xl mb-2">☁️</div>
+                    <p className="text-xs text-text-muted dark:text-dark-text-muted uppercase tracking-wide">Nuages</p>
+                    <p className="text-xl font-bold text-text-dark dark:text-dark-text-contrast mt-1">{weather.clouds}%</p>
+                  </div>
                 </div>
               </div>
             </div>

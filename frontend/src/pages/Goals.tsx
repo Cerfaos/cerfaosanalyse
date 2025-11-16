@@ -192,27 +192,36 @@ export default function Goals() {
     <AppLayout title="Objectifs" description="Définissez et suivez vos objectifs d'entraînement">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand to-blue-600 flex items-center justify-center text-2xl shadow-lg">
+        <div className="glass-panel p-6 relative overflow-hidden mb-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-purple-500/5" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+          <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-purple-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
                 🎯
               </div>
-              Mes Objectifs
-            </h1>
-            <p className="text-text-secondary dark:text-dark-text-secondary mt-2 ml-15">
-              Définissez et suivez vos objectifs d'entraînement
-            </p>
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
+                  Objectifs
+                </p>
+                <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
+                  Mes Objectifs
+                </h1>
+                <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
+                  Définissez et suivez vos objectifs d'entraînement pour atteindre vos ambitions.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-6 py-3 bg-gradient-to-r from-brand to-purple-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium flex items-center gap-2 flex-shrink-0"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Nouvel objectif
+            </button>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 bg-gradient-to-r from-brand to-blue-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nouvel objectif
-          </button>
         </div>
 
         {/* Stats */}

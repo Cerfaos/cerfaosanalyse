@@ -412,6 +412,28 @@ export default function Dashboard() {
       actions={actions}
     >
       <div className="space-y-8">
+        {/* Header avec impact visuel */}
+        <div className="glass-panel p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-green-500/5" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+          <div className="relative z-10 flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-green-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
+              📊
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
+                Tableau de bord
+              </p>
+              <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
+                Synthèse d'entraînement
+              </h1>
+              <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
+                Analysez vos performances, suivez votre charge d'entraînement et visualisez vos progrès.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Filtres */}
         <div className="glass-panel p-6 space-y-8">
           <div className="flex flex-wrap items-start justify-between gap-4">

@@ -199,6 +199,28 @@ export default function CyclingStats() {
       title="Cartographie FC"
       description="Analyse cardio, zones d'intensité et polarisation de vos sorties 🚴"
     >
+      {/* Header avec impact visuel */}
+      <div className="glass-panel p-6 relative overflow-hidden mb-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-sky-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+        <div className="relative z-10 flex items-start gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-sky-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
+            ❤️
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
+              Analyse cardio
+            </p>
+            <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
+              Cartographie FC
+            </h1>
+            <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
+              Zones d'intensité, polarisation et répartition de vos sorties cyclistes.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <section className="glass-panel p-6 space-y-6">
         <div className="flex flex-wrap gap-3 items-center justify-between">
           <div>
@@ -341,7 +363,7 @@ export default function CyclingStats() {
               description="Idéal: 80% en endurance (Z1-Z2), 10% tempo (Z3), 10% haute intensité (Z4-Z5)."
             >
               <div className="flex flex-col gap-4">
-                <div className="p-4 rounded-2xl bg-white/80 dark:bg-dark-surface/60">
+                <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-brand/20">
                   <p className="text-sm text-text-secondary">Score</p>
                   <p className="text-4xl font-semibold text-text-dark dark:text-dark-text-contrast">
                     {stats.polarization.score.toFixed(1)}%
