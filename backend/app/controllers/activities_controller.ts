@@ -9,6 +9,7 @@ import WeatherService from '#services/weather_service'
 import BadgeService from '#services/badge_service'
 import HeartRateZoneService from '#services/heart_rate_zone_service'
 import TrainingLoadService from '#services/training_load_service'
+import PersonalRecordService from '#services/personal_record_service'
 import type { ParsedGpsPoint, ZoneComputationSource } from '#types/training'
 
 // FitParser has double default export that varies by bundler
@@ -268,11 +269,23 @@ export default class ActivitiesController {
     const badgeService = new BadgeService()
     const newBadges = await badgeService.checkAndAwardBadges(user.id)
 
+    // Vérifier les records personnels
+    const newRecords = await PersonalRecordService.checkForNewRecords(activity)
+
     return response.created({
       message: 'Activité créée avec succès',
       data: {
         activity,
         newBadges: newBadges.map(b => ({ id: b.id, name: b.name, icon: b.icon })),
+        newRecords: newRecords.map(r => ({
+          recordType: r.recordType,
+          recordTypeName: PersonalRecordService.formatRecordTypeName(r.recordType),
+          activityType: r.activityType,
+          value: r.value,
+          unit: r.unit,
+          previousValue: r.previousValue,
+          improvement: r.improvement,
+        })),
       },
     })
   }
@@ -407,11 +420,23 @@ export default class ActivitiesController {
       const badgeService = new BadgeService()
       const newBadges = await badgeService.checkAndAwardBadges(user.id)
 
+      // Vérifier les records personnels
+      const newRecords = await PersonalRecordService.checkForNewRecords(activity)
+
       return response.created({
         message: 'Activité importée avec succès',
         data: {
           activity,
           newBadges: newBadges.map(b => ({ id: b.id, name: b.name, icon: b.icon })),
+          newRecords: newRecords.map(r => ({
+            recordType: r.recordType,
+            recordTypeName: PersonalRecordService.formatRecordTypeName(r.recordType),
+            activityType: r.activityType,
+            value: r.value,
+            unit: r.unit,
+            previousValue: r.previousValue,
+            improvement: r.improvement,
+          })),
         },
       })
     } catch (error) {

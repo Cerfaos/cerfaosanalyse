@@ -16,6 +16,7 @@ const navigation = [
   { label: 'Tableau de bord', to: '/dashboard', icon: DashboardIcon },
   { label: 'Cartographie FC', to: '/cycling', icon: CyclingIcon },
   { label: 'Activités', to: '/activities', icon: ActivitiesIcon },
+  { label: 'Records', to: '/records', icon: RecordsIcon },
   { label: 'Badges', to: '/badges', icon: BadgesIcon },
   { label: 'Objectifs', to: '/goals', icon: GoalsIcon },
   { label: 'Poids', to: '/weight', icon: WeightIcon },
@@ -111,6 +112,10 @@ export default function AppLayout({ title, description, actions, children }: Lay
               <p className="font-semibold text-text-dark dark:text-dark-text-contrast">{user?.fullName || 'Athlète'}</p>
               <p className="text-text-muted dark:text-dark-text-secondary text-xs">{user?.email}</p>
             </div>
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <span className="text-xs text-text-muted dark:text-dark-text-secondary">Thème</span>
+              <ThemeToggle />
+            </div>
             <button
               onClick={handleLogout}
               className="w-full px-4 py-2 rounded-xl border-2 border-panel-border bg-panel-bg hover:bg-danger/10 hover:border-danger/30 text-text-secondary hover:text-danger dark:text-dark-text-secondary dark:hover:text-danger transition-all duration-200 text-sm font-medium"
@@ -143,7 +148,6 @@ export default function AppLayout({ title, description, actions, children }: Lay
                   ☰
                 </button>
                 {actions}
-                <ThemeToggle />
                 <NavLink to="/profile" className="group relative">
                   {user?.avatarUrl ? (
                     <div className="relative">
@@ -273,6 +277,14 @@ function GoalsIcon() {
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="12" r="5" />
       <circle cx="12" cy="12" r="1" fill="currentColor" />
+    </svg>
+  )
+}
+
+function RecordsIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

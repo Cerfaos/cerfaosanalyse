@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { Section } from '../components/ui/Section'
@@ -49,6 +50,83 @@ interface ActivityStats {
   avgTrimp: number
   avgHeartRate: number
   byType: Record<string, number>
+}
+
+interface NewRecord {
+  recordType: string
+  recordTypeName: string
+  activityType: string
+  value: number
+  unit: string
+  previousValue: number | null
+  improvement: number | null
+}
+
+const RECORD_TYPE_ICONS: Record<string, string> = {
+  max_distance: '📏',
+  max_avg_speed: '⚡',
+  max_speed: '🚀',
+  max_trimp: '💪',
+  max_elevation: '⛰️',
+  longest_duration: '⏱️',
+  max_avg_heart_rate: '❤️',
+  max_calories: '🔥',
+}
+
+const formatRecordValue = (value: number, unit: string): string => {
+  switch (unit) {
+    case 'km':
+      return `${value.toFixed(2)} km`
+    case 'km/h':
+      return `${value.toFixed(1)} km/h`
+    case 'm':
+      return `${Math.round(value)} m`
+    case 'min':
+      const hours = Math.floor(value / 60)
+      const mins = Math.round(value % 60)
+      return hours > 0 ? `${hours}h ${mins}min` : `${mins} min`
+    case 'bpm':
+      return `${Math.round(value)} bpm`
+    case 'kcal':
+      return `${Math.round(value)} kcal`
+    case 'points':
+      return `${Math.round(value)} pts`
+    default:
+      return `${value} ${unit}`
+  }
+}
+
+const showRecordNotifications = (newRecords: NewRecord[]) => {
+  if (newRecords.length === 0) return
+
+  newRecords.forEach((record, index) => {
+    setTimeout(() => {
+      const icon = RECORD_TYPE_ICONS[record.recordType] || '🏆'
+      const improvement = record.improvement
+        ? ` (+${record.improvement.toFixed(1)}%)`
+        : ' (Premier record!)'
+
+      toast.success(
+        <div className="flex flex-col">
+          <div className="font-bold flex items-center gap-2">
+            <span className="text-xl">{icon}</span>
+            Nouveau Record!
+          </div>
+          <div className="text-sm">
+            {record.recordTypeName} - {record.activityType}
+          </div>
+          <div className="font-semibold text-brand">
+            {formatRecordValue(record.value, record.unit)}
+            <span className="text-success text-xs ml-1">{improvement}</span>
+          </div>
+        </div>,
+        {
+          duration: 6000,
+          icon: '🏆',
+        }
+      )
+    }, index * 800) // Décaler les notifications pour ne pas tout afficher en même temps
+  })
 }
 
 export default function Activities() {
@@ -137,7 +215,7 @@ export default function Activities() {
         formData.append('gpxFile', selectedGpxFile)
       }
 
-      await api.post('/api/activities/upload', formData, {
+      const response = await api.post('/api/activities/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -152,6 +230,11 @@ export default function Activities() {
       const gpxInput = document.getElementById('gpx-upload') as HTMLInputElement
       if (fileInput) fileInput.value = ''
       if (gpxInput) gpxInput.value = ''
+
+      // Afficher les notifications de nouveaux records
+      if (response.data.data?.newRecords && response.data.data.newRecords.length > 0) {
+        showRecordNotifications(response.data.data.newRecords)
+      }
 
       // Recharger les données
       loadData()
@@ -212,7 +295,7 @@ export default function Activities() {
         formData.append('gpxFile', manualGpxFile)
       }
 
-      await api.post('/api/activities/create', formData, {
+      const response = await api.post('/api/activities/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -241,6 +324,11 @@ export default function Activities() {
       // Reset file input
       const fileInput = document.getElementById('manual-gpx-file') as HTMLInputElement
       if (fileInput) fileInput.value = ''
+
+      // Afficher les notifications de nouveaux records
+      if (response.data.data?.newRecords && response.data.data.newRecords.length > 0) {
+        showRecordNotifications(response.data.data.newRecords)
+      }
 
       // Recharger les données
       loadData()

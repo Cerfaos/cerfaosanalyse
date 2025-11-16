@@ -19,6 +19,7 @@ const EquipmentController = () => import('#controllers/equipment_controller')
 const ExportsController = () => import('#controllers/exports_controller')
 const BadgesController = () => import('#controllers/badges_controller')
 const GoalsController = () => import('#controllers/goals_controller')
+const PersonalRecordsController = () => import('#controllers/personal_records_controller')
 
 // Health check
 router.get('/', async () => {
@@ -142,4 +143,17 @@ router
     router.delete('/:id', [GoalsController, 'destroy'])
   })
   .prefix('/api/goals')
+  .use(middleware.auth())
+
+// Routes records personnels protégées
+router
+  .group(() => {
+    router.get('/', [PersonalRecordsController, 'index'])
+    router.get('/stats', [PersonalRecordsController, 'stats'])
+    router.get('/recent', [PersonalRecordsController, 'recent'])
+    router.get('/recalculate', [PersonalRecordsController, 'recalculate'])
+    router.get('/type/:type', [PersonalRecordsController, 'byActivityType'])
+    router.get('/history/:type/:activityType', [PersonalRecordsController, 'history'])
+  })
+  .prefix('/api/records')
   .use(middleware.auth())
