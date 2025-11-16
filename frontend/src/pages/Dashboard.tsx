@@ -514,20 +514,24 @@ export default function Dashboard() {
         {stats && stats.totalActivities > 0 ? (
           <>
             {/* Vue d'ensemble de la période */}
-            <div className="glass-panel p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.4em] text-text-muted dark:text-dark-text-secondary">Période</p>
-                  <h2 className="text-2xl font-semibold text-text-dark dark:text-dark-text-contrast">
-                    {stats.totalActivities} activité{stats.totalActivities > 1 ? 's' : ''}
-                  </h2>
+            <div className="glass-panel p-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-green-500/5" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.4em] text-text-muted dark:text-dark-text-secondary">Période</p>
+                    <h2 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">
+                      {stats.totalActivities} activité{stats.totalActivities > 1 ? 's' : ''}
+                    </h2>
+                  </div>
+                  <div className="text-4xl animate-pulse">🎯</div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard label="Distance totale" value={formatDistance(stats.totalDistance)} />
-                <StatCard label="Durée totale" value={formatDuration(stats.totalDuration)} />
-                <StatCard label="Charge TRIMP" value={stats.totalTrimp ? `${stats.totalTrimp}` : '-'} />
-                <StatCard label="FC moyenne" value={stats.averageHeartRate ? `${stats.averageHeartRate} bpm` : '-'} />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                <StatCard label="Distance totale" value={formatDistance(stats.totalDistance)} icon="🛣️" color="brand" />
+                <StatCard label="Durée totale" value={formatDuration(stats.totalDuration)} icon="⏱️" color="orange" />
+                <StatCard label="Charge TRIMP" value={stats.totalTrimp ? `${stats.totalTrimp}` : '-'} icon="💪" color="red" />
+                <StatCard label="FC moyenne" value={stats.averageHeartRate ? `${stats.averageHeartRate} bpm` : '-'} icon="❤️" color="green" />
               </div>
             </div>
 
@@ -598,11 +602,22 @@ export default function Dashboard() {
   )
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({ label, value, icon, color = 'brand' }: { label: string; value: string; icon?: string; color?: string }) {
+  const colorMap: Record<string, string> = {
+    brand: 'bg-brand/10 group-hover:bg-brand/20',
+    orange: 'bg-orange-500/10 group-hover:bg-orange-500/20',
+    green: 'bg-green-500/10 group-hover:bg-green-500/20',
+    red: 'bg-red-500/10 group-hover:bg-red-500/20',
+  }
+
   return (
-    <div className="glass-panel px-4 py-5">
-      <p className="text-xs uppercase tracking-[0.3em] text-text-muted dark:text-dark-text-secondary mb-2">{label}</p>
-      <p className="text-2xl font-semibold text-text-dark dark:text-dark-text-contrast">{value}</p>
+    <div className="glass-panel px-4 py-5 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+      <div className={`absolute top-0 right-0 w-24 h-24 ${colorMap[color] || colorMap.brand} rounded-full -translate-y-12 translate-x-12 transition-all duration-500`} />
+      <div className="relative z-10">
+        {icon && <div className="text-2xl mb-2">{icon}</div>}
+        <p className="text-xs uppercase tracking-[0.3em] text-text-muted dark:text-dark-text-secondary mb-2">{label}</p>
+        <p className="text-2xl font-semibold text-text-dark dark:text-dark-text-contrast group-hover:scale-105 transition-transform duration-300 origin-left">{value}</p>
+      </div>
     </div>
   )
 }
@@ -692,19 +707,40 @@ function ActivityRow({
   formatDistance: (meters: number) => string
   formatDuration: (seconds: number) => string
 }) {
-  const config = activityTypeConfig[activity.type] || { icon: '📈' }
+  const config = activityTypeConfig[activity.type] || {
+    icon: '📈',
+    color: 'text-gray-600',
+    colorDark: 'dark:text-gray-400',
+    bgColor: 'bg-gray-50',
+    bgDark: 'dark:bg-gray-950/30'
+  }
+
+  const getTrimpColor = (trimp: number | null) => {
+    if (!trimp) return 'text-text-muted dark:text-dark-text-secondary'
+    if (trimp < 50) return 'text-green-600 dark:text-green-400'
+    if (trimp < 100) return 'text-yellow-600 dark:text-yellow-400'
+    if (trimp < 200) return 'text-orange-600 dark:text-orange-400'
+    return 'text-red-600 dark:text-red-400'
+  }
 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between p-4 border border-border-base rounded-2xl hover:border-brand/40 hover:bg-bg-gray-100 dark:hover:bg-dark-border/20 transition-colors text-left"
+      className="w-full flex items-center justify-between p-4 border border-border-base rounded-2xl hover:border-brand/40 hover:bg-bg-gray-100 dark:hover:bg-dark-border/20 transition-all duration-300 text-left group"
     >
       <div className="flex items-center gap-4">
-        <div className="h-10 w-10 rounded-xl bg-bg-gray-100 dark:bg-dark-border/40 flex items-center justify-center text-lg">
+        <div className={`h-12 w-12 rounded-xl ${config.bgColor} ${config.bgDark} flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform duration-300`}>
           {config.icon}
         </div>
         <div>
-          <p className="font-medium text-text-dark dark:text-dark-text-contrast">{activity.type}</p>
+          <div className="flex items-center gap-2">
+            <p className={`font-semibold ${config.color} ${config.colorDark}`}>{activity.type}</p>
+            {activity.trimp && (
+              <span className={`text-xs font-medium ${getTrimpColor(activity.trimp)}`}>
+                TRIMP {Math.round(activity.trimp)}
+              </span>
+            )}
+          </div>
           <p className="text-xs text-text-muted dark:text-dark-text-secondary">
             {new Date(activity.date).toLocaleDateString('fr-FR', {
               day: 'numeric',
@@ -720,8 +756,11 @@ function ActivityRow({
         </div>
       </div>
       <div className="text-right">
-        <p className="font-medium text-text-dark dark:text-dark-text-contrast">{formatDistance(activity.distance)}</p>
+        <p className="font-semibold text-text-dark dark:text-dark-text-contrast">{formatDistance(activity.distance)}</p>
         <p className="text-xs text-text-muted dark:text-dark-text-secondary">{formatDuration(activity.duration)}</p>
+        {activity.avgHeartRate && (
+          <p className="text-xs text-red-500 dark:text-red-400 font-medium">❤️ {activity.avgHeartRate} bpm</p>
+        )}
       </div>
     </button>
   )
@@ -1037,33 +1076,43 @@ function TypeChip({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-3 rounded-2xl border px-4 py-2 text-left transition ${
+      className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-300 group ${
         selected
-          ? 'border-brand/70 bg-brand/5 text-text-dark dark:text-dark-text-contrast shadow-sm'
-          : 'border-panel-border bg-white dark:bg-dark-surface text-text-muted dark:text-dark-text-secondary hover:border-brand/40'
+          ? 'border-brand/70 bg-brand/10 text-text-dark dark:text-dark-text-contrast shadow-md hover:shadow-lg'
+          : 'border-panel-border bg-white dark:bg-dark-surface text-text-muted dark:text-dark-text-secondary hover:border-brand/40 hover:bg-brand/5 opacity-60 hover:opacity-100'
       }`}
     >
-      <span className="text-lg">{icon}</span>
+      <span className={`text-xl transition-transform duration-300 ${selected ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</span>
       <div className="flex flex-col text-sm">
         <span className="font-semibold">{label}</span>
-        <span className="text-[11px] uppercase tracking-wide text-text-muted dark:text-dark-text-secondary">{count} activité{count > 1 ? 's' : ''}</span>
+        <span className="text-[11px] uppercase tracking-wide text-text-muted dark:text-dark-text-secondary">
+          {count} activité{count > 1 ? 's' : ''}
+        </span>
       </div>
+      {selected && (
+        <div className="ml-auto">
+          <div className="w-2 h-2 bg-brand rounded-full animate-pulse" />
+        </div>
+      )}
     </button>
   )
 }
 
 function EmptyState({ onImport }: { onImport: () => void }) {
   return (
-    <div className="glass-panel p-12 text-center">
-      <div className="max-w-md mx-auto">
-        <div className="text-6xl mb-4">📊</div>
-        <h3 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast mb-2">
+    <div className="glass-panel p-12 text-center relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-brand/5 via-transparent to-orange-500/5" />
+      <div className="absolute top-0 left-0 w-64 h-64 bg-brand/10 rounded-full -translate-x-32 -translate-y-32 blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full translate-x-32 translate-y-32 blur-3xl" />
+      <div className="max-w-md mx-auto relative z-10">
+        <div className="text-7xl mb-6 animate-bounce">📊</div>
+        <h3 className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast mb-3">
           Aucune activité pour le moment
         </h3>
-        <p className="text-text-secondary dark:text-dark-text-secondary mb-6">
-          Importez vos fichiers FIT, GPX ou CSV pour commencer à suivre votre charge d'entraînement.
+        <p className="text-text-secondary dark:text-dark-text-secondary mb-8 leading-relaxed">
+          Importez vos fichiers FIT, GPX ou CSV pour commencer à suivre votre charge d'entraînement et analyser vos performances.
         </p>
-        <button onClick={onImport} className="btn-primary">
+        <button onClick={onImport} className="btn-primary px-8 py-3 text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
           Importer une activité
         </button>
       </div>

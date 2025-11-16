@@ -417,6 +417,38 @@ export default function ActivityDetail() {
 
   const hrZonesData = calculateHRZones()
 
+  // Configuration des couleurs par type d'activité
+  const getActivityTypeConfig = (type: string) => {
+    const configs: Record<string, { icon: string; gradient: string; badge: string }> = {
+      'Cyclisme': { icon: '🚴', gradient: 'from-orange-500 to-amber-600', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' },
+      'Course': { icon: '🏃', gradient: 'from-blue-500 to-indigo-600', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
+      'Natation': { icon: '🏊', gradient: 'from-cyan-500 to-teal-600', badge: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300' },
+      'Randonnée': { icon: '🥾', gradient: 'from-green-500 to-emerald-600', badge: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+      'Marche': { icon: '🚶', gradient: 'from-lime-500 to-green-600', badge: 'bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-300' },
+      'Rameur': { icon: '🚣', gradient: 'from-sky-500 to-blue-600', badge: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300' },
+      'Fitness': { icon: '💪', gradient: 'from-purple-500 to-violet-600', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' },
+      'Entraînement': { icon: '🏋️', gradient: 'from-indigo-500 to-purple-600', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' },
+    }
+    return configs[type] || { icon: '🏆', gradient: 'from-gray-500 to-slate-600', badge: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300' }
+  }
+
+  const getTrimpColor = (trimp: number | null) => {
+    if (!trimp) return 'text-text-muted'
+    if (trimp < 50) return 'text-green-600 dark:text-green-400'
+    if (trimp < 100) return 'text-yellow-600 dark:text-yellow-400'
+    if (trimp < 200) return 'text-orange-600 dark:text-orange-400'
+    return 'text-red-600 dark:text-red-400'
+  }
+
+  const getRpeColor = (rpe: number) => {
+    if (rpe <= 3) return 'text-green-600 dark:text-green-400'
+    if (rpe <= 6) return 'text-yellow-600 dark:text-yellow-400'
+    if (rpe <= 8) return 'text-orange-600 dark:text-orange-400'
+    return 'text-red-600 dark:text-red-400'
+  }
+
+  const activityConfig = activity ? getActivityTypeConfig(activity.type) : null
+
   // Préparer les données pour le graphique d'élévation
   const elevationChartData = gpsData
     .filter((point) => point.ele !== undefined)
@@ -476,33 +508,45 @@ export default function ActivityDetail() {
         )}
 
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-text-dark mb-2">
-              {activity.type}
-              {activity.subSport && (
-                <span className="text-xl text-text-secondary font-normal ml-3">
-                  ({activity.subSport})
-                </span>
-              )}
-            </h1>
-            <p className="text-text-body">
-              {new Date(activity.date).toLocaleDateString('fr-FR', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-              {' à '}
-              {new Date(activity.date).toLocaleTimeString('fr-FR', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </p>
-            {activity.fileName && (
-              <p className="text-sm text-text-secondary mt-1">
-                Fichier: {activity.fileName}
-              </p>
+          <div className="flex items-center gap-6">
+            {activityConfig && (
+              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${activityConfig.gradient} flex items-center justify-center text-4xl shadow-lg transform hover:scale-110 transition-transform duration-300`}>
+                {activityConfig.icon}
+              </div>
             )}
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">
+                  {activity.type}
+                </h1>
+                {activity.subSport && (
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${activityConfig?.badge}`}>
+                    {activity.subSport}
+                  </span>
+                )}
+              </div>
+              <p className="text-text-body dark:text-dark-text-secondary text-lg">
+                {new Date(activity.date).toLocaleDateString('fr-FR', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+                {' à '}
+                {new Date(activity.date).toLocaleTimeString('fr-FR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+              {activity.fileName && (
+                <p className="text-sm text-text-secondary dark:text-dark-text-muted mt-1 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  {activity.fileName}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {activity.gpsData && (
@@ -1007,88 +1051,124 @@ export default function ActivityDetail() {
 
       {/* Statistiques principales */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-          <p className="text-sm text-text-secondary mb-1">Distance</p>
-          <p className="text-2xl font-bold text-accent-500">{formatDistance(activity.distance)}</p>
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-brand/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="text-2xl mb-2">🛣️</div>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Distance</p>
+            <p className="text-2xl font-bold text-brand">{formatDistance(activity.distance)}</p>
+          </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-          <p className="text-sm text-text-secondary mb-1">Durée</p>
-          <p className="text-2xl font-bold text-text-dark">{formatDuration(activity.duration)}</p>
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-orange-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="text-2xl mb-2">⏱️</div>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Durée</p>
+            <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">{formatDuration(activity.duration)}</p>
+          </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-          <p className="text-sm text-text-secondary mb-1">Vitesse moy</p>
-          <p className="text-2xl font-bold text-text-dark">{formatSpeed(activity.avgSpeed)}</p>
-          <p className="text-xs text-text-tertiary">{formatPace(activity.avgSpeed)}</p>
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="text-2xl mb-2">🚀</div>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Vitesse moy</p>
+            <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">{formatSpeed(activity.avgSpeed)}</p>
+            <p className="text-xs text-text-tertiary dark:text-dark-text-muted">{formatPace(activity.avgSpeed)}</p>
+          </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-          <p className="text-sm text-text-secondary mb-1">FC moyenne</p>
-          <p className="text-2xl font-bold text-text-dark">
-            {activity.avgHeartRate ? `${activity.avgHeartRate} bpm` : '-'}
-          </p>
-          <p className="text-xs text-text-tertiary">
-            Max: {activity.maxHeartRate ? `${activity.maxHeartRate} bpm` : '-'}
-          </p>
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="text-2xl mb-2">❤️</div>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">FC moyenne</p>
+            <p className="text-2xl font-bold text-red-500 dark:text-red-400">
+              {activity.avgHeartRate ? `${activity.avgHeartRate} bpm` : '-'}
+            </p>
+            <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
+              Max: {activity.maxHeartRate ? `${activity.maxHeartRate} bpm` : '-'}
+            </p>
+          </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-          <p className="text-sm text-text-secondary mb-1">Dénivelé</p>
-          <p className="text-2xl font-bold text-text-dark">{formatElevation(activity.elevationGain)}</p>
-          {activity.elevationLoss && (
-            <p className="text-xs text-text-tertiary">Descente: {formatElevation(activity.elevationLoss)}</p>
-          )}
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="text-2xl mb-2">⛰️</div>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Dénivelé</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatElevation(activity.elevationGain)}</p>
+            {activity.elevationLoss && (
+              <p className="text-xs text-text-tertiary dark:text-dark-text-muted">Descente: {formatElevation(activity.elevationLoss)}</p>
+            )}
+          </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-          <p className="text-sm text-text-secondary mb-1">TRIMP</p>
-          <p className="text-2xl font-bold text-accent-500">{activity.trimp || '-'}</p>
+        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="text-2xl mb-2">💪</div>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">TRIMP</p>
+            <p className={`text-2xl font-bold ${getTrimpColor(activity.trimp)}`}>{activity.trimp || '-'}</p>
+          </div>
         </div>
 
         {activity.rpe && (
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">RPE (Effort Perçu)</p>
-            <p className="text-2xl font-bold text-text-dark">{activity.rpe}/10</p>
-            <p className="text-xs text-text-tertiary">
-              {activity.rpe <= 3 ? 'Facile' : activity.rpe <= 6 ? 'Modéré' : activity.rpe <= 8 ? 'Difficile' : 'Extrême'}
-            </p>
+          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative z-10">
+              <div className="text-2xl mb-2">🎯</div>
+              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">RPE (Effort Perçu)</p>
+              <p className={`text-2xl font-bold ${getRpeColor(activity.rpe)}`}>{activity.rpe}/10</p>
+              <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
+                {activity.rpe <= 3 ? 'Facile' : activity.rpe <= 6 ? 'Modéré' : activity.rpe <= 8 ? 'Difficile' : 'Extrême'}
+              </p>
+            </div>
           </div>
         )}
 
         {activity.avgTemperature && (
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Température</p>
-            <p className="text-2xl font-bold text-text-dark">{activity.avgTemperature}°C</p>
-            {activity.maxTemperature && (
-              <p className="text-xs text-text-tertiary">Max: {activity.maxTemperature}°C</p>
-            )}
+          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-cyan-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative z-10">
+              <div className="text-2xl mb-2">🌡️</div>
+              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Température</p>
+              <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">{activity.avgTemperature}°C</p>
+              {activity.maxTemperature && (
+                <p className="text-xs text-text-tertiary dark:text-dark-text-muted">Max: {activity.maxTemperature}°C</p>
+              )}
+            </div>
           </div>
         )}
 
         {activity.movingTime && (
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card">
-            <p className="text-sm text-text-secondary mb-1">Temps en pause</p>
-            <p className="text-2xl font-bold text-text-dark">
-              {formatDuration(activity.duration - activity.movingTime)}
-            </p>
-            <p className="text-xs text-text-tertiary">
-              En mouvement: {formatDuration(activity.movingTime)}
-            </p>
+          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-slate-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative z-10">
+              <div className="text-2xl mb-2">⏸️</div>
+              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">Temps en pause</p>
+              <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">
+                {formatDuration(activity.duration - activity.movingTime)}
+              </p>
+              <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
+                En mouvement: {formatDuration(activity.movingTime)}
+              </p>
+            </div>
           </div>
         )}
       </div>
 
       {/* Notes de sensations */}
       {activity.feelingNotes && (
-        <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card mb-8">
-          <h3 className="text-lg font-semibold text-text-dark mb-2 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+        <div className="glass-panel p-6 rounded-lg border border-amber-200 dark:border-amber-800/30 shadow-card mb-8 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/10 dark:to-orange-900/10">
+          <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast mb-3 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xl">
+              📝
+            </div>
             Notes sur les sensations
           </h3>
-          <p className="text-text-body whitespace-pre-wrap">{activity.feelingNotes}</p>
+          <p className="text-text-body dark:text-dark-text-secondary whitespace-pre-wrap leading-relaxed pl-13">{activity.feelingNotes}</p>
         </div>
       )}
 
