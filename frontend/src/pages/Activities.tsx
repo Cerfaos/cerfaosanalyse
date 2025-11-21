@@ -283,6 +283,8 @@ export default function Activities() {
       // Convertir la distance en mètres
       const distance = Number(manualFormData.distance) * 1000
 
+      // Le format datetime-local donne "2024-11-21T22:00" sans fuseau horaire
+      // On l'envoie tel quel au backend qui le traitera comme heure locale
       const formData = new FormData()
       formData.append('date', manualFormData.date)
       formData.append('type', manualFormData.type)

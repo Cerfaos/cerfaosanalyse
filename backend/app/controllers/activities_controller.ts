@@ -226,8 +226,9 @@ export default class ActivitiesController {
     const finalElevationGain =
       parsedGpxData?.elevationGain || (data.elevationGain ? Number(data.elevationGain) : null)
 
-    // Convertir la date
-    const activityDate = DateTime.fromISO(data.date)
+    // Convertir la date (le frontend envoie une date locale sans fuseau horaire)
+    // On l'interprète dans le fuseau horaire local du serveur (Europe/Paris)
+    const activityDate = DateTime.fromISO(data.date, { zone: 'Europe/Paris' })
 
     // Calculer le TRIMP si FC disponible
     let trimp = null
