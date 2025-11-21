@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog'
+import { Input, Textarea, Label } from '../components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import toast from 'react-hot-toast'
 
 interface Goal {
@@ -365,142 +368,152 @@ export default function Goals() {
         )}
 
         {/* Create/Edit Modal */}
-        {(showCreateModal || editingGoal) && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#0A191A] border border-[#8BC34A]/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  {editingGoal ? 'Modifier l\'objectif' : 'Nouvel objectif'}
-                </h2>
-                <form onSubmit={editingGoal ? handleUpdate : handleCreate}>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Titre
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
-                        required
-                      />
-                    </div>
+        <Dialog
+          open={showCreateModal || !!editingGoal}
+          onOpenChange={(open) => {
+            if (!open) {
+              setShowCreateModal(false)
+              setEditingGoal(null)
+              resetForm()
+            }
+          }}
+        >
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingGoal ? 'Modifier l\'objectif' : 'Nouvel objectif'}
+              </DialogTitle>
+            </DialogHeader>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Type d'objectif
-                      </label>
-                      <select
-                        value={formData.type}
-                        onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
-                      >
-                        {GOAL_TYPES.map((type) => (
-                          <option key={type.value} value={type.value} className="bg-[#0A191A] text-white">
-                            {type.icon} {type.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+            <form onSubmit={editingGoal ? handleUpdate : handleCreate}>
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Titre</Label>
+                  <Input
+                    id="title"
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Ex: Objectif distance hebdomadaire"
+                    required
+                  />
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Valeur cible
-                      </label>
-                      <input
-                        type="number"
-                        value={formData.targetValue}
-                        onChange={(e) => setFormData({ ...formData, targetValue: Number(e.target.value) })}
-                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
-                        required
-                      />
-                      <p className="text-sm text-gray-500 mt-1">
-                        {GOAL_TYPES.find(t => t.value === formData.type)?.unit}
-                      </p>
-                    </div>
+                <div className="space-y-2">
+                  <Label>Type d'objectif</Label>
+                  <Select
+                    value={formData.type}
+                    onValueChange={(value) => setFormData({ ...formData, type: value as any })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez un type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GOAL_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          <span className="flex items-center gap-2">
+                            <span>{type.icon}</span>
+                            <span>{type.label}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Période
-                      </label>
-                      <select
-                        value={formData.period}
-                        onChange={(e) => setFormData({ ...formData, period: e.target.value as any })}
-                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
-                      >
-                        {PERIODS.map((period) => (
-                          <option key={period.value} value={period.value} className="bg-[#0A191A] text-white">
-                            {period.icon} {period.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="targetValue">Valeur cible</Label>
+                  <Input
+                    id="targetValue"
+                    type="number"
+                    value={formData.targetValue}
+                    onChange={(e) => setFormData({ ...formData, targetValue: Number(e.target.value) })}
+                    required
+                  />
+                  <p className="text-sm text-gray-500">
+                    {GOAL_TYPES.find(t => t.value === formData.type)?.unit}
+                  </p>
+                </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
-                          Date de début
-                        </label>
-                        <input
-                          type="date"
-                          value={formData.startDate}
-                          onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                          className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">
-                          Date de fin
-                        </label>
-                        <input
-                          type="date"
-                          value={formData.endDate}
-                          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <Label>Période</Label>
+                  <Select
+                    value={formData.period}
+                    onValueChange={(value) => setFormData({ ...formData, period: value as any })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez une période" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PERIODS.map((period) => (
+                        <SelectItem key={period.value} value={period.value}>
+                          <span className="flex items-center gap-2">
+                            <span>{period.icon}</span>
+                            <span>{period.label}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Description (optionnelle)
-                      </label>
-                      <textarea
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all resize-none"
-                        rows={3}
-                      />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Date de début</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                      required
+                    />
                   </div>
-
-                  <div className="flex justify-end gap-3 mt-6">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowCreateModal(false)
-                        setEditingGoal(null)
-                        resetForm()
-                      }}
-                      className="px-5 py-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn-primary"
-                    >
-                      {editingGoal ? 'Modifier' : 'Créer'}
-                    </button>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">Date de fin</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                      required
+                    />
                   </div>
-                </form>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description (optionnelle)</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Décrivez votre objectif..."
+                    rows={3}
+                  />
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+
+              <DialogFooter className="mt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false)
+                    setEditingGoal(null)
+                    resetForm()
+                  }}
+                  className="px-5 py-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                >
+                  {editingGoal ? 'Modifier' : 'Créer'}
+                </button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   )

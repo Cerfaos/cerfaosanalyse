@@ -4,6 +4,7 @@ import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
 import MetricInfo from '../components/ui/MetricInfo'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 interface TrainingLoadData {
   date: string
@@ -84,20 +85,20 @@ export default function TrainingLoad() {
           accentColor="#8BC34A"
         />
 
-        <div className="flex flex-wrap gap-3">
-          {periodOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setPeriod(option.value)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border ${
-                period === option.value
-                  ? 'bg-[#8BC34A] text-white border-[#8BC34A] shadow-md'
-                  : 'bg-[#0A191A]/60 text-gray-400 border-[#8BC34A]/20 hover:border-[#8BC34A]/40 hover:text-white'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-4">
+          <span className="text-gray-400 text-sm">Période :</span>
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sélectionnez une période" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {currentLoad && (

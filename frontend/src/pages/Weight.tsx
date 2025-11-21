@@ -3,6 +3,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
+import { Input, Textarea, Label } from '../components/ui/input'
 
 interface WeightEntry {
   id: number
@@ -189,26 +191,21 @@ export default function Weight() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div ref={formRef} className="lg:col-span-1" id="weight-form">
             <div className="glass-panel p-6">
-              <h2 className="text-xl font-semibold text-text-dark mb-6">Nouvelle pesée</h2>
+              <h2 className="text-xl font-semibold text-white mb-6">Nouvelle pesée</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-text-body mb-2">
-                    Date
-                  </label>
-                  <input
+                <div className="space-y-2">
+                  <Label htmlFor="date">Date</Label>
+                  <Input
                     type="date"
                     id="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     required
-                    className="w-full px-4 py-3 border border-border-base rounded-lg focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none"
                   />
                 </div>
-                <div>
-                  <label htmlFor="weight" className="block text-sm font-medium text-text-body mb-2">
-                    Poids (kg)
-                  </label>
-                  <input
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Poids (kg)</Label>
+                  <Input
                     type="number"
                     id="weight"
                     step="0.1"
@@ -217,29 +214,25 @@ export default function Weight() {
                     value={formData.weight}
                     onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                     required
-                    className="w-full px-4 py-3 border border-border-base rounded-lg focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none"
                   />
                 </div>
-                <div>
-                  <label htmlFor="notes" className="block text-sm font-medium text-text-body mb-2">
-                    Notes
-                  </label>
-                  <textarea
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 border border-border-base rounded-lg focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none"
                     placeholder="Comment vous sentez-vous ?"
-                  ></textarea>
+                  />
                 </div>
-              <button
-                type="submit"
-                disabled={formLoading}
-                className="btn-primary w-full"
-              >
-                {formLoading ? 'Enregistrement...' : 'Ajouter la pesée'}
-              </button>
+                <button
+                  type="submit"
+                  disabled={formLoading}
+                  className="btn-primary w-full"
+                >
+                  {formLoading ? 'Enregistrement...' : 'Ajouter la pesée'}
+                </button>
               </form>
             </div>
           </div>
@@ -282,40 +275,41 @@ export default function Weight() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold text-text-dark mb-4">Historique des pesées</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">Historique des pesées</h2>
           <div className="glass-panel p-0 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border-base">
-                <thead className="bg-bg-gray-100">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Poids</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Notes</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-bg-white divide-y divide-border-base">
-                  {weightHistories.map((entry) => (
-                    <tr key={entry.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark">
-                        {new Date(entry.date).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">{entry.weight} kg</td>
-                      <td className="px-6 py-4 text-sm text-text-body">{entry.notes || '—'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onClick={() => handleDelete(entry.id)} className="text-error hover:text-error-dark">
-                          Supprimer
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Poids</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {weightHistories.map((entry) => (
+                  <TableRow key={entry.id}>
+                    <TableCell>
+                      {new Date(entry.date).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </TableCell>
+                    <TableCell className="font-semibold text-[#5CE1E6]">{entry.weight} kg</TableCell>
+                    <TableCell className="text-gray-400">{entry.notes || '—'}</TableCell>
+                    <TableCell className="text-right">
+                      <button
+                        onClick={() => handleDelete(entry.id)}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        Supprimer
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>

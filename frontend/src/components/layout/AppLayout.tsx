@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Bike, Plus, Zap, Menu } from "lucide-react";
+import { Bike, Plus, Menu } from "lucide-react";
 import { getAvatarUrl } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import NotificationCenter from "../NotificationCenter";
