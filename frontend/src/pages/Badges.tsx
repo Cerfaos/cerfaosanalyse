@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 
 interface Badge {
   id: number
@@ -130,14 +131,23 @@ export default function Badges() {
   return (
     <AppLayout title="Badges" description="Suivez vos accomplissements et débloquez de nouveaux défis">
       <div className="space-y-8">
+        <PageHeader
+          eyebrow="Accomplissements"
+          title="Badges & Récompenses"
+          description="Suivez vos accomplissements et débloquez de nouveaux défis."
+          icon="🏆"
+          gradient="from-[#FFAB40] to-[#8BC34A]"
+          accentColor="#FFAB40"
+        />
+
         {/* Statistiques globales */}
         <div className="glass-panel p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast mb-2 font-display">
-                Vos badges
+              <h2 className="text-xl font-bold text-white mb-2 font-display">
+                Progression globale
               </h2>
-              <p className="text-text-secondary dark:text-dark-text-secondary">
+              <p className="text-gray-400">
                 {badges.stats.unlocked} sur {badges.stats.total} badges débloqués
               </p>
             </div>
@@ -151,22 +161,22 @@ export default function Badges() {
                     stroke="currentColor"
                     strokeWidth="8"
                     fill="transparent"
-                    className="text-bg-subtle dark:text-dark-bg-subtle"
+                    className="text-white/10"
                   />
                   <circle
                     cx="48"
                     cy="48"
                     r="40"
-                    stroke="currentColor"
+                    stroke="#8BC34A"
                     strokeWidth="8"
                     fill="transparent"
                     strokeDasharray={`${2 * Math.PI * 40}`}
                     strokeDashoffset={`${2 * Math.PI * 40 * (1 - badges.stats.percentageUnlocked / 100)}`}
-                    className="text-accent transition-all duration-500"
+                    className="transition-all duration-500"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-bold text-text-dark dark:text-dark-text-contrast">
+                  <span className="text-xl font-bold text-white">
                     {badges.stats.percentageUnlocked}%
                   </span>
                 </div>
@@ -181,10 +191,10 @@ export default function Badges() {
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`px-4 py-2 rounded-xl font-medium transition-all border-2 ${
+              className={`px-4 py-2 rounded-xl font-medium transition-all border ${
                 selectedCategory === category.value
-                  ? 'bg-accent text-white border-accent shadow-md transform scale-105'
-                  : 'bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary border-panel-border hover:bg-bg-subtle dark:hover:bg-dark-bg-subtle'
+                  ? 'bg-[#8BC34A] text-white border-[#8BC34A] shadow-md transform scale-105'
+                  : 'bg-[#0A191A]/60 text-gray-400 border-[#8BC34A]/20 hover:border-[#8BC34A]/40 hover:text-white'
               }`}
             >
               <span className="mr-2">{category.icon}</span>

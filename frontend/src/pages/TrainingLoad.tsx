@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 import MetricInfo from '../components/ui/MetricInfo'
 
 interface TrainingLoadData {
@@ -74,37 +75,24 @@ export default function TrainingLoad() {
   return (
     <AppLayout title="Charge d'entraînement" description="Comprenez votre forme et votre fatigue">
       <div className="space-y-8">
-        {/* Header avec impact visuel */}
-        <div className="glass-panel p-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-red-500/5" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
-          <div className="relative z-10 flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-red-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-              📈
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
-                Performance
-              </p>
-              <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
-                Charge d'entraînement
-              </h1>
-              <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
-                Analysez votre CTL (forme), ATL (fatigue) et TSB (équilibre) pour optimiser votre entraînement.
-              </p>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow="Performance"
+          title="Charge d'entraînement"
+          description="Analysez votre CTL (forme), ATL (fatigue) et TSB (équilibre) pour optimiser votre entraînement."
+          icon="📈"
+          gradient="from-[#8BC34A] to-[#FF5252]"
+          accentColor="#8BC34A"
+        />
 
         <div className="flex flex-wrap gap-3">
           {periodOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => setPeriod(option.value)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border-2 ${
+              className={`px-5 py-2.5 rounded-xl text-sm font-display font-semibold transition-all border ${
                 period === option.value
-                  ? `${option.color} ${option.colorDark} shadow-md`
-                  : 'border-panel-border bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary hover:bg-bg-subtle'
+                  ? 'bg-[#8BC34A] text-white border-[#8BC34A] shadow-md'
+                  : 'bg-[#0A191A]/60 text-gray-400 border-[#8BC34A]/20 hover:border-[#8BC34A]/40 hover:text-white'
               }`}
             >
               {option.label}
@@ -140,19 +128,29 @@ export default function TrainingLoad() {
         )}
 
         <div className="glass-panel p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Évolution CTL / ATL / TSB</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Évolution CTL / ATL / TSB</h3>
           <div className="h-80 w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%" minWidth={260} minHeight={320}>
               <LineChart data={history}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" strokeOpacity={0.5} />
                 <XAxis dataKey="date" tickFormatter={formatDate} stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
-                <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')} />
-                <Legend />
-                <ReferenceLine y={0} stroke="#E6E2CC" strokeDasharray="3 3" />
-                <Line type="monotone" dataKey="ctl" stroke="#7FBBB3" name="CTL (Forme)" strokeWidth={3} dot={false} />
-                <Line type="monotone" dataKey="atl" stroke="#E69875" name="ATL (Fatigue)" strokeWidth={3} dot={false} />
-                <Line type="monotone" dataKey="tsb" stroke="#A7C080" name="TSB (Équilibre)" strokeWidth={3} dot={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(10, 25, 26, 0.95)',
+                    border: '1px solid rgba(139, 195, 74, 0.3)',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  }}
+                  labelStyle={{ color: '#fff', fontWeight: 'bold', marginBottom: '8px' }}
+                  itemStyle={{ color: '#9CA3AF' }}
+                  labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                />
+                <Legend wrapperStyle={{ color: '#9CA3AF' }} />
+                <ReferenceLine y={0} stroke="#8BC34A" strokeDasharray="3 3" strokeOpacity={0.5} />
+                <Line type="monotone" dataKey="ctl" stroke="#5CE1E6" name="CTL (Forme)" strokeWidth={3} dot={false} />
+                <Line type="monotone" dataKey="atl" stroke="#FF5252" name="ATL (Fatigue)" strokeWidth={3} dot={false} />
+                <Line type="monotone" dataKey="tsb" stroke="#8BC34A" name="TSB (Équilibre)" strokeWidth={3} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>

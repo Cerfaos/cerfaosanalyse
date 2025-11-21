@@ -15,6 +15,7 @@ import ActivityHeatmap from "../components/ActivityHeatmap";
 import DashboardConfig from "../components/DashboardConfig";
 import GPSTracesMap from "../components/GPSTracesMap";
 import AppLayout from "../components/layout/AppLayout";
+import { PageHeader } from "../components/ui/PageHeader";
 import YearComparison from "../components/YearComparison";
 import ZoneProgressionChart from "../components/ZoneProgressionChart";
 import api from "../services/api";
@@ -632,7 +633,7 @@ export default function Dashboard() {
         description={`Synthèse ${getPeriodLabel()}`}
         actions={actions}
       >
-        <div className="glass-panel p-6 text-center text-text-secondary dark:text-dark-text-secondary">
+        <div className="glass-panel p-6 text-center text-gray-400">
           Chargement...
         </div>
       </AppLayout>
@@ -648,37 +649,22 @@ export default function Dashboard() {
       actions={actions}
     >
       <div className="space-y-8">
-        {/* Header avec impact visuel */}
-        <div className="glass-panel p-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-green-500/5" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
-          <div className="relative z-10 flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-green-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-              📊
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
-                Tableau de bord
-              </p>
-              <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
-                Synthèse d'entraînement
-              </h1>
-              <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
-                Analysez vos performances, suivez votre charge d'entraînement et
-                visualisez vos progrès.
-              </p>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow="Tableau de bord"
+          title="Synthèse d'entraînement"
+          description="Analysez vos performances, suivez votre charge d'entraînement et visualisez vos progrès."
+          icon="📊"
+          gradient="from-[#8BC34A] to-[#5CE1E6]"
+        />
 
         {/* Filtres */}
         <div className="glass-panel p-6 space-y-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-text-muted dark:text-dark-text-secondary">
+              <p className="text-xs uppercase tracking-[0.4em] text-gray-400">
                 Filtres intelligents
               </p>
-              <h3 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast">
+              <h3 className="text-xl font-semibold text-white">
                 Affinez vos statistiques
               </h3>
             </div>
@@ -691,7 +677,7 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast mb-4">
+            <p className="text-sm font-semibold text-white mb-4">
               Période
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -709,14 +695,14 @@ export default function Dashboard() {
           {/* Sélecteurs de mois et année (mode personnalisé) */}
           {period === "custom" && (
             <div className="rounded-2xl border border-panel-border bg-bg-subtle/40 dark:bg-dark-border/20 p-4">
-              <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast mb-3">
+              <p className="text-sm font-semibold text-white mb-3">
                 Sélectionner le mois et l'année
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                  className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-text-dark dark:text-dark-text-contrast font-medium text-sm focus:outline-none focus:border-brand transition-colors"
+                  className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-white font-medium text-sm focus:outline-none focus:border-brand transition-colors"
                 >
                   {[
                     "Janvier",
@@ -740,7 +726,7 @@ export default function Dashboard() {
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-text-dark dark:text-dark-text-contrast font-medium text-sm focus:outline-none focus:border-brand transition-colors"
+                  className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-white font-medium text-sm focus:outline-none focus:border-brand transition-colors"
                 >
                   {Array.from(
                     { length: 10 },
@@ -760,17 +746,17 @@ export default function Dashboard() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <p className="text-sm font-semibold text-white">
                     Types d'activités
                   </p>
-                  <p className="text-xs text-text-muted dark:text-dark-text-secondary">
+                  <p className="text-xs text-gray-400">
                     Touchez pour afficher/masquer une discipline
                   </p>
                 </div>
                 {selectedTypes.length > 0 && (
                   <button
                     onClick={() => setSelectedTypes([])}
-                    className="text-xs text-brand hover:text-brand-dark dark:text-brand dark:hover:text-brand-light font-medium"
+                    className="text-xs text-[#8BC34A] hover:text-[#8BC34A]-dark dark:text-[#8BC34A] dark:hover:text-[#8BC34A]-light font-medium"
                   >
                     Tout afficher
                   </button>
@@ -811,10 +797,10 @@ export default function Dashboard() {
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <p className="text-sm uppercase tracking-[0.4em] text-text-muted dark:text-dark-text-secondary">
+                    <p className="text-sm uppercase tracking-[0.4em] text-gray-400">
                       Période
                     </p>
-                    <h2 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">
+                    <h2 className="text-3xl font-bold text-white">
                       {stats.totalActivities} activité
                       {stats.totalActivities > 1 ? "s" : ""}
                     </h2>
@@ -876,11 +862,11 @@ export default function Dashboard() {
                 <div className="mb-8">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="text-4xl">📊</div>
-                    <h2 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast font-display">
+                    <h2 className="text-3xl font-bold text-white font-display">
                       Statistiques par type d'activité
                     </h2>
                   </div>
-                  <p className="text-sm text-text-muted dark:text-dark-text-secondary ml-16">
+                  <p className="text-sm text-gray-400 ml-16">
                     Détail de vos performances pour chaque discipline sur la
                     période sélectionnée
                   </p>
@@ -902,7 +888,7 @@ export default function Dashboard() {
             {isWidgetEnabled("heatmap") && (
               <div className="glass-panel p-6">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <h3 className="text-lg font-semibold text-white">
                     Calendrier d'activités
                   </h3>
                   <p className="text-sm text-text-muted">
@@ -917,7 +903,7 @@ export default function Dashboard() {
             {isWidgetEnabled("year-comparison") && (
               <div className="glass-panel p-6">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <h3 className="text-lg font-semibold text-white">
                     Comparaison annuelle
                   </h3>
                   <p className="text-sm text-text-muted">
@@ -932,7 +918,7 @@ export default function Dashboard() {
             {isWidgetEnabled("zone-progression") && (
               <div className="glass-panel p-6">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <h3 className="text-lg font-semibold text-white">
                     Distribution des zones d'effort
                   </h3>
                   <p className="text-sm text-text-muted">
@@ -948,7 +934,7 @@ export default function Dashboard() {
             {isWidgetEnabled("gps-map") && (
               <div className="glass-panel p-6">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <h3 className="text-lg font-semibold text-white">
                     Carte des parcours
                   </h3>
                   <p className="text-sm text-text-muted">
@@ -963,12 +949,12 @@ export default function Dashboard() {
             {isWidgetEnabled("recent-activities") && (
               <div className="glass-panel p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <h3 className="text-lg font-semibold text-white">
                     Dernières activités
                   </h3>
                   <button
                     onClick={() => navigate("/activities")}
-                    className="text-sm text-brand hover:text-brand-dark dark:text-brand dark:hover:text-brand-light font-medium"
+                    className="text-sm text-[#8BC34A] hover:text-[#8BC34A]-dark dark:text-[#8BC34A] dark:hover:text-[#8BC34A]-light font-medium"
                   >
                     Voir tout →
                   </button>
@@ -985,7 +971,7 @@ export default function Dashboard() {
                       />
                     ))
                   ) : (
-                    <p className="text-center text-text-muted dark:text-dark-text-secondary py-4">
+                    <p className="text-center text-gray-400 py-4">
                       Aucune activité récente
                     </p>
                   )}
@@ -1019,10 +1005,10 @@ function StatCard({
   color?: string;
 }) {
   const colorMap: Record<string, string> = {
-    brand: "bg-brand/10 group-hover:bg-brand/20",
-    orange: "bg-orange-500/10 group-hover:bg-orange-500/20",
-    green: "bg-green-500/10 group-hover:bg-green-500/20",
-    red: "bg-red-500/10 group-hover:bg-red-500/20",
+    brand: "bg-[#5CE1E6]/10 group-hover:bg-[#5CE1E6]/20",
+    orange: "bg-[#FFAB40]/10 group-hover:bg-[#FFAB40]/20",
+    green: "bg-[#8BC34A]/10 group-hover:bg-[#8BC34A]/20",
+    red: "bg-[#FF5252]/10 group-hover:bg-[#FF5252]/20",
   };
 
   return (
@@ -1034,10 +1020,10 @@ function StatCard({
       />
       <div className="relative z-10">
         {icon && <div className="text-2xl mb-2">{icon}</div>}
-        <p className="text-xs uppercase tracking-[0.3em] text-text-muted dark:text-dark-text-secondary mb-2">
+        <p className="text-xs uppercase tracking-wider text-gray-400 mb-2">
           {label}
         </p>
-        <p className="text-2xl font-semibold text-text-dark dark:text-dark-text-contrast group-hover:scale-105 transition-transform duration-300 origin-left">
+        <p className="text-2xl font-semibold text-white group-hover:scale-105 transition-transform duration-300 origin-left">
           {value}
         </p>
       </div>
@@ -1054,26 +1040,15 @@ function ActivityTypeCard({
   formatDistance: (meters: number) => string;
   formatDuration: (seconds: number) => string;
 }) {
-  const config = activityTypeConfig[typeData.type] || {
-    bgColor: "bg-gray-50",
-    bgDark: "dark:bg-gray-950/30",
-    color: "text-gray-600",
-    colorDark: "dark:text-gray-400",
-  };
-
   return (
-    <div
-      className={`rounded-2xl border-3 border-panel-border p-7 ${config.bgColor} ${config.bgDark} transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-opacity-80 cursor-default`}
-    >
+    <div className="glass-panel p-6 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-default">
       <div className="flex items-center gap-3 mb-5">
         <div className="text-5xl">{typeData.icon}</div>
         <div>
-          <h3
-            className={`text-2xl font-bold ${config.color} ${config.colorDark}`}
-          >
+          <h3 className="text-2xl font-bold text-[#8BC34A]">
             {typeData.type}
           </h3>
-          <p className="text-sm font-medium text-text-muted dark:text-dark-text-secondary">
+          <p className="text-sm font-medium text-gray-400">
             {typeData.count} sortie{typeData.count > 1 ? "s" : ""}
           </p>
         </div>
@@ -1114,18 +1089,18 @@ function ActivityTypeCard({
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <p className="text-text-muted dark:text-dark-text-secondary">
+            <p className="text-gray-400">
               Moy./sortie
             </p>
-            <p className="font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="font-semibold text-white">
               {formatDistance(typeData.averageDistance)}
             </p>
           </div>
           <div>
-            <p className="text-text-muted dark:text-dark-text-secondary">
+            <p className="text-gray-400">
               Durée moy.
             </p>
-            <p className="font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="font-semibold text-white">
               {formatDuration(typeData.averageDuration)}
             </p>
           </div>
@@ -1138,10 +1113,10 @@ function ActivityTypeCard({
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="text-sm text-text-muted dark:text-dark-text-secondary">
+      <span className="text-sm text-gray-400">
         {label}
       </span>
-      <span className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast">
+      <span className="text-sm font-semibold text-white">
         {value}
       </span>
     </div>
@@ -1161,47 +1136,41 @@ function ActivityRow({
 }) {
   const config = activityTypeConfig[activity.type] || {
     icon: "📈",
-    color: "text-gray-600",
-    colorDark: "dark:text-gray-400",
-    bgColor: "bg-gray-50",
-    bgDark: "dark:bg-gray-950/30",
+    color: "text-gray-400",
+    colorDark: "",
+    bgColor: "bg-white/5",
+    bgDark: "",
   };
 
   const getTrimpColor = (trimp: number | null) => {
-    if (!trimp) return "text-text-muted dark:text-dark-text-secondary";
-    if (trimp < 50) return "text-green-600 dark:text-green-400";
-    if (trimp < 100) return "text-yellow-600 dark:text-yellow-400";
-    if (trimp < 200) return "text-orange-600 dark:text-orange-400";
-    return "text-red-600 dark:text-red-400";
+    if (!trimp) return "text-gray-400";
+    if (trimp < 50) return "text-[#8BC34A]";
+    if (trimp < 100) return "text-[#FFAB40]";
+    if (trimp < 200) return "text-[#FF5252]";
+    return "text-[#FF5252]";
   };
 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between p-4 border border-border-base rounded-2xl hover:border-brand/40 hover:bg-bg-gray-100 dark:hover:bg-dark-border/20 transition-all duration-300 text-left group"
+      className="w-full flex items-center justify-between p-4 border border-[#8BC34A]/20 rounded-2xl hover:border-[#8BC34A]/40 hover:bg-white/5 transition-all duration-300 text-left group"
     >
       <div className="flex items-center gap-4">
-        <div
-          className={`h-12 w-12 rounded-xl ${config.bgColor} ${config.bgDark} flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform duration-300`}
-        >
+        <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform duration-300">
           {config.icon}
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className={`font-semibold ${config.color} ${config.colorDark}`}>
+            <p className="font-semibold text-[#8BC34A]">
               {activity.type}
             </p>
             {activity.trimp && (
-              <span
-                className={`text-xs font-medium ${getTrimpColor(
-                  activity.trimp
-                )}`}
-              >
+              <span className={`text-xs font-medium ${getTrimpColor(activity.trimp)}`}>
                 TRIMP {Math.round(activity.trimp)}
               </span>
             )}
           </div>
-          <p className="text-xs text-text-muted dark:text-dark-text-secondary">
+          <p className="text-xs text-gray-400">
             {new Date(activity.date).toLocaleDateString("fr-FR", {
               day: "numeric",
               month: "short",
@@ -1216,14 +1185,14 @@ function ActivityRow({
         </div>
       </div>
       <div className="text-right">
-        <p className="font-semibold text-text-dark dark:text-dark-text-contrast">
+        <p className="font-semibold text-white">
           {formatDistance(activity.distance)}
         </p>
-        <p className="text-xs text-text-muted dark:text-dark-text-secondary">
+        <p className="text-xs text-gray-400">
           {formatDuration(activity.duration)}
         </p>
         {activity.avgHeartRate && (
-          <p className="text-xs text-red-500 dark:text-red-400 font-medium">
+          <p className="text-xs text-[#FF5252] font-medium">
             ❤️ {activity.avgHeartRate} bpm
           </p>
         )}
@@ -1260,15 +1229,15 @@ function ActivityTimelineCard({
     <div className="glass-panel p-6 h-full min-w-0">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-text-muted dark:text-dark-text-secondary">
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
             Charge journalière
           </p>
-          <h3 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast">
+          <h3 className="text-xl font-semibold text-white">
             Volumes d'activité
           </h3>
         </div>
         {data.length > 0 && (
-          <span className="text-xs text-text-muted dark:text-dark-text-secondary">
+          <span className="text-xs text-gray-400">
             {data.length} jour{data.length > 1 ? "s" : ""}
           </span>
         )}
@@ -1289,12 +1258,28 @@ function ActivityTimelineCard({
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.45} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-chart-1)"
+                    stopOpacity={0.4}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-chart-1)"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
                 <linearGradient id="trimpGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-chart-2)"
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-chart-2)"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -1341,26 +1326,26 @@ function ActivityTimelineCard({
           </ResponsiveContainer>
         </div>
       ) : (
-        <p className="text-sm text-text-muted dark:text-dark-text-secondary">
+        <p className="text-sm text-gray-400">
           Pas assez d'activités pour tracer un graphique sur cette période.
         </p>
       )}
 
       {data.length > 0 && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="rounded-xl bg-bg-gray-100 dark:bg-dark-border/30 p-4">
-            <p className="text-text-muted dark:text-dark-text-secondary">
+          <div className="rounded-xl bg-white/5 p-4">
+            <p className="text-gray-400">
               Distance cumulée
             </p>
-            <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="text-lg font-semibold text-white">
               {totalDistance.toFixed(1)} km
             </p>
           </div>
-          <div className="rounded-xl bg-bg-gray-100 dark:bg-dark-border/30 p-4">
-            <p className="text-text-muted dark:text-dark-text-secondary">
+          <div className="rounded-xl bg-white/5 p-4">
+            <p className="text-gray-400">
               Jour le plus long
             </p>
-            <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="text-lg font-semibold text-white">
               {bestDistanceDay
                 ? `${
                     bestDistanceDay.label
@@ -1368,22 +1353,22 @@ function ActivityTimelineCard({
                 : "—"}
             </p>
             {bestDistanceDay && (
-              <p className="text-xs text-text-muted dark:text-dark-text-secondary">
+              <p className="text-xs text-gray-400">
                 {bestDistanceDay.count} sortie
                 {bestDistanceDay.count > 1 ? "s" : ""} ·{" "}
                 {formatDuration(bestDistanceDay.duration)}
               </p>
             )}
           </div>
-          <div className="rounded-xl bg-bg-gray-100 dark:bg-dark-border/30 p-4">
-            <p className="text-text-muted dark:text-dark-text-secondary">
+          <div className="rounded-xl bg-white/5 p-4">
+            <p className="text-gray-400">
               TRIMP cumulé
             </p>
-            <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="text-lg font-semibold text-white">
               {Math.round(totalTrimp)} pts
             </p>
             {bestTrimpDay && (
-              <p className="text-xs text-text-muted dark:text-dark-text-secondary">
+              <p className="text-xs text-gray-400">
                 Pic : {bestTrimpDay.label} ({bestTrimpDay.trimp} pts)
               </p>
             )}
@@ -1408,22 +1393,24 @@ function ActivityTimelineTooltip({
   const day = payload[0].payload as ActivityTimelinePoint;
 
   return (
-    <div className="rounded-xl border border-panel-border bg-white/90 px-4 py-3 text-xs shadow-xl dark:bg-dark-surface/90">
-      <p className="font-semibold text-text-dark dark:text-dark-text-contrast">
+    <div className="rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/95 backdrop-blur-sm px-4 py-3 text-xs shadow-xl">
+      <p className="font-bold text-sm text-white">
         {day.label}
       </p>
-      <p className="text-text-muted dark:text-dark-text-secondary">
+      <p className="text-[#8BC34A] font-semibold">
         {day.count} activité{day.count > 1 ? "s" : ""}
       </p>
-      <p className="mt-2 text-text-dark dark:text-dark-text-contrast">
-        {day.distanceKm.toFixed(1)} km
-      </p>
-      <p className="text-text-muted dark:text-dark-text-secondary">
-        {formatDuration(day.duration)}
-      </p>
-      <p className="mt-1 text-text-muted dark:text-dark-text-secondary">
-        TRIMP : {day.trimp}
-      </p>
+      <div className="mt-2 space-y-1">
+        <p className="text-white">
+          Distance: <span className="font-semibold text-[#5CE1E6]">{day.distanceKm.toFixed(1)} km</span>
+        </p>
+        <p className="text-white">
+          Durée: <span className="text-gray-300">{formatDuration(day.duration)}</span>
+        </p>
+        <p className="text-white">
+          TRIMP: <span className="font-semibold text-[#FFAB40]">{day.trimp}</span>
+        </p>
+      </div>
     </div>
   );
 }
@@ -1464,10 +1451,10 @@ function WeightSummaryCard({
   };
 
   const getTrendColor = (trend: number | null) => {
-    if (trend === null) return "text-text-muted dark:text-dark-text-secondary";
+    if (trend === null) return "text-gray-400";
     if (trend > 0) return "text-error";
     if (trend < 0) return "text-success";
-    return "text-text-muted dark:text-dark-text-secondary";
+    return "text-gray-400";
   };
 
   const displayedWeight = latestEntry?.weight ?? stats?.current;
@@ -1477,10 +1464,10 @@ function WeightSummaryCard({
       <div className="glass-panel p-6 h-full flex flex-col items-center justify-center text-center gap-4">
         <div className="text-5xl">⚖️</div>
         <div>
-          <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+          <p className="text-lg font-semibold text-white">
             Aucune pesée enregistrée
           </p>
-          <p className="text-sm text-text-muted dark:text-dark-text-secondary">
+          <p className="text-sm text-gray-400">
             Ajoutez vos mesures pour suivre l'évolution de votre poids depuis ce
             tableau de bord.
           </p>
@@ -1496,15 +1483,15 @@ function WeightSummaryCard({
     <div className="glass-panel p-6 h-full flex flex-col min-w-0">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-text-muted dark:text-dark-text-secondary">
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
             Suivi du poids
           </p>
-          <h3 className="text-2xl font-semibold text-text-dark dark:text-dark-text-contrast">
+          <h3 className="text-2xl font-semibold text-white">
             {displayedWeight !== undefined
               ? `${displayedWeight.toFixed(1)} kg`
               : "-- kg"}
           </h3>
-          <p className="text-sm text-text-muted dark:text-dark-text-secondary">
+          <p className="text-sm text-gray-400">
             {latestEntry
               ? `Dernière pesée ${formatWeightDate(latestEntry.date)}`
               : "Aucune pesée enregistrée"}
@@ -1512,7 +1499,7 @@ function WeightSummaryCard({
         </div>
         <button
           onClick={onNavigate}
-          className="text-sm font-medium text-brand hover:text-brand-dark dark:text-brand dark:hover:text-brand-light"
+          className="text-sm font-medium text-[#8BC34A] hover:text-[#8BC34A]-dark dark:text-[#8BC34A] dark:hover:text-[#8BC34A]-light"
         >
           Gérer →
         </button>
@@ -1547,7 +1534,7 @@ function WeightSummaryCard({
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-text-muted dark:text-dark-text-secondary">
+          <div className="flex h-full items-center justify-center text-sm text-gray-400">
             Ajoutez plusieurs pesées pour afficher une tendance
           </div>
         )}
@@ -1556,25 +1543,25 @@ function WeightSummaryCard({
       {stats ? (
         <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-text-muted dark:text-dark-text-secondary">
+            <p className="text-gray-400">
               Moyenne
             </p>
-            <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="text-lg font-semibold text-white">
               {stats.average ? `${stats.average.toFixed(1)} kg` : "—"}
             </p>
           </div>
           <div>
-            <p className="text-text-muted dark:text-dark-text-secondary">
+            <p className="text-gray-400">
               Plage
             </p>
-            <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast">
+            <p className="text-lg font-semibold text-white">
               {stats.min !== null && stats.max !== null
                 ? `${stats.min.toFixed(1)} – ${stats.max.toFixed(1)} kg`
                 : "—"}
             </p>
           </div>
           <div>
-            <p className="text-text-muted dark:text-dark-text-secondary">
+            <p className="text-gray-400">
               Trend 30 jours
             </p>
             <p
@@ -1586,7 +1573,7 @@ function WeightSummaryCard({
             </p>
           </div>
           <div>
-            <p className="text-text-muted dark:text-dark-text-secondary">
+            <p className="text-gray-400">
               Trend 90 jours
             </p>
             <p
@@ -1599,7 +1586,7 @@ function WeightSummaryCard({
           </div>
         </div>
       ) : (
-        <p className="mt-4 text-sm text-text-muted dark:text-dark-text-secondary">
+        <p className="mt-4 text-sm text-gray-400">
           Ajoutez vos pesées pour suivre vos progrès directement depuis ce
           tableau de bord.
         </p>
@@ -1621,31 +1608,28 @@ function PeriodCard({
   onSelect: () => void;
 }) {
   const info = periodDetails[option.value];
-  const gradient = info
-    ? `bg-gradient-to-br ${info.accent} to-transparent`
-    : "";
 
   return (
     <button
       onClick={onSelect}
-      className={`w-full rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
+      className={`w-full rounded-2xl border p-4 text-left transition-all duration-200 ${
         isActive
-          ? `border-brand bg-white dark:bg-dark-surface shadow-lg ring-2 ring-brand/20 ${gradient}`
-          : "border-panel-border bg-white dark:bg-dark-surface hover:border-brand/40"
+          ? "border-[#8BC34A] bg-[#8BC34A]/10 shadow-lg ring-2 ring-[#8BC34A]/20"
+          : "border-[#8BC34A]/20 bg-[#0A191A]/60 hover:border-[#8BC34A]/40 hover:bg-[#8BC34A]/5"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <span className="text-3xl">{info?.icon}</span>
         {isActive && (
-          <span className="text-[10px] uppercase tracking-[0.3em] text-brand">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#8BC34A]">
             Actif
           </span>
         )}
       </div>
-      <p className="mt-2 text-base font-semibold text-text-dark dark:text-dark-text-contrast">
+      <p className="mt-2 text-base font-semibold text-white">
         {info?.title ?? option.label}
       </p>
-      <p className="text-xs text-text-muted dark:text-dark-text-secondary">
+      <p className="text-xs text-gray-400">
         {info?.subtitle}
       </p>
     </button>
@@ -1670,8 +1654,8 @@ function TypeChip({
       onClick={onClick}
       className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-300 group ${
         selected
-          ? "border-brand/70 bg-brand/10 text-text-dark dark:text-dark-text-contrast shadow-md hover:shadow-lg"
-          : "border-panel-border bg-white dark:bg-dark-surface text-text-muted dark:text-dark-text-secondary hover:border-brand/40 hover:bg-brand/5 opacity-60 hover:opacity-100"
+          ? "border-[#8BC34A]/70 bg-[#8BC34A]/10 text-white shadow-md hover:shadow-lg"
+          : "border-[#8BC34A]/20 bg-[#0A191A]/60 text-gray-400 hover:border-[#8BC34A]/40 hover:bg-[#8BC34A]/5 opacity-60 hover:opacity-100"
       }`}
     >
       <span
@@ -1683,13 +1667,13 @@ function TypeChip({
       </span>
       <div className="flex flex-col text-sm">
         <span className="font-semibold">{label}</span>
-        <span className="text-[11px] uppercase tracking-wide text-text-muted dark:text-dark-text-secondary">
+        <span className="text-[11px] uppercase tracking-wide text-gray-400">
           {count} activité{count > 1 ? "s" : ""}
         </span>
       </div>
       {selected && (
         <div className="ml-auto">
-          <div className="w-2 h-2 bg-brand rounded-full animate-pulse" />
+          <div className="w-2 h-2 bg-[#8BC34A] rounded-full animate-pulse" />
         </div>
       )}
     </button>
@@ -1704,10 +1688,10 @@ function EmptyState({ onImport }: { onImport: () => void }) {
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full translate-x-32 translate-y-32 blur-3xl" />
       <div className="max-w-md mx-auto relative z-10">
         <div className="text-7xl mb-6 animate-bounce">📊</div>
-        <h3 className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast mb-3">
+        <h3 className="text-2xl font-bold text-white mb-3">
           Aucune activité pour le moment
         </h3>
-        <p className="text-text-secondary dark:text-dark-text-secondary mb-8 leading-relaxed">
+        <p className="text-gray-400 mb-8 leading-relaxed">
           Importez vos fichiers FIT, GPX ou CSV pour commencer à suivre votre
           charge d'entraînement et analyser vos performances.
         </p>

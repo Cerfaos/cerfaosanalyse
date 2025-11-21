@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 import toast from 'react-hot-toast'
 
 interface Goal {
@@ -214,36 +215,26 @@ export default function Goals() {
     <AppLayout title="Objectifs" description="Définissez et suivez vos objectifs d'entraînement">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="glass-panel p-6 relative overflow-hidden mb-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-purple-500/5" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
-          <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-purple-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-                🎯
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
-                  Objectifs
-                </p>
-                <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
-                  Mes Objectifs
-                </h1>
-                <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
-                  Définissez et suivez vos objectifs d'entraînement pour atteindre vos ambitions.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-brand to-purple-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium flex items-center gap-2 flex-shrink-0"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Nouvel objectif
-            </button>
-          </div>
+        <div className="mb-8">
+          <PageHeader
+            eyebrow="Objectifs"
+            title="Mes Objectifs"
+            description="Définissez et suivez vos objectifs d'entraînement pour atteindre vos ambitions."
+            icon="🎯"
+            gradient="from-[#8BC34A] to-[#5CE1E6]"
+            accentColor="#8BC34A"
+            actions={
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-[#8BC34A] to-[#5CE1E6] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Nouvel objectif
+              </button>
+            }
+          />
         </div>
 
         {/* Stats */}
@@ -375,38 +366,38 @@ export default function Goals() {
 
         {/* Create/Edit Modal */}
         {(showCreateModal || editingGoal) && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-dark-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0A191A] border border-[#8BC34A]/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-6">
                   {editingGoal ? 'Modifier l\'objectif' : 'Nouvel objectif'}
                 </h2>
                 <form onSubmit={editingGoal ? handleUpdate : handleCreate}>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
                         Titre
                       </label>
                       <input
                         type="text"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
                         Type d'objectif
                       </label>
                       <select
                         value={formData.type}
                         onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
                       >
                         {GOAL_TYPES.map((type) => (
-                          <option key={type.value} value={type.value}>
+                          <option key={type.value} value={type.value} className="bg-[#0A191A] text-white">
                             {type.icon} {type.label}
                           </option>
                         ))}
@@ -414,32 +405,32 @@ export default function Goals() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
                         Valeur cible
                       </label>
                       <input
                         type="number"
                         value={formData.targetValue}
                         onChange={(e) => setFormData({ ...formData, targetValue: Number(e.target.value) })}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
                         required
                       />
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-gray-500 mt-1">
                         {GOAL_TYPES.find(t => t.value === formData.type)?.unit}
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
                         Période
                       </label>
                       <select
                         value={formData.period}
                         onChange={(e) => setFormData({ ...formData, period: e.target.value as any })}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
                       >
                         {PERIODS.map((period) => (
-                          <option key={period.value} value={period.value}>
+                          <option key={period.value} value={period.value} className="bg-[#0A191A] text-white">
                             {period.icon} {period.label}
                           </option>
                         ))}
@@ -448,39 +439,39 @@ export default function Goals() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
                           Date de début
                         </label>
                         <input
                           type="date"
                           value={formData.startDate}
                           onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                          className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
                           Date de fin
                         </label>
                         <input
                           type="date"
                           value={formData.endDate}
                           onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                          className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
                         Description (optionnelle)
                       </label>
                       <textarea
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border border-[#8BC34A]/30 rounded-xl bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition-all resize-none"
                         rows={3}
                       />
                     </div>
@@ -494,13 +485,13 @@ export default function Goals() {
                         setEditingGoal(null)
                         resetForm()
                       }}
-                      className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-bg rounded-lg transition-colors"
+                      className="px-5 py-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                     >
                       Annuler
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="btn-primary"
                     >
                       {editingGoal ? 'Modifier' : 'Créer'}
                     </button>

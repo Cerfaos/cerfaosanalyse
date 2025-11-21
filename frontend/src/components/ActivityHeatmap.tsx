@@ -128,19 +128,19 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
   }, [selectedYear])
 
   const getIntensityColor = (trimp: number, hasActivity: boolean) => {
-    // Pas d'activité = gris
-    if (!hasActivity) return 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+    // Pas d'activité = gris sombre
+    if (!hasActivity) return 'bg-gray-800 border-gray-700'
 
-    // Activité présente mais TRIMP = 0 (pas de données cardio) = bleu clair
-    if (trimp === 0) return 'bg-blue-200 dark:bg-blue-800 border-blue-300 dark:border-blue-600'
+    // Activité présente mais TRIMP = 0 (pas de données cardio) = bleu
+    if (trimp === 0) return 'bg-blue-700 border-blue-600'
 
-    // Gradient basé sur l'intensité TRIMP
-    if (trimp < 30) return 'bg-green-200 dark:bg-green-800 border-green-300 dark:border-green-600'
-    if (trimp < 70) return 'bg-green-300 dark:bg-green-700 border-green-400 dark:border-green-500'
-    if (trimp < 120) return 'bg-green-400 dark:bg-green-600 border-green-500 dark:border-green-400'
-    if (trimp < 180) return 'bg-green-500 dark:bg-green-500 border-green-600 dark:border-green-400'
-    if (trimp < 250) return 'bg-green-600 dark:bg-green-400 border-green-700 dark:border-green-300'
-    return 'bg-green-700 dark:bg-green-300 border-green-800 dark:border-green-200'
+    // Gradient basé sur l'intensité TRIMP (couleurs du design Figma)
+    if (trimp < 30) return 'bg-[#448AFF] border-[#448AFF]/70' // Recovery - Bleu
+    if (trimp < 70) return 'bg-[#5CE1E6] border-[#5CE1E6]/70' // Endurance - Cyan
+    if (trimp < 120) return 'bg-[#8BC34A] border-[#8BC34A]/70' // Tempo - Vert
+    if (trimp < 180) return 'bg-[#FFAB40] border-[#FFAB40]/70' // Threshold - Orange
+    if (trimp < 250) return 'bg-[#FF5252] border-[#FF5252]/70' // Anaerobic - Rouge
+    return 'bg-[#FF1744] border-[#FF1744]/70' // Max effort - Rouge vif
   }
 
   const dayLabels = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
@@ -180,7 +180,7 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
   }
 
   if (loading) {
-    return <div className="text-center py-8 text-text-muted">Chargement du calendrier...</div>
+    return <div className="text-center py-8 text-gray-400">Chargement du calendrier...</div>
   }
 
   return (
@@ -190,16 +190,16 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSelectedYear((y) => y - 1)}
-            className="p-2 hover:bg-bg-gray-100 dark:hover:bg-dark-border rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
             title="Année précédente"
           >
             ←
           </button>
-          <span className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">{selectedYear}</span>
+          <span className="text-2xl font-bold text-white">{selectedYear}</span>
           <button
             onClick={() => setSelectedYear((y) => y + 1)}
             disabled={selectedYear >= new Date().getFullYear()}
-            className="p-2 hover:bg-bg-gray-100 dark:hover:bg-dark-border rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-white"
             title="Année suivante"
           >
             →
@@ -208,16 +208,16 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
 
         <div className="flex flex-wrap items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-text-muted dark:text-dark-text-secondary">Activités:</span>
-            <span className="font-bold text-lg text-brand">{stats.totalActivities}</span>
+            <span className="text-gray-400">Activités:</span>
+            <span className="font-bold text-lg text-[#8BC34A]">{stats.totalActivities}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-text-muted dark:text-dark-text-secondary">Jours actifs:</span>
-            <span className="font-bold text-lg text-green-600 dark:text-green-400">{stats.activeDays}</span>
+            <span className="text-gray-400">Jours actifs:</span>
+            <span className="font-bold text-lg text-[#5CE1E6]">{stats.activeDays}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-text-muted dark:text-dark-text-secondary">Série max:</span>
-            <span className="font-bold text-lg text-orange-600 dark:text-orange-400">{stats.maxStreak} jours</span>
+            <span className="text-gray-400">Série max:</span>
+            <span className="font-bold text-lg text-[#FFAB40]">{stats.maxStreak} jours</span>
           </div>
         </div>
       </div>
@@ -225,16 +225,16 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
       {/* Grille des mois */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {months.map((month) => (
-          <div key={month.monthIndex} className="bg-bg-gray-100/50 dark:bg-dark-border/20 rounded-xl p-4 border border-panel-border">
+          <div key={month.monthIndex} className="bg-[#0A191A]/60 rounded-xl p-4 border border-[#8BC34A]/20">
             {/* Nom du mois */}
-            <h4 className="text-sm font-bold uppercase tracking-wide text-text-dark dark:text-dark-text-contrast mb-3 text-center">
+            <h4 className="text-sm font-bold uppercase tracking-wide text-white mb-3 text-center">
               {month.name}
             </h4>
 
             {/* Jours de la semaine */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {dayLabels.map((day) => (
-                <div key={day} className="text-[10px] text-center font-medium text-text-muted dark:text-dark-text-secondary">
+                <div key={day} className="text-xs text-center font-medium text-gray-400">
                   {day}
                 </div>
               ))}
@@ -267,7 +267,7 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
                             </div>
                             {dayData ? (
                               <div className="space-y-0.5 text-xs">
-                                <div className="font-semibold text-brand">
+                                <div className="font-semibold text-[#8BC34A]">
                                   {dayData.count} activité{dayData.count > 1 ? 's' : ''}
                                 </div>
                                 <div>Distance: {Math.round(dayData.distance / 1000)} km</div>
@@ -289,15 +289,15 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
                         <div
                           className={`
                             aspect-square rounded-md border-2 transition-all cursor-pointer
-                            flex items-center justify-center text-[10px] font-medium
+                            flex items-center justify-center text-sm font-semibold
                             ${getIntensityColor(trimp, hasActivity)}
                             ${hasActivity
-                              ? 'hover:scale-110 hover:shadow-lg hover:border-brand hover:z-10'
-                              : 'hover:border-gray-300 dark:hover:border-gray-600'
+                              ? 'hover:scale-110 hover:shadow-lg hover:border-[#8BC34A] hover:z-10'
+                              : 'hover:border-gray-500'
                             }
                           `}
                         >
-                          <span className={hasActivity ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 dark:text-gray-600'}>
+                          <span className="text-white">
                             {day.dayOfMonth}
                           </span>
                         </div>
@@ -314,31 +314,31 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
       {/* Légende améliorée et compacte */}
       <div className="flex flex-col items-center justify-center gap-2 text-sm px-4">
         <div className="flex items-center gap-3 flex-wrap justify-center">
-          <span className="text-text-muted dark:text-dark-text-secondary text-xs font-medium">Légende :</span>
+          <span className="text-gray-400 text-xs font-medium">Légende :</span>
 
           {/* Repos */}
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded border-2 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600" />
-            <span className="text-text-muted dark:text-dark-text-secondary text-xs">Repos</span>
+            <div className="w-4 h-4 rounded border-2 bg-gray-800 border-gray-700" />
+            <span className="text-gray-400 text-xs">Repos</span>
           </div>
 
           {/* Sans cardio */}
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded border-2 bg-blue-200 dark:bg-blue-800 border-blue-300 dark:border-blue-600" />
-            <span className="text-text-muted dark:text-dark-text-secondary text-xs">Sans FC</span>
+            <div className="w-4 h-4 rounded border-2 bg-blue-700 border-blue-600" />
+            <span className="text-gray-400 text-xs">Sans FC</span>
           </div>
 
-          {/* Gradient vert */}
-          <span className="text-text-muted dark:text-dark-text-secondary text-xs">•</span>
+          {/* Gradient d'intensité */}
+          <span className="text-gray-400 text-xs">•</span>
           <div className="flex items-center gap-0.5">
-            <div className="w-4 h-4 rounded border bg-green-200 dark:bg-green-800 border-green-300" title="TRIMP < 30" />
-            <div className="w-4 h-4 rounded border bg-green-300 dark:bg-green-700 border-green-400" title="TRIMP 30-70" />
-            <div className="w-4 h-4 rounded border bg-green-400 dark:bg-green-600 border-green-500" title="TRIMP 70-120" />
-            <div className="w-4 h-4 rounded border bg-green-500 dark:bg-green-500 border-green-600" title="TRIMP 120-180" />
-            <div className="w-4 h-4 rounded border bg-green-600 dark:bg-green-400 border-green-700" title="TRIMP 180-250" />
-            <div className="w-4 h-4 rounded border bg-green-700 dark:bg-green-300 border-green-800" title="TRIMP > 250" />
+            <div className="w-4 h-4 rounded border bg-[#448AFF] border-[#448AFF]/70" title="TRIMP < 30 - Recovery" />
+            <div className="w-4 h-4 rounded border bg-[#5CE1E6] border-[#5CE1E6]/70" title="TRIMP 30-70 - Endurance" />
+            <div className="w-4 h-4 rounded border bg-[#8BC34A] border-[#8BC34A]/70" title="TRIMP 70-120 - Tempo" />
+            <div className="w-4 h-4 rounded border bg-[#FFAB40] border-[#FFAB40]/70" title="TRIMP 120-180 - Threshold" />
+            <div className="w-4 h-4 rounded border bg-[#FF5252] border-[#FF5252]/70" title="TRIMP 180-250 - Anaerobic" />
+            <div className="w-4 h-4 rounded border bg-[#FF1744] border-[#FF1744]/70" title="TRIMP > 250 - Max" />
           </div>
-          <span className="text-text-muted dark:text-dark-text-secondary text-xs">Intensité TRIMP</span>
+          <span className="text-gray-400 text-xs">Intensité TRIMP</span>
         </div>
       </div>
     </div>

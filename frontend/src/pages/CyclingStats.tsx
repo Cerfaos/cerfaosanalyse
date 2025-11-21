@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts'
 import AppLayout from '../components/layout/AppLayout'
 import { Card } from '../components/ui/Card'
+import { PageHeader } from '../components/ui/PageHeader'
 import api from '../services/api'
 
 type ZoneComputationSource = 'samples' | 'average' | 'none'
@@ -199,26 +200,15 @@ export default function CyclingStats() {
       title="Cartographie FC"
       description="Analyse cardio, zones d'intensité et polarisation de vos sorties 🚴"
     >
-      {/* Header avec impact visuel */}
-      <div className="glass-panel p-6 relative overflow-hidden mb-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-brand/5 via-transparent to-sky-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
-        <div className="relative z-10 flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand to-sky-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-            ❤️
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-brand font-semibold mb-1">
-              Analyse cardio
-            </p>
-            <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
-              Cartographie FC
-            </h1>
-            <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
-              Zones d'intensité, polarisation et répartition de vos sorties cyclistes.
-            </p>
-          </div>
-        </div>
+      <div className="mb-6">
+        <PageHeader
+          eyebrow="Analyse cardio"
+          title="Cartographie FC"
+          description="Zones d'intensité, polarisation et répartition de vos sorties cyclistes."
+          icon="❤️"
+          gradient="from-[#FF5252] to-[#5CE1E6]"
+          accentColor="#FF5252"
+        />
       </div>
 
       <section className="glass-panel p-6 space-y-6">
@@ -237,8 +227,8 @@ export default function CyclingStats() {
                 key={option.value}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   period === option.value
-                    ? 'bg-brand text-white shadow-md'
-                    : 'bg-white/80 dark:bg-dark-surface/50 text-text-secondary hover:text-text-dark dark:hover:text-dark-text-contrast'
+                    ? 'bg-[#8BC34A] text-white shadow-md'
+                    : 'bg-[#0A191A]/60 border border-[#8BC34A]/20 text-gray-400 hover:text-white hover:border-[#8BC34A]/40'
                 }`}
                 onClick={() => setPeriod(option.value)}
               >
@@ -335,7 +325,18 @@ export default function CyclingStats() {
                   <BarChart data={stats.zoneDistribution}>
                     <XAxis dataKey="name" stroke="#94a3b8" />
                     <YAxis stroke="#94a3b8" tickFormatter={(value) => `${value}%`} />
-                    <Tooltip formatter={(value: number) => [`${value}%`, 'Temps']} />
+                    <Tooltip
+                      cursor={{ fill: 'transparent' }}
+                      contentStyle={{
+                        backgroundColor: 'rgba(10, 25, 26, 0.95)',
+                        border: '1px solid rgba(139, 195, 74, 0.3)',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                      }}
+                      labelStyle={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}
+                      itemStyle={{ color: '#9CA3AF' }}
+                      formatter={(value: number) => [`${value.toFixed(1)}%`, 'Temps']}
+                    />
                     <Bar dataKey="percentage" radius={[8, 8, 0, 0]}>
                       {stats.zoneDistribution.map((zone) => (
                         <Cell key={zone.zone} fill={zone.color} />
@@ -346,13 +347,13 @@ export default function CyclingStats() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 {stats.zoneDistribution.map((zone) => (
-                  <div key={zone.zone} className="p-3 rounded-xl border border-border-base">
-                    <p className="text-sm font-semibold text-text-dark dark:text-dark-text-contrast">
+                  <div key={zone.zone} className="p-3 rounded-xl border border-[#8BC34A]/20 bg-[#0A191A]/40 hover:border-[#8BC34A]/40 transition-colors">
+                    <p className="text-sm font-semibold text-white">
                       {zone.name}
                     </p>
-                    <p className="text-xs text-text-muted">{zone.description}</p>
-                    <p className="text-lg font-display mt-2">{zone.percentage.toFixed(1)}%</p>
-                    <p className="text-xs text-text-muted">{formatDuration(zone.seconds)}</p>
+                    <p className="text-xs text-gray-400">{zone.description}</p>
+                    <p className="text-lg font-display mt-2 text-[#8BC34A]">{zone.percentage.toFixed(1)}%</p>
+                    <p className="text-xs text-gray-500">{formatDuration(zone.seconds)}</p>
                   </div>
                 ))}
               </div>

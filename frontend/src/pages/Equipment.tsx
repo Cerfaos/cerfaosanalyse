@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 
 interface Equipment {
   id: number
@@ -200,6 +201,14 @@ export default function Equipment() {
   return (
     <AppLayout title="Équipement" description="Suivez l'usure et planifiez vos remplacements" actions={actions}>
       <div className="space-y-8">
+        <PageHeader
+          eyebrow="Matériel"
+          title="Mon Équipement"
+          description="Suivez l'usure de votre matériel et planifiez vos remplacements."
+          icon="🚲"
+          gradient="from-[#8BC34A] to-[#5CE1E6]"
+          accentColor="#8BC34A"
+        />
 
         {/* Formulaire */}
         {showForm && (

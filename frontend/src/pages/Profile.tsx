@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
 import api, { getAvatarUrl } from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
-import { Section } from '../components/ui/Section'
+import { PageHeader } from '../components/ui/PageHeader'
 import { Card } from '../components/ui/Card'
 import { FormField } from '../components/ui/FormField'
 
@@ -195,7 +195,14 @@ export default function Profile() {
   return (
     <AppLayout title="Mon profil" description="Paramètres physiologiques et compte">
       <div className="max-w-4xl mx-auto space-y-8">
-        <Section eyebrow="Profil" title="Vos informations" description="Configurez vos constantes pour des analyses précises" />
+        <PageHeader
+          eyebrow="Profil"
+          title="Mon Profil"
+          description="Configurez vos paramètres physiologiques pour des analyses précises."
+          icon="👤"
+          gradient="from-[#8BC34A] to-[#5CE1E6]"
+          accentColor="#8BC34A"
+        />
 
         {success && <div className="glass-panel border-success/30 text-success px-4 py-3">{success}</div>}
         {error && <div className="glass-panel border-error/30 text-error px-4 py-3">{error}</div>}

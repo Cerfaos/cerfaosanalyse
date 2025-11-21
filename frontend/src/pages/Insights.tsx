@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 import { Section } from '../components/ui/Section'
 
 interface FatigueAnalysis {
@@ -256,26 +257,14 @@ export default function Insights() {
   return (
     <AppLayout title="Insights" description="Analyse intelligente et prédictions basées sur vos données">
       <div className="space-y-8">
-        {/* En-tête */}
-        <div className="glass-panel p-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-blue-500/5" />
-          <div className="relative z-10 flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-              🧠
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-purple-600 font-semibold mb-1">
-                Intelligence
-              </p>
-              <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast mb-1">
-                Insights & Prédictions
-              </h1>
-              <p className="text-text-secondary dark:text-dark-text-secondary max-w-2xl">
-                Analyses personnalisées basées sur vos données d'entraînement pour optimiser vos performances.
-              </p>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow="Intelligence"
+          title="Insights & Prédictions"
+          description="Analyses personnalisées basées sur vos données d'entraînement pour optimiser vos performances."
+          icon="🧠"
+          gradient="from-[#5CE1E6] to-[#8BC34A]"
+          accentColor="#5CE1E6"
+        />
 
         {/* Analyse de fatigue */}
         {fatigue && (

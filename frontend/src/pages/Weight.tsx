@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 
 interface WeightEntry {
   id: number
@@ -151,6 +152,15 @@ export default function Weight() {
   return (
     <AppLayout title="Suivi du poids" description="Enregistrez vos pesées et suivez vos tendances" actions={actions}>
       <div className="space-y-8">
+        <PageHeader
+          eyebrow="Suivi"
+          title="Suivi du poids"
+          description="Enregistrez vos pesées et suivez vos tendances corporelles."
+          icon="⚖️"
+          gradient="from-[#5CE1E6] to-[#8BC34A]"
+          accentColor="#5CE1E6"
+        />
+
         {success && <div className="glass-panel border-success/30 text-success px-4 py-3">{success}</div>}
         {error && <div className="glass-panel border-error/30 text-error px-4 py-3">{error}</div>}
 
@@ -245,11 +255,22 @@ export default function Weight() {
                 <div className="h-64 w-full min-w-0">
                   <ResponsiveContainer width="100%" height="100%" minWidth={240} minHeight={260}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" strokeOpacity={0.5} />
                       <XAxis dataKey="date" stroke="#9CA3AF" />
                       <YAxis domain={['dataMin - 2', 'dataMax + 2']} stroke="#9CA3AF" />
-                      <Tooltip formatter={(value: number) => `${value} kg`} labelFormatter={(label) => `Date: ${label}`} />
-                      <Line type="monotone" dataKey="poids" stroke="#E69875" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'rgba(10, 25, 26, 0.95)',
+                          border: '1px solid rgba(139, 195, 74, 0.3)',
+                          borderRadius: '12px',
+                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                        }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}
+                        itemStyle={{ color: '#5CE1E6' }}
+                        formatter={(value: number) => [`${value} kg`, 'Poids']}
+                        labelFormatter={(label) => `${label}`}
+                      />
+                      <Line type="monotone" dataKey="poids" stroke="#5CE1E6" strokeWidth={3} dot={{ r: 3, fill: '#5CE1E6' }} activeDot={{ r: 6, fill: '#8BC34A' }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>

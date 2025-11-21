@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import AppLayout from "../components/layout/AppLayout";
+import { PageHeader } from "../components/ui/PageHeader";
 import api from "../services/api";
 import type {
   LoadedTrainingPlan,
@@ -617,36 +618,32 @@ export default function TrainingPlan() {
       description="Créez un cycle aligné sur vos objectifs nature-friendly"
     >
       <div className="space-y-8">
-        <section className="hero-backdrop p-6 text-canopy md:p-8">
-          <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center">
-            <div className="flex-1 space-y-5">
-              <span className="hero-label">Cycle nature</span>
-              <h1 className="hero-title">Plan d'entraînement intelligent</h1>
-              <p className="hero-description">
-                Un accompagnement semaine par semaine pour équilibrer charges,
-                récupérations et intensités sous un prisme forestier.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <span className="hero-pill">Charge maîtrisée</span>
-                <span className="hero-pill">Récupération active</span>
-                <span className="hero-pill">Intensités guidées</span>
-              </div>
-            </div>
-            <div className="hero-metrics grid w-full gap-4 p-5 text-center lg:w-auto lg:min-w-[320px] lg:grid-cols-3">
-              <div className="hero-stat-card">
-                <p className="hero-stat-value">{planStats.weeks}</p>
-                <p className="hero-stat-label">Semaines prêtes</p>
-              </div>
-              <div className="hero-stat-card">
-                <p className="hero-stat-value">{planStats.sessions}</p>
-                <p className="hero-stat-label">Sessions</p>
-              </div>
-              <div className="hero-stat-card">
-                <p className="hero-stat-value">{planStats.hours}h</p>
-                <p className="hero-stat-label">Volume total</p>
-              </div>
-            </div>
+        <PageHeader
+          eyebrow="Planification"
+          title="Plan d'entraînement"
+          description="Un accompagnement semaine par semaine pour équilibrer charges, récupérations et intensités."
+          icon="📅"
+          gradient="from-[#8BC34A] to-[#5CE1E6]"
+          accentColor="#8BC34A"
+        />
+
+        {/* Stats section */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="glass-panel p-4 text-center">
+            <p className="text-3xl font-bold text-[#8BC34A]">{planStats.weeks}</p>
+            <p className="text-sm text-gray-400">Semaines prêtes</p>
           </div>
+          <div className="glass-panel p-4 text-center">
+            <p className="text-3xl font-bold text-[#5CE1E6]">{planStats.sessions}</p>
+            <p className="text-sm text-gray-400">Sessions</p>
+          </div>
+          <div className="glass-panel p-4 text-center">
+            <p className="text-3xl font-bold text-[#FFAB40]">{planStats.hours}h</p>
+            <p className="text-sm text-gray-400">Volume total</p>
+          </div>
+        </div>
+
+        <section className="glass-panel p-6">
 
           {nextSession ? (
             <div className="hero-reco mt-6 p-5 text-text-primary dark:text-dark-text-contrast">

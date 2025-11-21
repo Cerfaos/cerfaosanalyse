@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
+import { PageHeader } from '../components/ui/PageHeader'
 import toast from 'react-hot-toast'
 
 interface ExportStats {
@@ -160,12 +161,14 @@ export default function Export() {
   return (
     <AppLayout title="Export de données" description="Sauvegardez vos données en JSON ou CSV">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="glass-panel p-6">
-          <h1 className="text-3xl font-bold text-text-dark font-display">Export de données</h1>
-          <p className="mt-2 text-text-body">
-            Exportez vos données pour les sauvegarder ou les analyser dans d'autres outils
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Données"
+          title="Export de données"
+          description="Exportez vos données pour les sauvegarder ou les analyser dans d'autres outils."
+          icon="📦"
+          gradient="from-[#5CE1E6] to-[#8BC34A]"
+          accentColor="#5CE1E6"
+        />
 
         {/* Statistiques */}
         {stats && (

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
-import { Section } from '../components/ui/Section'
+import { PageHeader } from '../components/ui/PageHeader'
 
 interface PersonalRecord {
   id: number
@@ -172,83 +172,85 @@ export default function Records() {
   return (
     <AppLayout title="Records Personnels" description="Vos meilleures performances par discipline">
       <div className="space-y-8">
-        <Section
+        <PageHeader
+          eyebrow="Records"
           title="Records Personnels"
-          description="Suivez vos meilleures performances et battez vos propres records"
+          description="Suivez vos meilleures performances et battez vos propres records."
           icon="🏆"
-          gradient="from-yellow-500 to-orange-500"
+          gradient="from-[#FFAB40] to-[#FF5252]"
+          accentColor="#FFAB40"
           actions={
             <button
               onClick={handleRecalculate}
               disabled={recalculating}
-              className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-[#8BC34A] text-white rounded-lg hover:bg-[#7CB342] transition-colors disabled:opacity-50"
             >
               {recalculating ? 'Recalcul...' : 'Recalculer'}
             </button>
           }
-        >
-          {/* Statistiques globales */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="glass-panel p-4 text-center">
-              <div className="text-3xl font-bold text-brand mb-1">{stats.totalRecords}</div>
-              <div className="text-sm text-text-secondary dark:text-dark-text-secondary">
-                Records actuels
-              </div>
-            </div>
-            <div className="glass-panel p-4 text-center">
-              <div className="text-3xl font-bold text-accent mb-1">{stats.recentRecords}</div>
-              <div className="text-sm text-text-secondary dark:text-dark-text-secondary">
-                Battus ce mois
-              </div>
-            </div>
-            <div className="glass-panel p-4 text-center">
-              <div className="text-3xl font-bold text-warning mb-1">
-                {Object.keys(stats.byActivityType).length}
-              </div>
-              <div className="text-sm text-text-secondary dark:text-dark-text-secondary">
-                Types d'activités
-              </div>
+        />
+
+        {/* Statistiques globales */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="glass-panel p-4 text-center">
+            <div className="text-3xl font-bold text-[#8BC34A] mb-1">{stats.totalRecords}</div>
+            <div className="text-sm text-gray-400">
+              Records actuels
             </div>
           </div>
-
-          {/* Records récents */}
-          {recentRecords.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast mb-3 flex items-center gap-2">
-                <span>🔥</span> Records récents (30 derniers jours)
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {recentRecords.slice(0, 6).map((record) => (
-                  <Link
-                    key={record.id}
-                    to={`/activities/${record.activityId}`}
-                    className="glass-panel p-4 hover:shadow-lg transition-all transform hover:-translate-y-1"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">
-                        {RECORD_TYPE_ICONS[record.recordType] || '🏅'}
-                      </span>
-                      {record.improvement && (
-                        <span className="text-sm font-bold text-success">
-                          {formatImprovement(record.improvement)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="font-semibold text-text-dark dark:text-dark-text-contrast">
-                      {record.recordTypeName}
-                    </div>
-                    <div className="text-lg font-bold text-brand">
-                      {formatValue(record.value, record.unit)}
-                    </div>
-                    <div className="text-xs text-text-muted dark:text-dark-text-muted mt-1">
-                      {record.activityType} - {formatDate(record.achievedAt)}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+          <div className="glass-panel p-4 text-center">
+            <div className="text-3xl font-bold text-[#5CE1E6] mb-1">{stats.recentRecords}</div>
+            <div className="text-sm text-gray-400">
+              Battus ce mois
             </div>
-          )}
-        </Section>
+          </div>
+          <div className="glass-panel p-4 text-center">
+            <div className="text-3xl font-bold text-[#FFAB40] mb-1">
+              {Object.keys(stats.byActivityType).length}
+            </div>
+            <div className="text-sm text-gray-400">
+              Types d'activités
+            </div>
+          </div>
+        </div>
+
+        {/* Records récents */}
+        {recentRecords.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <span>🔥</span> Records récents (30 derniers jours)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {recentRecords.slice(0, 6).map((record) => (
+                <Link
+                  key={record.id}
+                  to={`/activities/${record.activityId}`}
+                  className="glass-panel p-4 hover:shadow-lg transition-all transform hover:-translate-y-1"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-2xl">
+                      {RECORD_TYPE_ICONS[record.recordType] || '🏅'}
+                    </span>
+                    {record.improvement && (
+                      <span className="text-sm font-bold text-[#8BC34A]">
+                        {formatImprovement(record.improvement)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-semibold text-white">
+                    {record.recordTypeName}
+                  </div>
+                  <div className="text-lg font-bold text-[#8BC34A]">
+                    {formatValue(record.value, record.unit)}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    {record.activityType} - {formatDate(record.achievedAt)}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Filtres par type d'activité */}
         <div className="flex flex-wrap gap-2">
@@ -256,10 +258,10 @@ export default function Records() {
             <button
               key={type.value}
               onClick={() => setSelectedType(type.value)}
-              className={`px-4 py-2 rounded-xl font-medium transition-all border-2 ${
+              className={`px-4 py-2 rounded-xl font-medium transition-all border ${
                 selectedType === type.value
-                  ? 'bg-brand text-white border-brand shadow-md transform scale-105'
-                  : 'bg-white dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary border-panel-border hover:bg-bg-subtle dark:hover:bg-dark-bg-subtle'
+                  ? 'bg-[#8BC34A] text-white border-[#8BC34A] shadow-md transform scale-105'
+                  : 'bg-[#0A191A]/60 text-gray-400 border-[#8BC34A]/20 hover:border-[#8BC34A]/40 hover:text-white'
               }`}
             >
               <span className="mr-2">{type.icon}</span>

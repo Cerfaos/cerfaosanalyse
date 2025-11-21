@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
-import { Section } from '../components/ui/Section'
+import { PageHeader } from '../components/ui/PageHeader'
 import { Card } from '../components/ui/Card'
 
 interface WeatherData {
@@ -450,11 +450,11 @@ export default function Activities() {
   }
 
   const getTrimpColor = (trimp: number | null) => {
-    if (!trimp) return 'text-text-muted'
-    if (trimp < 50) return 'text-green-600 dark:text-green-400'
-    if (trimp < 100) return 'text-yellow-600 dark:text-yellow-400'
-    if (trimp < 200) return 'text-orange-600 dark:text-orange-400'
-    return 'text-red-600 dark:text-red-400'
+    if (!trimp) return 'text-gray-400'
+    if (trimp < 50) return 'text-[#8BC34A]'
+    if (trimp < 100) return 'text-[#5CE1E6]'
+    if (trimp < 200) return 'text-[#FFAB40]'
+    return 'text-[#FF5252]'
   }
 
   const getTrimpLevel = (trimp: number | null) => {
@@ -487,12 +487,13 @@ export default function Activities() {
   return (
     <AppLayout title="Activités" description="Importez vos fichiers et suivez vos stats" actions={actions}>
       <div className="space-y-8">
-        <Section
+        <PageHeader
           eyebrow="Activités"
           title="Suivi des sorties"
           description="Importez vos fichiers ou ajoutez vos entraînements manuellement."
           icon="🚴"
-          gradient="from-orange-500 to-amber-600"
+          gradient="from-[#FFAB40] to-[#FF5252]"
+          accentColor="#FFAB40"
         />
 
         {success && (
@@ -1074,15 +1075,15 @@ export default function Activities() {
 
           {/* Liste */}
           <div className="glass-panel p-6">
-            <h2 className="text-xl font-semibold text-text-dark mb-6">Historique</h2>
+            <h2 className="text-xl font-semibold text-white mb-6">Historique</h2>
 
             {loading ? (
-              <p className="text-center text-text-secondary py-8">Chargement...</p>
+              <p className="text-center text-gray-400 py-8">Chargement...</p>
             ) : activities.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
                   <svg
-                    className="w-10 h-10 text-text-tertiary"
+                    className="w-10 h-10 text-gray-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1095,8 +1096,8 @@ export default function Activities() {
                     />
                   </svg>
                 </div>
-                <p className="text-xl font-semibold text-text-secondary mb-2">Aucune activité enregistrée</p>
-                <p className="text-sm text-text-tertiary max-w-sm mx-auto">
+                <p className="text-xl font-semibold text-gray-300 mb-2">Aucune activité enregistrée</p>
+                <p className="text-sm text-gray-400 max-w-sm mx-auto">
                   Importez votre première activité pour commencer à suivre vos performances
                 </p>
               </div>
@@ -1107,7 +1108,7 @@ export default function Activities() {
                   return (
                     <div
                       key={activity.id}
-                      className="group relative bg-white dark:bg-dark-bg-elevated rounded-2xl border border-border-base hover:border-brand/30 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+                      className="group relative bg-[#0A191A]/60 rounded-2xl border border-[#8BC34A]/20 hover:border-[#8BC34A]/40 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm"
                       onClick={() => navigate(`/activities/${activity.id}`)}
                     >
                       {/* Bande de couleur à gauche */}
@@ -1122,17 +1123,17 @@ export default function Activities() {
                             </div>
                             <div>
                               <div className="flex items-center gap-3 mb-1">
-                                <h3 className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                                <h3 className="text-lg font-bold text-white">
                                   {activity.type}
                                 </h3>
-                                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-700 text-white dark:bg-gray-600 shadow-sm">
+                                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#8BC34A]/20 text-[#8BC34A] shadow-sm">
                                   {new Date(activity.date).toLocaleDateString('fr-FR', {
                                     day: '2-digit',
                                     month: 'short',
                                   })}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2 font-medium">
+                              <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -1140,8 +1141,8 @@ export default function Activities() {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })}
-                                <span className="text-gray-400 dark:text-gray-500">•</span>
-                                <span className="text-gray-500 dark:text-gray-400">
+                                <span className="text-gray-500">•</span>
+                                <span className="text-gray-400">
                                   {new Date(activity.date).toLocaleDateString('fr-FR', {
                                     weekday: 'long',
                                   })}
@@ -1165,36 +1166,36 @@ export default function Activities() {
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
-                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Distance</p>
-                            <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Distance</p>
+                            <p className="text-lg font-bold text-white">
                               {formatDistance(activity.distance)}
                             </p>
                           </div>
-                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
-                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">Durée</p>
-                            <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Durée</p>
+                            <p className="text-lg font-bold text-white">
                               {formatDuration(activity.duration)}
                             </p>
                           </div>
-                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
-                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">FC moy</p>
-                            <p className="text-lg font-bold text-red-600 dark:text-red-400">
+                          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">FC moy</p>
+                            <p className="text-lg font-bold text-[#FF5252]">
                               {activity.avgHeartRate ? `${activity.avgHeartRate}` : '-'}
                               {activity.avgHeartRate && <span className="text-xs font-normal ml-1">bpm</span>}
                             </p>
                           </div>
-                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 text-center border border-gray-200/80 dark:border-white/10 shadow-sm">
-                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1">TRIMP</p>
+                          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">TRIMP</p>
                             <p className={`text-lg font-bold ${getTrimpColor(activity.trimp)}`}>
                               {activity.trimp || '-'}
                             </p>
                             {activity.trimp && (
-                              <p className="text-xs text-text-muted mt-0.5">{getTrimpLevel(activity.trimp)}</p>
+                              <p className="text-xs text-gray-400 mt-0.5">{getTrimpLevel(activity.trimp)}</p>
                             )}
                           </div>
-                          <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 border border-gray-200/80 dark:border-white/10 shadow-sm">
-                            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-1 text-center">Météo</p>
+                          <div className="bg-white/5 rounded-xl p-3 border border-white/10 shadow-sm">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1 text-center">Météo</p>
                             {activity.weather && (() => {
                               try {
                                 const weather: WeatherData = JSON.parse(activity.weather)
@@ -1206,26 +1207,26 @@ export default function Activities() {
                                         alt={weather.description}
                                         className="w-8 h-8"
                                       />
-                                      <p className="text-lg font-bold text-text-dark dark:text-dark-text-contrast">
+                                      <p className="text-lg font-bold text-white">
                                         {Math.round(weather.temperature)}°
                                       </p>
                                     </div>
-                                    <p className="text-xs text-text-tertiary truncate max-w-full">
+                                    <p className="text-xs text-gray-400 truncate max-w-full">
                                       💨 {weather.windSpeed} km/h
                                     </p>
                                   </div>
                                 )
                               } catch {
-                                return <p className="text-lg font-bold text-text-dark text-center">-</p>
+                                return <p className="text-lg font-bold text-white text-center">-</p>
                               }
-                            })() || <p className="text-lg font-bold text-text-dark text-center">-</p>}
+                            })() || <p className="text-lg font-bold text-white text-center">-</p>}
                           </div>
                         </div>
                       </div>
 
                       {/* Indicateur de navigation */}
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-6 h-6 text-[#8BC34A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </div>

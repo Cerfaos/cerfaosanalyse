@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { Bike, Plus, Zap, Menu } from "lucide-react";
 import { getAvatarUrl } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import NotificationCenter from "../NotificationCenter";
-import ThemeToggle from "../ThemeToggle";
 
 type LayoutProps = {
   title: string;
@@ -45,142 +45,144 @@ export default function AppLayout({
   };
 
   return (
-    <div className="page-shell min-h-screen w-full text-text-dark dark:text-dark-text-contrast">
-      <div className="flex">
-        <aside
-          className={`sidebar-shell font-display fixed inset-y-0 left-0 z-40 w-80 flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 ${
-            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+    <div className="flex h-screen w-full overflow-hidden bg-[#0a1915] font-sans text-white selection:bg-emerald-500/30 relative">
+      {/* Gradient Backgrounds for Atmosphere */}
+      <div className="pointer-events-none absolute -left-64 top-0 h-[500px] w-[500px] rounded-full bg-emerald-900/20 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-64 bottom-0 h-[600px] w-[600px] rounded-full bg-emerald-900/10 blur-[120px]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/40 blur-[100px]" />
+
+      {/* Mobile Menu Button */}
+      <div className="absolute left-4 top-4 z-50 md:hidden">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0A191A] border border-[#8BC34A]/30 text-[#8BC34A] shadow-lg backdrop-blur-md"
         >
-          <div className="px-8 py-8 flex items-center justify-between border-b-2 border-white/10">
-            <div>
-              <p className="text-sm uppercase tracking-[0.35em] opacity-60">
-                Cerfao
-              </p>
-              <p className="text-3xl font-bold text-white">Centre Cycliste</p>
-            </div>
-            <button
-              className="lg:hidden opacity-60 hover:opacity-100"
-              onClick={() => setIsSidebarOpen(false)}
-              aria-label="Fermer le menu"
-            >
-              ✕
-            </button>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
-            {navigation.map(({ label, to, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                onClick={() => setIsSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "sidebar-link-active" : ""}`
-                }
-              >
-                <span className="sidebar-link-icon">
-                  <Icon />
-                </span>
-                <span className="sidebar-link-label">{label}</span>
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="px-8 py-6 border-t-2 border-white/10 mt-6">
-            <div className="text-sm mb-4">
-              <p className="font-semibold text-white">
-                {user?.fullName || "Athlète"}
-              </p>
-              <p className="opacity-60 text-xs">{user?.email}</p>
-            </div>
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <span className="text-xs opacity-60">Thème</span>
-              <ThemeToggle />
-            </div>
-            <button
-              onClick={() => {
-                const event = new CustomEvent("toggle-shortcuts-help");
-                window.dispatchEvent(event);
-              }}
-              className="btn-primary btn-compact btn-no-transform mb-3 flex items-center justify-center gap-2"
-            >
-              <kbd className="px-1.5 py-0.5 text-xs bg-white/10 rounded">?</kbd>
-              <span>Raccourcis clavier</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="btn-primary btn-compact btn-no-transform"
-            >
-              Déconnexion
-            </button>
-          </div>
-        </aside>
-
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          ></div>
-        )}
-
-        <div className="flex-1 lg:ml-0 lg:w-auto w-full min-h-screen flex flex-col">
-          <header className="px-6 pt-12">
-            <div className="glass-panel p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 max-w-7xl mx-auto">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-text-muted dark:text-dark-text-secondary mb-1 font-display">
-                  Vue générale
-                </p>
-                <h1 className="text-2xl font-semibold text-text-dark dark:text-dark-text-contrast font-display">
-                  {title}
-                </h1>
-                {description && (
-                  <p className="text-sm text-text-muted dark:text-dark-text-secondary">
-                    {description}
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center gap-4">
-                <button
-                  className="lg:hidden h-10 w-10 rounded-full border border-border-base flex items-center justify-center"
-                  onClick={() => setIsSidebarOpen(true)}
-                  aria-label="Ouvrir le menu"
-                >
-                  ☰
-                </button>
-                <NotificationCenter />
-                {actions}
-                <NavLink to="/profile" className="group relative">
-                  {user?.avatarUrl ? (
-                    <div className="relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-brand via-accent to-brand rounded-full blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
-                      <img
-                        src={getAvatarUrl(user.avatarUrl)}
-                        alt={
-                          user.fullName || user.email || "Avatar utilisateur"
-                        }
-                        className="relative h-11 w-11 rounded-full border-3 border-white dark:border-dark-surface object-cover shadow-md ring-2 ring-brand/30"
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-brand via-accent to-brand rounded-full blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
-                      <div className="relative h-11 w-11 rounded-full border-3 border-white dark:border-dark-surface bg-gradient-to-br from-brand/30 to-accent/30 flex items-center justify-center font-bold text-lg text-brand shadow-md ring-2 ring-brand/30">
-                        {user?.fullName?.charAt(0)?.toUpperCase() ||
-                          user?.email?.charAt(0)?.toUpperCase() ||
-                          "C"}
-                      </div>
-                    </div>
-                  )}
-                </NavLink>
-              </div>
-            </div>
-          </header>
-
-          <main className="flex-1 px-6 pb-12 mt-12">
-            <div className="max-w-7xl mx-auto space-y-8">{children}</div>
-          </main>
-        </div>
+          <Menu size={24} />
+        </button>
       </div>
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex h-full w-[250px] flex-col border-r-[3px] border-[#8BC34A] bg-[#0A191A] py-6 transition-transform duration-300 md:static md:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Logo area */}
+        <div className="flex items-center gap-3 px-6 mb-8 shrink-0 cursor-pointer group" onClick={() => navigate("/dashboard")}>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-black group-hover:bg-[#8BC34A] transition-colors">
+            <Bike size={20} strokeWidth={3} />
+          </div>
+          <span className="text-[18px] font-bold text-white leading-tight group-hover:text-[#8BC34A] transition-colors">
+            Centre d'Analyse<br/>Cycliste
+          </span>
+        </div>
+
+        {/* Main Action */}
+        <div className="px-4 mb-6 shrink-0">
+          <button
+            onClick={() => navigate("/activities")}
+            className="group flex w-full items-center gap-3 rounded-2xl bg-white/10 p-3 text-white backdrop-blur-md transition-all hover:bg-[#8BC34A] hover:text-black hover:shadow-[0_0_15px_rgba(139,195,74,0.3)]"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 group-hover:bg-black/10">
+              <Plus size={16} />
+            </div>
+            <span className="font-medium">Nouvelle Sortie</span>
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto space-y-1 px-0">
+          {navigation.map(({ label, to, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              onClick={() => setIsSidebarOpen(false)}
+              className={({ isActive }) =>
+                `group relative flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-all duration-200 ease-in-out ${
+                  isActive
+                    ? "bg-[#8BC34A]/10 text-[#E0E0E0]"
+                    : "text-[#E0E0E0] hover:bg-[#8BC34A]/5 hover:pl-5"
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <div className="absolute left-0 top-0 h-full w-[3px] bg-[#8BC34A] shadow-[0_0_8px_rgba(139,195,74,0.4)]" />
+                  )}
+                  <div className="flex items-center gap-3">
+                    <span className={`transition-colors ${isActive ? "text-[#8BC34A]" : "text-[#E0E0E0] group-hover:text-[#8BC34A]/70"}`}>
+                      <Icon />
+                    </span>
+                    <span>{label}</span>
+                  </div>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* User Info & Logout */}
+        <div className="px-4 mt-4 shrink-0 border-t border-white/10 pt-4">
+          <div className="text-sm mb-3">
+            <p className="font-semibold text-white">{user?.fullName || "Athlète"}</p>
+            <p className="text-gray-400 text-xs">{user?.email}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full text-sm text-gray-400 hover:text-white transition-colors text-left"
+          >
+            Déconnexion
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-hidden bg-white/5 shadow-2xl ring-1 ring-white/5 backdrop-blur-3xl md:rounded-l-[3rem]">
+        <div className="h-full w-full overflow-y-auto p-6 md:p-8 space-y-8">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-2">{title}</h1>
+              {description && (
+                <p className="text-sm text-gray-400">{description}</p>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              <NotificationCenter />
+              {actions}
+              {/* User Profile Mini */}
+              <NavLink to="/profile" className="flex items-center gap-3 bg-white/5 rounded-full p-1 pr-4 border border-white/10 hover:border-[#8BC34A]/30 transition-colors">
+                {user?.avatarUrl ? (
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#8BC34A] to-[#5CE1E6] p-[1px] overflow-hidden">
+                    <img
+                      src={getAvatarUrl(user.avatarUrl)}
+                      alt={user.fullName || user.email || "Avatar"}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#8BC34A] to-[#5CE1E6] flex items-center justify-center text-sm font-bold text-white">
+                    {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "C"}
+                  </div>
+                )}
+                <span className="text-sm font-medium text-[#E0E0E0]">{user?.fullName || "Cycliste"}</span>
+              </NavLink>
+            </div>
+          </div>
+
+          {/* Page Content */}
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

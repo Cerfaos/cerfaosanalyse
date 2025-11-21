@@ -35,10 +35,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Composant de chargement pour Suspense
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-gray-50 dark:bg-dark-bg">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a1915]">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto"></div>
-        <p className="mt-4 text-text-secondary dark:text-dark-text-secondary">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8BC34A] mx-auto"></div>
+        <p className="mt-4 text-[#E0E0E0]">
           Chargement...
         </p>
       </div>
@@ -54,15 +54,11 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen transition-colors duration-300">
+      <div className="min-h-screen transition-colors duration-300 bg-[#0a1915]">
         {/* Raccourcis clavier globaux */}
         <GlobalShortcuts />
         {/* Recherche globale */}
         <GlobalSearch />
-        {/* Skip navigation pour accessibilité */}
-        <a href="#main-content" className="skip-link">
-          Aller au contenu principal
-        </a>
         <Toaster
           position="top-right"
           toastOptions={{
