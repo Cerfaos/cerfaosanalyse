@@ -227,13 +227,17 @@ export default class ActivitiesController {
       parsedGpxData?.elevationGain || (data.elevationGain ? Number(data.elevationGain) : null)
 
     // Convertir la date (le frontend envoie "2024-11-21T22:29" sans fuseau)
-    // On ajoute le décalage horaire actuel pour que l'heure soit correcte
-    const inputDate = data.date.includes('+') || data.date.includes('Z')
-      ? data.date
-      : `${data.date}:00`  // Ajouter les secondes si manquantes
-    const activityDate = DateTime.fromFormat(inputDate, "yyyy-MM-dd'T'HH:mm:ss", { zone: 'local' }).isValid
-      ? DateTime.fromFormat(inputDate, "yyyy-MM-dd'T'HH:mm:ss", { zone: 'local' })
-      : DateTime.fromFormat(data.date, "yyyy-MM-dd'T'HH:mm", { zone: 'local' })
+    // Le serveur tourne en UTC, donc on force le fuseau Europe/Paris
+    const [datePart, timePart] = data.date.split('T')
+    const [year, month, day] = datePart.split('-').map(Number)
+    const [hours, minutes] = timePart.split(':').map(Number)
+
+    // L'utilisateur entre une heure locale (Europe/Paris), on la stocke en UTC
+    // mais en interprétant l'entrée comme étant du fuseau Paris
+    const activityDate = DateTime.fromObject(
+      { year, month, day, hour: hours, minute: minutes, second: 0 },
+      { zone: 'Europe/Paris' }
+    )
 
     // Calculer le TRIMP si FC disponible
     let trimp = null
@@ -254,7 +258,7 @@ export default class ActivitiesController {
     // Créer l'activité
     const activity = await Activity.create({
       userId: user.id,
-      date: activityDate,
+      date: activityDate.toUTC(),
       type: data.type || 'Cyclisme',
       duration: finalDuration,
       movingTime: data.movingTime ? Number(data.movingTime) : null,
@@ -846,7 +850,13 @@ export default class ActivitiesController {
 
     // Convertir la date si fournie
     if (data.date && typeof data.date === 'string') {
-      data.date = DateTime.fromISO(data.date)
+      // Si la date est au format ISO sans fuseau (ex: "2024-11-21T22:00"),
+      // on l'interprète comme étant en Europe/Paris
+      if (data.date.includes('T') && !data.date.includes('Z') && !data.date.includes('+')) {
+        data.date = DateTime.fromISO(data.date, { zone: 'Europe/Paris' })
+      } else {
+        data.date = DateTime.fromISO(data.date)
+      }
     }
 
     // Si FC modifiée et user a fcMax/fcRepos, recalculer TRIMP
@@ -893,6 +903,9 @@ export default class ActivitiesController {
 
     // Cast to remove weather fields that are already deleted
     const mergeData = data as Partial<typeof activity>
+    if (mergeData.date && DateTime.isDateTime(mergeData.date)) {
+      mergeData.date = mergeData.date.toUTC()
+    }
     activity.merge(mergeData)
     await activity.save()
 
@@ -986,8 +999,8 @@ export default class ActivitiesController {
         typeData.duration += a.duration
       })
 
-      stats.byType = Array.from(typeMap.entries()).map(([type, data]) => ({
-        type,
+      stats.byType = Array.from(typeMap.entries()).map(([activityType, data]) => ({
+        type: activityType,
         count: data.count,
         distance: data.distance,
         duration: data.duration,
