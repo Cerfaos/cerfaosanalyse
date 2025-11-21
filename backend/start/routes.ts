@@ -7,9 +7,9 @@
 |
 */
 
-import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import app from '@adonisjs/core/services/app'
+import router from '@adonisjs/core/services/router'
 
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
@@ -21,11 +21,12 @@ const BadgesController = () => import('#controllers/badges_controller')
 const GoalsController = () => import('#controllers/goals_controller')
 const PersonalRecordsController = () => import('#controllers/personal_records_controller')
 const AnalyticsController = () => import('#controllers/analytics_controller')
+const TrainingPlansController = () => import('#controllers/training_plans_controller')
 
 // Health check
 router.get('/', async () => {
   return {
-    app: 'Centre d\'Analyse Cycliste API',
+    app: "Centre d'Analyse Cycliste API",
     version: '1.0.0',
     status: 'running',
   }
@@ -85,13 +86,17 @@ router
   .group(() => {
     router.get('/', [ActivitiesController, 'index'])
     router.post('/create', [ActivitiesController, 'create'])
-    router.post('/upload', [ActivitiesController, 'upload']).use([middleware.rateLimit(['handleUpload'])])
+    router
+      .post('/upload', [ActivitiesController, 'upload'])
+      .use([middleware.rateLimit(['handleUpload'])])
     router.get('/stats', [ActivitiesController, 'stats'])
     router.get('/cycling-stats', [ActivitiesController, 'cyclingStats'])
     router.get('/training-load', [ActivitiesController, 'trainingLoad'])
     router.get('/:id', [ActivitiesController, 'show'])
     router.patch('/:id', [ActivitiesController, 'update'])
-    router.post('/:id/replace-file', [ActivitiesController, 'replaceFile']).use([middleware.rateLimit(['handleUpload'])])
+    router
+      .post('/:id/replace-file', [ActivitiesController, 'replaceFile'])
+      .use([middleware.rateLimit(['handleUpload'])])
     router.delete('/:id', [ActivitiesController, 'destroy'])
   })
   .prefix('/api/activities')
@@ -168,4 +173,18 @@ router
     router.get('/suggest-goals', [AnalyticsController, 'suggestGoals'])
   })
   .prefix('/api/analytics')
+  .use(middleware.auth())
+
+// Routes plans d'entraînement
+router
+  .group(() => {
+    router.post('/generate', [TrainingPlansController, 'generate'])
+    router.get('/next-session', [TrainingPlansController, 'nextSession'])
+    router.post('/save', [TrainingPlansController, 'save'])
+    router.get('/load', [TrainingPlansController, 'load'])
+    router.get('/load/:id', [TrainingPlansController, 'load'])
+    router.get('/list', [TrainingPlansController, 'list'])
+    router.delete('/:id', [TrainingPlansController, 'delete'])
+  })
+  .prefix('/api/training-plans')
   .use(middleware.auth())

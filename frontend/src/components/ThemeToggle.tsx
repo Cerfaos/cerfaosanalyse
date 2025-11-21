@@ -88,12 +88,12 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors duration-200 text-white/90"
+      className="btn-primary btn-compact btn-no-transform flex items-center gap-2 px-3 py-1.5 text-xs"
       aria-label={getLabel()}
       title={getLabel()}
     >
       {getIcon()}
-      <span className="text-xs font-medium uppercase tracking-wide">
+      <span className="font-semibold tracking-wide">
         {mode === 'auto' ? 'Auto' : mode === 'light' ? 'Clair' : 'Sombre'}
       </span>
     </button>

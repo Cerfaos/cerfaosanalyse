@@ -39,8 +39,15 @@ export default function ZoneProgressionChart() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/api/activities?limit=1000')
-      const activities = response.data.data.activities || []
+      const response = await api.get('/api/activities', {
+        params: { limit: 1000, page: 1 }
+      })
+      const activities = response.data.data.data || []
+
+      // Debug: vérifier la structure des données
+      if (activities.length > 0) {
+        console.log('📊 Première activité pour zones:', activities[0])
+      }
 
       // Grouper par période
       const grouped = groupByPeriod(activities, viewMode)
@@ -78,10 +85,14 @@ export default function ZoneProgressionChart() {
       // Estimer le temps dans chaque zone basé sur le TRIMP et la durée
       const duration = activity.duration || 0
       const trimp = activity.trimp || 0
-      const avgHrPercent = activity.avgHr && activity.maxHr ? (activity.avgHr / activity.maxHr) * 100 : 70
+      const avgHeartRate = activity.avgHeartRate || activity.avg_heart_rate || null
+
+      // Estimer FCmax (formule: 220 - âge, on suppose 35 ans par défaut => FCmax = 185)
+      const estimatedMaxHr = 185
+      const avgHrPercent = avgHeartRate ? (avgHeartRate / estimatedMaxHr) * 100 : null
 
       // Distribution estimée basée sur l'intensité moyenne
-      const distribution = estimateZoneDistribution(avgHrPercent, trimp)
+      const distribution = estimateZoneDistribution(avgHrPercent, trimp, duration)
       periods[periodKey].zone1 += Math.round(duration * distribution.zone1)
       periods[periodKey].zone2 += Math.round(duration * distribution.zone2)
       periods[periodKey].zone3 += Math.round(duration * distribution.zone3)
@@ -89,30 +100,73 @@ export default function ZoneProgressionChart() {
       periods[periodKey].zone5 += Math.round(duration * distribution.zone5)
     })
 
-    // Convertir en tableau et trier
-    const result = Object.entries(periods)
-      .map(([period, zones]) => ({
-        period: formatPeriodLabel(period, mode),
-        ...zones,
-      }))
-      .sort((a, b) => a.period.localeCompare(b.period))
+    // Convertir en tableau et trier par date (clé brute, pas le label)
+    const entries = Object.entries(periods).map(([periodKey, zones]) => ({
+      periodKey,
+      periodLabel: formatPeriodLabel(periodKey, mode),
+      ...zones,
+    }))
 
-    // Garder les 12 dernières périodes
-    return result.slice(-12)
+    // Trier par clé de période (ordre chronologique)
+    entries.sort((a, b) => a.periodKey.localeCompare(b.periodKey))
+
+    // Garder les 12 dernières périodes et convertir en format final
+    const last12 = entries.slice(-12)
+
+    return last12.map(entry => ({
+      period: entry.periodLabel,
+      zone1: entry.zone1,
+      zone2: entry.zone2,
+      zone3: entry.zone3,
+      zone4: entry.zone4,
+      zone5: entry.zone5,
+    }))
   }
 
-  const estimateZoneDistribution = (avgHrPercent: number, _trimp: number) => {
-    // Estimation simplifiée basée sur l'intensité moyenne
-    if (avgHrPercent < 60) {
-      return { zone1: 0.6, zone2: 0.3, zone3: 0.08, zone4: 0.02, zone5: 0 }
-    } else if (avgHrPercent < 70) {
-      return { zone1: 0.2, zone2: 0.5, zone3: 0.2, zone4: 0.08, zone5: 0.02 }
-    } else if (avgHrPercent < 80) {
-      return { zone1: 0.1, zone2: 0.3, zone3: 0.4, zone4: 0.15, zone5: 0.05 }
-    } else if (avgHrPercent < 90) {
-      return { zone1: 0.05, zone2: 0.15, zone3: 0.3, zone4: 0.35, zone5: 0.15 }
+  const estimateZoneDistribution = (avgHrPercent: number | null, trimp: number, duration: number) => {
+    // Si pas de données de FC, estimer basé sur TRIMP et durée
+    if (!avgHrPercent) {
+      // Estimer l'intensité basée sur TRIMP par minute
+      const trimpPerMinute = duration > 0 ? trimp / (duration / 60) : 0
+
+      if (trimpPerMinute < 1) {
+        // Activité très légère - principalement zone 1-2
+        return { zone1: 0.4, zone2: 0.5, zone3: 0.08, zone4: 0.02, zone5: 0 }
+      } else if (trimpPerMinute < 2) {
+        // Activité légère à modérée - principalement zone 2
+        return { zone1: 0.15, zone2: 0.65, zone3: 0.15, zone4: 0.04, zone5: 0.01 }
+      } else if (trimpPerMinute < 3) {
+        // Activité modérée - zone 2-3
+        return { zone1: 0.05, zone2: 0.5, zone3: 0.35, zone4: 0.08, zone5: 0.02 }
+      } else if (trimpPerMinute < 4) {
+        // Activité soutenue - zone 3-4
+        return { zone1: 0.02, zone2: 0.25, zone3: 0.45, zone4: 0.23, zone5: 0.05 }
+      } else {
+        // Activité intense - zone 4-5
+        return { zone1: 0.01, zone2: 0.1, zone3: 0.25, zone4: 0.4, zone5: 0.24 }
+      }
+    }
+
+    // Avec données de FC - distribution plus précise basée sur % FCmax
+    // Les pourcentages des zones: Z1(50-60%), Z2(60-70%), Z3(70-80%), Z4(80-90%), Z5(90-100%)
+    if (avgHrPercent < 55) {
+      // Très léger - repos actif
+      return { zone1: 0.7, zone2: 0.25, zone3: 0.04, zone4: 0.01, zone5: 0 }
+    } else if (avgHrPercent < 65) {
+      // Léger - endurance de base (typique pour longues sorties)
+      return { zone1: 0.25, zone2: 0.65, zone3: 0.08, zone4: 0.02, zone5: 0 }
+    } else if (avgHrPercent < 75) {
+      // Modéré - endurance active
+      return { zone1: 0.08, zone2: 0.6, zone3: 0.25, zone4: 0.06, zone5: 0.01 }
+    } else if (avgHrPercent < 85) {
+      // Soutenu - tempo/seuil
+      return { zone1: 0.03, zone2: 0.25, zone3: 0.5, zone4: 0.18, zone5: 0.04 }
+    } else if (avgHrPercent < 95) {
+      // Intense - intervalles
+      return { zone1: 0.01, zone2: 0.1, zone3: 0.25, zone4: 0.5, zone5: 0.14 }
     } else {
-      return { zone1: 0.02, zone2: 0.08, zone3: 0.2, zone4: 0.3, zone5: 0.4 }
+      // Très intense - VO2max
+      return { zone1: 0, zone2: 0.05, zone3: 0.15, zone4: 0.35, zone5: 0.45 }
     }
   }
 

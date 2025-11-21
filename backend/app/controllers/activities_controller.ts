@@ -1,19 +1,20 @@
-import type { HttpContext } from '@adonisjs/core/http'
 import Activity from '#models/activity'
-import { DateTime } from 'luxon'
-import FitParserModule from 'fit-file-parser'
-import GPXParser from 'gpxparser'
-import { parse } from 'csv-parse/sync'
-import fs from 'fs/promises'
-import WeatherService from '#services/weather_service'
 import BadgeService from '#services/badge_service'
 import HeartRateZoneService from '#services/heart_rate_zone_service'
-import TrainingLoadService from '#services/training_load_service'
 import PersonalRecordService from '#services/personal_record_service'
+import TrainingLoadService from '#services/training_load_service'
+import WeatherService from '#services/weather_service'
 import type { ParsedGpsPoint, ZoneComputationSource } from '#types/training'
+import type { HttpContext } from '@adonisjs/core/http'
+import { parse } from 'csv-parse/sync'
+import FitParserModule from 'fit-file-parser'
+import GPXParser from 'gpxparser'
+import { DateTime } from 'luxon'
+import fs from 'node:fs/promises'
 
 // FitParser has double default export that varies by bundler
-const FitParser = (FitParserModule as unknown as { default?: typeof FitParserModule }).default || FitParserModule
+const FitParser =
+  (FitParserModule as unknown as { default?: typeof FitParserModule }).default || FitParserModule
 
 interface FitRecord {
   position_lat?: number
@@ -115,7 +116,17 @@ export default class ActivitiesController {
     const startDate = request.input('startDate')
     const endDate = request.input('endDate')
 
+    const fields = request.input('fields')
+
     let query = Activity.query().where('user_id', user.id).orderBy('date', 'desc')
+
+    if (fields) {
+      const fieldsArray = fields.split(',').map((f: string) => {
+        // Convertir camelCase en snake_case pour la base de données
+        return f.trim().replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+      })
+      query = query.select(fieldsArray)
+    }
 
     if (type) {
       query = query.where('type', type)
@@ -147,10 +158,7 @@ export default class ActivitiesController {
   async show({ auth, params, response }: HttpContext) {
     const user = auth.user!
 
-    const activity = await Activity.query()
-      .where('id', params.id)
-      .where('user_id', user.id)
-      .first()
+    const activity = await Activity.query().where('id', params.id).where('user_id', user.id).first()
 
     if (!activity) {
       return response.notFound({
@@ -216,8 +224,7 @@ export default class ActivitiesController {
     const finalDistance = parsedGpxData?.distance || Number(data.distance)
     const finalDuration = parsedGpxData?.duration || Number(data.duration)
     const finalElevationGain =
-      parsedGpxData?.elevationGain ||
-      (data.elevationGain ? Number(data.elevationGain) : null)
+      parsedGpxData?.elevationGain || (data.elevationGain ? Number(data.elevationGain) : null)
 
     // Convertir la date
     const activityDate = DateTime.fromISO(data.date)
@@ -276,8 +283,8 @@ export default class ActivitiesController {
       message: 'Activité créée avec succès',
       data: {
         activity,
-        newBadges: newBadges.map(b => ({ id: b.id, name: b.name, icon: b.icon })),
-        newRecords: newRecords.map(r => ({
+        newBadges: newBadges.map((b) => ({ id: b.id, name: b.name, icon: b.icon })),
+        newRecords: newRecords.map((r) => ({
           recordType: r.recordType,
           recordTypeName: PersonalRecordService.formatRecordTypeName(r.recordType),
           activityType: r.activityType,
@@ -427,8 +434,8 @@ export default class ActivitiesController {
         message: 'Activité importée avec succès',
         data: {
           activity,
-          newBadges: newBadges.map(b => ({ id: b.id, name: b.name, icon: b.icon })),
-          newRecords: newRecords.map(r => ({
+          newBadges: newBadges.map((b) => ({ id: b.id, name: b.name, icon: b.icon })),
+          newRecords: newRecords.map((r) => ({
             recordType: r.recordType,
             recordTypeName: PersonalRecordService.formatRecordTypeName(r.recordType),
             activityType: r.activityType,
@@ -596,21 +603,21 @@ export default class ActivitiesController {
               lon: r.position_long!,
               ele: r.altitude,
               time: r.timestamp,
-              hr: typeof r.heart_rate === 'number' ? r.heart_rate : r.heart_rate ?? null,
-              speed: typeof r.speed === 'number' ? r.speed : r.speed ?? null,
+              hr: typeof r.heart_rate === 'number' ? r.heart_rate : (r.heart_rate ?? null),
+              speed: typeof r.speed === 'number' ? r.speed : (r.speed ?? null),
             }))
 
           // Déterminer le type d'activité
           const sportMap: Record<string, string> = {
-            'cycling': 'Cyclisme',
-            'running': 'Course',
-            'walking': 'Marche',
-            'rowing': 'Rameur',
-            'swimming': 'Natation',
-            'hiking': 'Randonnée',
-            'fitness_equipment': 'Fitness',
-            'training': 'Entraînement',
-            'transition': 'Transition',
+            cycling: 'Cyclisme',
+            running: 'Course',
+            walking: 'Marche',
+            rowing: 'Rameur',
+            swimming: 'Natation',
+            hiking: 'Randonnée',
+            fitness_equipment: 'Fitness',
+            training: 'Entraînement',
+            transition: 'Transition',
           }
           const type = session.sport ? sportMap[session.sport] || 'Cyclisme' : 'Cyclisme'
 
@@ -619,24 +626,24 @@ export default class ActivitiesController {
           if (session.sub_sport) {
             const subSportMap: Record<string, string> = {
               // Cyclisme
-              'road': 'Route',
-              'mountain': 'VTT',
-              'track': 'Piste',
-              'gravel': 'Gravel',
-              'cyclocross': 'Cyclocross',
-              'indoor_cycling': 'Home Trainer',
-              'virtual_activity': 'Virtuel',
+              road: 'Route',
+              mountain: 'VTT',
+              track: 'Piste',
+              gravel: 'Gravel',
+              cyclocross: 'Cyclocross',
+              indoor_cycling: 'Home Trainer',
+              virtual_activity: 'Virtuel',
               // Course à pied
-              'treadmill': 'Tapis de course',
-              'trail': 'Trail',
-              'street': 'Route',
+              treadmill: 'Tapis de course',
+              trail: 'Trail',
+              street: 'Route',
               // Natation
-              'lap_swimming': 'Piscine',
-              'open_water': 'Eau libre',
+              lap_swimming: 'Piscine',
+              open_water: 'Eau libre',
               // Rameur
-              'indoor_rowing': 'Rameur intérieur',
+              indoor_rowing: 'Rameur intérieur',
               // Autres
-              'generic': 'Général',
+              generic: 'Général',
             }
             subSport = subSportMap[session.sub_sport] || session.sub_sport
           }
@@ -698,8 +705,12 @@ export default class ActivitiesController {
     if (!firstPointTime || !lastPointTime) {
       throw new Error('Les points GPS doivent contenir des timestamps')
     }
-    const startTime = DateTime.fromJSDate(firstPointTime instanceof Date ? firstPointTime : new Date(firstPointTime))
-    const endTime = DateTime.fromJSDate(lastPointTime instanceof Date ? lastPointTime : new Date(lastPointTime))
+    const startTime = DateTime.fromJSDate(
+      firstPointTime instanceof Date ? firstPointTime : new Date(firstPointTime)
+    )
+    const endTime = DateTime.fromJSDate(
+      lastPointTime instanceof Date ? lastPointTime : new Date(lastPointTime)
+    )
     const duration = endTime.diff(startTime, 'seconds').seconds
 
     // Note: GPXParser retourne la distance en mètres
@@ -713,7 +724,7 @@ export default class ActivitiesController {
       distance: distanceInMeters, // déjà en mètres
       avgHeartRate: null,
       maxHeartRate: null,
-      avgSpeed: (distanceInMeters / 1000) / (duration / 3600), // km/h
+      avgSpeed: distanceInMeters / 1000 / (duration / 3600), // km/h
       maxSpeed: null,
       elevationGain: track.elevation.pos || null,
       elevationLoss: track.elevation.neg || null,
@@ -750,20 +761,39 @@ export default class ActivitiesController {
       date: DateTime.fromISO(row.date || row.Date),
       type: row.type || row.Type || 'Cyclisme',
       duration: Number(row.duration || row.Duration || 0),
-      movingTime: row.movingTime || row.MovingTime ? Number(row.movingTime || row.MovingTime) : null,
+      movingTime:
+        row.movingTime || row.MovingTime ? Number(row.movingTime || row.MovingTime) : null,
       distance: Number(row.distance || row.Distance || 0),
-      avgHeartRate: row.avgHeartRate || row.AvgHeartRate ? Number(row.avgHeartRate || row.AvgHeartRate) : null,
-      maxHeartRate: row.maxHeartRate || row.MaxHeartRate ? Number(row.maxHeartRate || row.MaxHeartRate) : null,
+      avgHeartRate:
+        row.avgHeartRate || row.AvgHeartRate ? Number(row.avgHeartRate || row.AvgHeartRate) : null,
+      maxHeartRate:
+        row.maxHeartRate || row.MaxHeartRate ? Number(row.maxHeartRate || row.MaxHeartRate) : null,
       avgSpeed: row.avgSpeed || row.AvgSpeed ? Number(row.avgSpeed || row.AvgSpeed) : null,
       maxSpeed: row.maxSpeed || row.MaxSpeed ? Number(row.maxSpeed || row.MaxSpeed) : null,
-      elevationGain: row.elevationGain || row.ElevationGain ? Number(row.elevationGain || row.ElevationGain) : null,
-      elevationLoss: row.elevationLoss || row.ElevationLoss ? Number(row.elevationLoss || row.ElevationLoss) : null,
+      elevationGain:
+        row.elevationGain || row.ElevationGain
+          ? Number(row.elevationGain || row.ElevationGain)
+          : null,
+      elevationLoss:
+        row.elevationLoss || row.ElevationLoss
+          ? Number(row.elevationLoss || row.ElevationLoss)
+          : null,
       calories: row.calories || row.Calories ? Number(row.calories || row.Calories) : null,
-      avgCadence: row.avgCadence || row.AvgCadence ? Number(row.avgCadence || row.AvgCadence) : null,
+      avgCadence:
+        row.avgCadence || row.AvgCadence ? Number(row.avgCadence || row.AvgCadence) : null,
       avgPower: row.avgPower || row.AvgPower ? Number(row.avgPower || row.AvgPower) : null,
-      normalizedPower: row.normalizedPower || row.NormalizedPower ? Number(row.normalizedPower || row.NormalizedPower) : null,
-      avgTemperature: row.avgTemperature || row.AvgTemperature ? Number(row.avgTemperature || row.AvgTemperature) : null,
-      maxTemperature: row.maxTemperature || row.MaxTemperature ? Number(row.maxTemperature || row.MaxTemperature) : null,
+      normalizedPower:
+        row.normalizedPower || row.NormalizedPower
+          ? Number(row.normalizedPower || row.NormalizedPower)
+          : null,
+      avgTemperature:
+        row.avgTemperature || row.AvgTemperature
+          ? Number(row.avgTemperature || row.AvgTemperature)
+          : null,
+      maxTemperature:
+        row.maxTemperature || row.MaxTemperature
+          ? Number(row.maxTemperature || row.MaxTemperature)
+          : null,
       subSport: row.subSport || row.SubSport || null,
       trimp: null,
     }
@@ -775,10 +805,7 @@ export default class ActivitiesController {
   async update({ auth, params, request, response }: HttpContext) {
     const user = auth.user!
 
-    const activity = await Activity.query()
-      .where('id', params.id)
-      .where('user_id', user.id)
-      .first()
+    const activity = await Activity.query().where('id', params.id).where('user_id', user.id).first()
 
     if (!activity) {
       return response.notFound({
@@ -825,10 +852,20 @@ export default class ActivitiesController {
     ) {
       const avgHr = data.avgHeartRate || activity.avgHeartRate
       const duration = data.duration || activity.duration
-      data.trimp = new TrainingLoadService().calculateTrimp(duration, avgHr!, user.fcMax, user.fcRepos)
+      data.trimp = new TrainingLoadService().calculateTrimp(
+        duration,
+        avgHr!,
+        user.fcMax,
+        user.fcRepos
+      )
     } else if (data.avgHeartRate && user.fcMax && user.fcRepos) {
       // Recalculer avec durée existante
-      data.trimp = new TrainingLoadService().calculateTrimp(activity.duration, data.avgHeartRate, user.fcMax, user.fcRepos)
+      data.trimp = new TrainingLoadService().calculateTrimp(
+        activity.duration,
+        data.avgHeartRate,
+        user.fcMax,
+        user.fcRepos
+      )
     }
 
     // Si une condition météo manuelle est fournie, créer les données météo
@@ -865,10 +902,7 @@ export default class ActivitiesController {
   async destroy({ auth, params, response }: HttpContext) {
     const user = auth.user!
 
-    const activity = await Activity.query()
-      .where('id', params.id)
-      .where('user_id', user.id)
-      .first()
+    const activity = await Activity.query().where('id', params.id).where('user_id', user.id).first()
 
     if (!activity) {
       return response.notFound({
@@ -892,7 +926,9 @@ export default class ActivitiesController {
     const period = request.input('period', '30') // 7, 30, 90, 365
     const type = request.input('type') // Optionnel: filtrer par type
 
-    const startDate = DateTime.now().minus({ days: Number(period) }).toSQLDate()
+    const startDate = DateTime.now()
+      .minus({ days: Number(period) })
+      .toSQLDate()
 
     let query = Activity.query().where('user_id', user.id).where('date', '>=', startDate!)
 
@@ -978,7 +1014,9 @@ export default class ActivitiesController {
     const numericPeriod = Number(period)
     const computedStart =
       startDateInput ||
-      (!Number.isNaN(numericPeriod) ? now.minus({ days: numericPeriod }).startOf('day').toSQLDate() : null)
+      (!Number.isNaN(numericPeriod)
+        ? now.minus({ days: numericPeriod }).startOf('day').toSQLDate()
+        : null)
     const computedEnd = endDateInput || now.toSQLDate()
 
     let query = Activity.query().where('user_id', user.id).where('type', 'Cyclisme')
@@ -1001,7 +1039,10 @@ export default class ActivitiesController {
     }))
 
     const perActivity = activities.map((activity) => {
-      const { durations, totalSeconds, source } = hrZoneService.calculateZoneDurations(activity, heartRateZones)
+      const { durations, totalSeconds, source } = hrZoneService.calculateZoneDurations(
+        activity,
+        heartRateZones
+      )
 
       durations.forEach((value, idx) => {
         aggregatedZones[idx].seconds += value
@@ -1010,8 +1051,10 @@ export default class ActivitiesController {
       const total = totalSeconds || activity.duration || 0
 
       // Calculer l'index de la zone dominante AVANT de l'utiliser
-      const dominantZoneIndex =
-        durations.reduce((bestIdx, value, idx) => (value > durations[bestIdx] ? idx : bestIdx), 0)
+      const dominantZoneIndex = durations.reduce(
+        (bestIdx, value, idx) => (value > durations[bestIdx] ? idx : bestIdx),
+        0
+      )
 
       const zoneDurations = durations.map((value, idx) => ({
         zone: heartRateZones[idx].zone,
@@ -1039,12 +1082,16 @@ export default class ActivitiesController {
     const totalDistance = activities.reduce((sum, activity) => sum + (activity.distance || 0), 0)
     const totalDuration = activities.reduce((sum, activity) => sum + (activity.duration || 0), 0)
     const totalTrimp = activities.reduce((sum, activity) => sum + (activity.trimp || 0), 0)
-    const hrValues = activities.filter((activity) => activity.avgHeartRate).map((activity) => activity.avgHeartRate!)
+    const hrValues = activities
+      .filter((activity) => activity.avgHeartRate)
+      .map((activity) => activity.avgHeartRate!)
     const avgHeartRate = hrValues.length
       ? Math.round(hrValues.reduce((sum, value) => sum + value, 0) / hrValues.length)
       : null
     const avgSpeed =
-      totalDuration > 0 ? Math.round(((totalDistance / 1000) / (totalDuration / 3600)) * 10) / 10 : null
+      totalDuration > 0
+        ? Math.round((totalDistance / 1000 / (totalDuration / 3600)) * 10) / 10
+        : null
 
     const totalZoneSeconds = aggregatedZones.reduce((sum, zone) => sum + zone.seconds, 0)
     const zoneDistribution = aggregatedZones.map((zone) => ({
@@ -1056,7 +1103,8 @@ export default class ActivitiesController {
       color: zone.color,
       seconds: Math.round(zone.seconds),
       hours: Math.round((zone.seconds / 3600) * 10) / 10,
-      percentage: totalZoneSeconds > 0 ? Math.round((zone.seconds / totalZoneSeconds) * 1000) / 10 : 0,
+      percentage:
+        totalZoneSeconds > 0 ? Math.round((zone.seconds / totalZoneSeconds) * 1000) / 10 : 0,
     }))
 
     const polarization = hrZoneService.buildPolarizationSummary(aggregatedZones)
