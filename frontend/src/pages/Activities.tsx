@@ -5,6 +5,8 @@ import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Card } from '../components/ui/Card'
+import { Label } from '../components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 interface WeatherData {
   temperature: number
@@ -144,8 +146,16 @@ export default function Activities() {
   const [filterType, setFilterType] = useState('')
   const [period, setPeriod] = useState('30')
   const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload')
+  // Fonction pour obtenir la date/heure locale au format datetime-local
+  const getLocalDateTime = () => {
+    const now = new Date()
+    const offset = now.getTimezoneOffset()
+    const localDate = new Date(now.getTime() - offset * 60 * 1000)
+    return localDate.toISOString().slice(0, 16)
+  }
+
   const [manualFormData, setManualFormData] = useState({
-    date: new Date().toISOString().slice(0, 16),
+    date: getLocalDateTime(),
     type: 'Cyclisme',
     hours: '',
     minutes: '',
@@ -162,9 +172,9 @@ export default function Activities() {
     normalizedPower: '',
   })
 
-  const inputClass = 'w-full px-4 py-3 rounded-xl border border-border-base bg-bg-white/90 focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none transition'
-  const compactInputClass = 'w-full px-3 py-2 rounded-xl border border-border-base bg-bg-white/90 focus:border-cta focus:ring-2 focus:ring-cta/30 outline-none text-center transition'
-  const labelClass = 'block text-sm font-medium text-text-body mb-2'
+  const inputClass = 'w-full px-4 py-3 rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition'
+  const compactInputClass = 'w-full px-3 py-2 rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none text-center transition'
+  const labelClass = 'block text-sm font-medium text-gray-300 mb-2'
   const primaryActionClass = 'btn-primary w-full font-display'
 
   useEffect(() => {
@@ -303,7 +313,7 @@ export default function Activities() {
 
       setSuccess('Activité créée avec succès !')
       setManualFormData({
-        date: new Date().toISOString().split('T')[0],
+        date: getLocalDateTime(),
         type: 'Cyclisme',
         hours: '',
         minutes: '',
@@ -706,28 +716,26 @@ export default function Activities() {
                     />
                   </div>
 
-                  <div className="col-span-2">
-                    <label htmlFor="manual-type" className={labelClass}>
-                      Type d'activité *
-                    </label>
-                    <select
-                      id="manual-type"
+                  <div className="col-span-2 space-y-2">
+                    <Label>Type d'activité *</Label>
+                    <Select
                       value={manualFormData.type}
-                      onChange={(e) =>
-                        setManualFormData({ ...manualFormData, type: e.target.value })
-                      }
-                      required
-                      className={inputClass}
+                      onValueChange={(value) => setManualFormData({ ...manualFormData, type: value })}
                     >
-                      <option value="Cyclisme">Cyclisme</option>
-                      <option value="Course">Course</option>
-                      <option value="Marche">Marche</option>
-                      <option value="Rameur">Rameur</option>
-                      <option value="Randonnée">Randonnée</option>
-                      <option value="Natation">Natation</option>
-                      <option value="Fitness">Fitness</option>
-                      <option value="Entraînement">Entraînement</option>
-                    </select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez un type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Cyclisme">🚴 Cyclisme</SelectItem>
+                        <SelectItem value="Course">🏃 Course</SelectItem>
+                        <SelectItem value="Marche">🚶 Marche</SelectItem>
+                        <SelectItem value="Rameur">🚣 Rameur</SelectItem>
+                        <SelectItem value="Randonnée">🥾 Randonnée</SelectItem>
+                        <SelectItem value="Natation">🏊 Natation</SelectItem>
+                        <SelectItem value="Fitness">💪 Fitness</SelectItem>
+                        <SelectItem value="Entraînement">🎯 Entraînement</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="col-span-2">
