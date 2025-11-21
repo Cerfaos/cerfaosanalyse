@@ -227,8 +227,13 @@ export default class ActivitiesController {
       parsedGpxData?.elevationGain || (data.elevationGain ? Number(data.elevationGain) : null)
 
     // Convertir la date (le frontend envoie "2024-11-21T22:29" sans fuseau)
-    // fromISO sans zone interprète comme UTC, donc on force l'interprétation locale
-    const activityDate = DateTime.fromISO(data.date, { zone: 'local' })
+    // On ajoute le décalage horaire actuel pour que l'heure soit correcte
+    const inputDate = data.date.includes('+') || data.date.includes('Z')
+      ? data.date
+      : `${data.date}:00`  // Ajouter les secondes si manquantes
+    const activityDate = DateTime.fromFormat(inputDate, "yyyy-MM-dd'T'HH:mm:ss", { zone: 'local' }).isValid
+      ? DateTime.fromFormat(inputDate, "yyyy-MM-dd'T'HH:mm:ss", { zone: 'local' })
+      : DateTime.fromFormat(data.date, "yyyy-MM-dd'T'HH:mm", { zone: 'local' })
 
     // Calculer le TRIMP si FC disponible
     let trimp = null
