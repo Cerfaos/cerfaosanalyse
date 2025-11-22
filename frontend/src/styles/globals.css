@@ -6,46 +6,46 @@
 
   /* Figma Base Colors */
   --background: #0a1915;
-  --foreground: #E0E0E0;
+  --foreground: #e0e0e0;
 
   /* Card & Surface Colors */
   --card: rgba(10, 25, 26, 0.6);
-  --card-foreground: #E0E0E0;
-  --popover: #0A191A;
-  --popover-foreground: #E0E0E0;
+  --card-foreground: #e0e0e0;
+  --popover: #0a191a;
+  --popover-foreground: #e0e0e0;
 
   /* Primary (Green) */
-  --primary: #8BC34A;
-  --primary-foreground: #0A191A;
+  --primary: #8bc34a;
+  --primary-foreground: #0a191a;
 
   /* Secondary (Cyan) */
-  --secondary: #5CE1E6;
-  --secondary-foreground: #0A191A;
+  --secondary: #5ce1e6;
+  --secondary-foreground: #0a191a;
 
   /* Muted & Accent */
-  --muted: #1A2F30;
-  --muted-foreground: #9CA3AF;
-  --accent: #5CE1E6;
-  --accent-foreground: #0A191A;
+  --muted: #1a2f30;
+  --muted-foreground: #9ca3af;
+  --accent: #5ce1e6;
+  --accent-foreground: #0a191a;
 
   /* Status Colors */
-  --destructive: #FF5252;
-  --destructive-foreground: #FFFFFF;
-  --success: #8BC34A;
-  --warning: #FFAB40;
+  --destructive: #ff5252;
+  --destructive-foreground: #ffffff;
+  --success: #8bc34a;
+  --warning: #ffab40;
 
   /* Borders & Inputs */
   --border: rgba(139, 195, 74, 0.3);
-  --input: #1A2F30;
+  --input: #1a2f30;
   --input-background: rgba(255, 255, 255, 0.05);
   --ring: rgba(139, 195, 74, 0.5);
 
   /* Chart Colors - 5 variants */
-  --chart-1: #5CE1E6;
-  --chart-2: #8BC34A;
-  --chart-3: #FFAB40;
-  --chart-4: #FF5252;
-  --chart-5: #448AFF;
+  --chart-1: #5ce1e6;
+  --chart-2: #8bc34a;
+  --chart-3: #ffab40;
+  --chart-4: #ff5252;
+  --chart-5: #448aff;
 
   /* Radius */
   --radius: 1.5rem;
@@ -216,7 +216,7 @@ html {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #8BC34A 0%, #7CB342 100%);
+  background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
   color: white;
   font-weight: 600;
   border-radius: 0.75rem;
@@ -226,7 +226,7 @@ html {
   box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #9CCC65 0%, #8BC34A 100%);
+  background: linear-gradient(135deg, #9ccc65 0%, #8bc34a 100%);
   box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4);
   transform: translateY(-2px);
 }
@@ -248,7 +248,7 @@ html {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background: rgba(10, 25, 26, 0.6);
-  color: #E0E0E0;
+  color: #e0e0e0;
   font-weight: 600;
   border-radius: 0.75rem;
   border: 1px solid rgba(139, 195, 74, 0.3);
@@ -288,4 +288,87 @@ html {
 }
 .to-organic-gold {
   --tw-gradient-to: var(--secondary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Micro-interactions */
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.interactive-list-item {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.interactive-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+/* Loading Shimmer */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }

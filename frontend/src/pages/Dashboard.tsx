@@ -13,6 +13,8 @@ import {
 } from "recharts";
 import ActivityHeatmap from "../components/ActivityHeatmap";
 import DashboardConfig from "../components/DashboardConfig";
+import DashboardSkeleton from "../components/DashboardSkeleton";
+import FatigueCard from "../components/FatigueCard";
 import GPSTracesMap from "../components/GPSTracesMap";
 import AppLayout from "../components/layout/AppLayout";
 import { PageHeader } from "../components/ui/PageHeader";
@@ -633,9 +635,7 @@ export default function Dashboard() {
         description={`Synthèse ${getPeriodLabel()}`}
         actions={actions}
       >
-        <div className="glass-panel p-6 text-center text-gray-400">
-          Chargement...
-        </div>
+        <DashboardSkeleton />
       </AppLayout>
     );
   }
@@ -677,9 +677,7 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-white mb-4">
-              Période
-            </p>
+            <p className="text-sm font-semibold text-white mb-4">Période</p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {periodOptions.map((option) => (
                 <PeriodCard
@@ -847,12 +845,17 @@ export default function Dashboard() {
                   formatDuration={formatDuration}
                 />
               </div>
-              <div className="min-w-0">
-                <WeightSummaryCard
-                  stats={weightStats}
-                  entries={weightEntries}
-                  onNavigate={() => navigate("/weight")}
-                />
+              <div className="min-w-0 flex flex-col gap-6">
+                <div className="h-[300px]">
+                  <FatigueCard />
+                </div>
+                <div className="flex-1">
+                  <WeightSummaryCard
+                    stats={weightStats}
+                    entries={weightEntries}
+                    onNavigate={() => navigate("/weight")}
+                  />
+                </div>
               </div>
             </div>
 
@@ -1045,9 +1048,7 @@ function ActivityTypeCard({
       <div className="flex items-center gap-3 mb-5">
         <div className="text-5xl">{typeData.icon}</div>
         <div>
-          <h3 className="text-2xl font-bold text-[#8BC34A]">
-            {typeData.type}
-          </h3>
+          <h3 className="text-2xl font-bold text-[#8BC34A]">{typeData.type}</h3>
           <p className="text-sm font-medium text-gray-400">
             {typeData.count} sortie{typeData.count > 1 ? "s" : ""}
           </p>
@@ -1089,17 +1090,13 @@ function ActivityTypeCard({
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <p className="text-gray-400">
-              Moy./sortie
-            </p>
+            <p className="text-gray-400">Moy./sortie</p>
             <p className="font-semibold text-white">
               {formatDistance(typeData.averageDistance)}
             </p>
           </div>
           <div>
-            <p className="text-gray-400">
-              Durée moy.
-            </p>
+            <p className="text-gray-400">Durée moy.</p>
             <p className="font-semibold text-white">
               {formatDuration(typeData.averageDuration)}
             </p>
@@ -1113,12 +1110,8 @@ function ActivityTypeCard({
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="text-sm text-gray-400">
-        {label}
-      </span>
-      <span className="text-sm font-semibold text-white">
-        {value}
-      </span>
+      <span className="text-sm text-gray-400">{label}</span>
+      <span className="text-sm font-semibold text-white">{value}</span>
     </div>
   );
 }
@@ -1161,11 +1154,13 @@ function ActivityRow({
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-[#8BC34A]">
-              {activity.type}
-            </p>
+            <p className="font-semibold text-[#8BC34A]">{activity.type}</p>
             {activity.trimp && (
-              <span className={`text-xs font-medium ${getTrimpColor(activity.trimp)}`}>
+              <span
+                className={`text-xs font-medium ${getTrimpColor(
+                  activity.trimp
+                )}`}
+              >
                 TRIMP {Math.round(activity.trimp)}
               </span>
             )}
@@ -1334,17 +1329,13 @@ function ActivityTimelineCard({
       {data.length > 0 && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="rounded-xl bg-white/5 p-4">
-            <p className="text-gray-400">
-              Distance cumulée
-            </p>
+            <p className="text-gray-400">Distance cumulée</p>
             <p className="text-lg font-semibold text-white">
               {totalDistance.toFixed(1)} km
             </p>
           </div>
           <div className="rounded-xl bg-white/5 p-4">
-            <p className="text-gray-400">
-              Jour le plus long
-            </p>
+            <p className="text-gray-400">Jour le plus long</p>
             <p className="text-lg font-semibold text-white">
               {bestDistanceDay
                 ? `${
@@ -1361,9 +1352,7 @@ function ActivityTimelineCard({
             )}
           </div>
           <div className="rounded-xl bg-white/5 p-4">
-            <p className="text-gray-400">
-              TRIMP cumulé
-            </p>
+            <p className="text-gray-400">TRIMP cumulé</p>
             <p className="text-lg font-semibold text-white">
               {Math.round(totalTrimp)} pts
             </p>
@@ -1394,21 +1383,24 @@ function ActivityTimelineTooltip({
 
   return (
     <div className="rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/95 backdrop-blur-sm px-4 py-3 text-xs shadow-xl">
-      <p className="font-bold text-sm text-white">
-        {day.label}
-      </p>
+      <p className="font-bold text-sm text-white">{day.label}</p>
       <p className="text-[#8BC34A] font-semibold">
         {day.count} activité{day.count > 1 ? "s" : ""}
       </p>
       <div className="mt-2 space-y-1">
         <p className="text-white">
-          Distance: <span className="font-semibold text-[#5CE1E6]">{day.distanceKm.toFixed(1)} km</span>
+          Distance:{" "}
+          <span className="font-semibold text-[#5CE1E6]">
+            {day.distanceKm.toFixed(1)} km
+          </span>
         </p>
         <p className="text-white">
-          Durée: <span className="text-gray-300">{formatDuration(day.duration)}</span>
+          Durée:{" "}
+          <span className="text-gray-300">{formatDuration(day.duration)}</span>
         </p>
         <p className="text-white">
-          TRIMP: <span className="font-semibold text-[#FFAB40]">{day.trimp}</span>
+          TRIMP:{" "}
+          <span className="font-semibold text-[#FFAB40]">{day.trimp}</span>
         </p>
       </div>
     </div>
@@ -1543,17 +1535,13 @@ function WeightSummaryCard({
       {stats ? (
         <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-gray-400">
-              Moyenne
-            </p>
+            <p className="text-gray-400">Moyenne</p>
             <p className="text-lg font-semibold text-white">
               {stats.average ? `${stats.average.toFixed(1)} kg` : "—"}
             </p>
           </div>
           <div>
-            <p className="text-gray-400">
-              Plage
-            </p>
+            <p className="text-gray-400">Plage</p>
             <p className="text-lg font-semibold text-white">
               {stats.min !== null && stats.max !== null
                 ? `${stats.min.toFixed(1)} – ${stats.max.toFixed(1)} kg`
@@ -1561,9 +1549,7 @@ function WeightSummaryCard({
             </p>
           </div>
           <div>
-            <p className="text-gray-400">
-              Trend 30 jours
-            </p>
+            <p className="text-gray-400">Trend 30 jours</p>
             <p
               className={`text-lg font-semibold ${getTrendColor(
                 stats.trend30Days
@@ -1573,9 +1559,7 @@ function WeightSummaryCard({
             </p>
           </div>
           <div>
-            <p className="text-gray-400">
-              Trend 90 jours
-            </p>
+            <p className="text-gray-400">Trend 90 jours</p>
             <p
               className={`text-lg font-semibold ${getTrendColor(
                 stats.trend90Days
@@ -1629,9 +1613,7 @@ function PeriodCard({
       <p className="mt-2 text-base font-semibold text-white">
         {info?.title ?? option.label}
       </p>
-      <p className="text-xs text-gray-400">
-        {info?.subtitle}
-      </p>
+      <p className="text-xs text-gray-400">{info?.subtitle}</p>
     </button>
   );
 }

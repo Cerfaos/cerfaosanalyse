@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import { Skeleton } from "../components/ui/skeleton";
 import api from "../services/api";
 
 interface WeatherData {
@@ -145,6 +146,7 @@ export default function Activities() {
   const [stats, setStats] = useState<ActivityStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -232,6 +234,12 @@ export default function Activities() {
       const response = await api.post("/api/activities/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+          );
+          setUploadProgress(percentCompleted);
         },
       });
 
@@ -901,6 +909,20 @@ export default function Activities() {
                     {uploading ? "Import en cours..." : "Importer"}
                   </button>
 
+                  {uploading && (
+                    <div className="w-full">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                        <div
+                          className="bg-brand h-2.5 rounded-full transition-all duration-300 ease-out"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-center text-text-muted mt-1">
+                        {uploadProgress}%
+                      </p>
+                    </div>
+                  )}
+
                   <div className="glass-panel p-4 border border-info bg-info-light/60">
                     <p className="text-sm text-info-dark">
                       <strong>💡 Import en 2 étapes :</strong>
@@ -1404,7 +1426,30 @@ export default function Activities() {
               </h2>
 
               {loading ? (
-                <p className="text-center text-gray-400 py-8">Chargement...</p>
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className="glass-panel p-5 h-40 flex flex-col justify-between"
+                    >
+                      <div className="flex justify-between">
+                        <div className="flex gap-4">
+                          <Skeleton className="w-14 h-14 rounded-xl" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-5 w-32" />
+                            <Skeleton className="h-4 w-48" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-8 w-8 rounded-lg" />
+                      </div>
+                      <div className="grid grid-cols-5 gap-4 mt-4">
+                        {[1, 2, 3, 4, 5].map((j) => (
+                          <Skeleton key={j} className="h-12 rounded-xl" />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : activities.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
