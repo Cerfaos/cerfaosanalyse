@@ -37,10 +37,6 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg-bg-gray-50 px-4">
-      <SEO
-        title="Inscription"
-        description="Créez votre compte Centre d'Analyse Cycliste."
-      />
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-accent-500 rounded-xl mb-4">

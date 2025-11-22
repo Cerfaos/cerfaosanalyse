@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import SimilarActivities from "../components/SimilarActivities";
 import MetricInfo from "../components/ui/MetricInfo";
+import { useActivityExport } from "../hooks/useActivityExport";
 import api from "../services/api";
 import { useAuthStore } from "../store/authStore";
 

@@ -10,8 +10,8 @@ ENV VITE_API_URL=$VITE_API_URL
 # Copier les fichiers de dépendances
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm ci
+# Installer les dépendances (legacy-peer-deps pour compatibilité React 19)
+RUN npm ci --legacy-peer-deps
 
 # Copier le code source
 COPY . .

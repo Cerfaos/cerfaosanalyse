@@ -33,10 +33,6 @@ export default function Login() {
 
   return (
     <div className="page-shell min-h-screen">
-      <SEO
-        title="Connexion"
-        description="Connectez-vous à votre espace Centre d'Analyse Cycliste."
-      />
       <Navbar />
       <div className="max-w-5xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-12 items-center">
         <div>
