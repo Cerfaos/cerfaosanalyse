@@ -32,6 +32,11 @@ router.get('/', async () => {
   }
 })
 
+// Health check endpoint pour Docker
+router.get('/health', async () => {
+  return { status: 'ok', timestamp: new Date().toISOString() }
+})
+
 // Servir les fichiers statiques (uploads)
 router.get('/uploads/*', async ({ params, response }) => {
   const filePath = params['*'].join('/')

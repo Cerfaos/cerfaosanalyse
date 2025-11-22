@@ -11,7 +11,6 @@ services:
     volumes:
       - ./backend/tmp:/app/tmp
       - ./backend/uploads:/app/uploads
-      - sqlite-data:/app/database
     environment:
       - NODE_ENV=production
       - PORT=3333
@@ -19,7 +18,16 @@ services:
       - LOG_LEVEL=info
       - APP_KEY=${APP_KEY:-your-secret-app-key-change-in-production}
       - DB_CONNECTION=sqlite
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:5173}
+      - OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY:-}
+      - TZ=Europe/Paris
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - cycliste-network
 
@@ -27,20 +35,23 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3333}
     container_name: cycliste-frontend
     ports:
-      - "5173:80"
-    environment:
-      - VITE_API_URL=http://localhost:3333
+      - "80:80"
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
     networks:
       - cycliste-network
-
-volumes:
-  sqlite-data:
-    driver: local
 
 networks:
   cycliste-network:
