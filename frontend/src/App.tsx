@@ -36,10 +36,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function LoadingFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a1915]">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8BC34A] mx-auto"></div>
-        <p className="mt-4 text-[#E0E0E0]">
-          Chargement...
+      <div className="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-gray-300 font-medium animate-pulse">
+          Chargement de l'application...
         </p>
       </div>
     </div>

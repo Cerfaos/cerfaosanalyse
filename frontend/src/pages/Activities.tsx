@@ -650,6 +650,10 @@ export default function Activities() {
       description="Importez vos fichiers et suivez vos stats"
       actions={actions}
     >
+      <SEO
+        title="Mes Activités"
+        description="Gérez et analysez vos activités cyclistes."
+      />
       <div className="space-y-8">
         <PageHeader
           eyebrow="Activités"

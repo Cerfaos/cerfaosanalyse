@@ -1,38 +1,46 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
-import api from '../services/api'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../services/api";
+import { useAuthStore } from "../store/authStore";
 
 export default function Register() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate()
-  const { setAuth } = useAuthStore()
+  const navigate = useNavigate();
+  const { setAuth } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const response = await api.post('/api/auth/register', { email, password, fullName })
-      const { user, token } = response.data.data
+      const response = await api.post("/api/auth/register", {
+        email,
+        password,
+        fullName,
+      });
+      const { user, token } = response.data.data;
 
-      setAuth(user, token)
-      navigate('/dashboard')
+      setAuth(user, token);
+      navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de l\'inscription')
+      setError(err.response?.data?.message || "Erreur lors de l'inscription");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg-bg-gray-50 px-4">
+      <SEO
+        title="Inscription"
+        description="Créez votre compte Centre d'Analyse Cycliste."
+      />
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-accent-500 rounded-xl mb-4">
@@ -50,8 +58,12 @@ export default function Register() {
               />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-text-dark mb-2">Créer un compte</h2>
-          <p className="text-text-secondary">Commencez à analyser vos performances cyclistes</p>
+          <h2 className="text-3xl font-bold text-text-dark mb-2">
+            Créer un compte
+          </h2>
+          <p className="text-text-secondary">
+            Commencez à analyser vos performances cyclistes
+          </p>
         </div>
 
         <div className="glass-panel p-8">
@@ -63,7 +75,10 @@ export default function Register() {
             )}
 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-text-body mb-2">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-text-body mb-2"
+              >
                 Nom complet
               </label>
               <input
@@ -77,7 +92,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-text-body mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-text-body mb-2"
+              >
                 Email
               </label>
               <input
@@ -92,7 +110,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-text-body mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-text-body mb-2"
+              >
                 Mot de passe
               </label>
               <input
@@ -106,25 +127,35 @@ export default function Register() {
               />
             </div>
 
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? 'Création du compte...' : 'Créer mon compte'}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full"
+            >
+              {loading ? "Création du compte..." : "Créer mon compte"}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-text-secondary">
-            Déjà un compte ?{' '}
-            <Link to="/login" className="text-cta hover:text-cta/80 font-medium">
+            Déjà un compte ?{" "}
+            <Link
+              to="/login"
+              className="text-cta hover:text-cta/80 font-medium"
+            >
               Se connecter
             </Link>
           </div>
         </div>
 
         <div className="mt-6 text-center">
-          <Link to="/" className="text-text-secondary hover:text-text-dark transition-colors">
+          <Link
+            to="/"
+            className="text-text-secondary hover:text-text-dark transition-colors"
+          >
             ← Retour à l'accueil
           </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }

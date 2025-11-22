@@ -648,6 +648,10 @@ export default function Dashboard() {
       }, voici tes ${getPeriodLabel()?.toLowerCase()}`}
       actions={actions}
     >
+      <SEO
+        title="Tableau de bord"
+        description="Vue d'ensemble de vos performances et de votre état de forme."
+      />
       <div className="space-y-8">
         <PageHeader
           eyebrow="Tableau de bord"
