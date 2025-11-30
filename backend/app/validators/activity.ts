@@ -20,6 +20,8 @@ export const createActivityValidator = vine.compile(
     maxTemperature: vine.number().min(-50).max(60).optional(),
     subSport: vine.string().optional(),
     movingTime: vine.number().min(0).optional(),
+    rpe: vine.number().min(1).max(10).optional(),
+    feelingNotes: vine.string().maxLength(500).optional(),
   })
 )
 

@@ -366,3 +366,157 @@ sudo firewall-cmd --reload
 # Vérifier que les ports sont ouverts
 sudo firewall-cmd --list-ports
 ```
+
+## Migration vers un autre PC
+
+Pour migrer l'application sur un nouveau PC ou serveur.
+
+### Ce qu'il faut copier
+
+| Élément | Chemin | Obligatoire |
+|---------|--------|-------------|
+| Code source | Tout le dossier du projet | Oui |
+| Base de données | `backend/tmp/db.sqlite3` | Oui |
+| Fichiers uploadés | `backend/public/uploads/` | Oui |
+| Images Docker | `~/.local/share/podman/` | Non (reconstruites) |
+
+**Note** : Les images Docker/Podman n'ont pas besoin d'être copiées, elles seront reconstruites sur le nouveau PC.
+
+### Étape 1 : Copier le projet
+
+**Option A - Clé USB** :
+```bash
+cp -r /home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse /media/usb/
+```
+
+**Option B - rsync (réseau)** :
+```bash
+rsync -avz /home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse/ user@nouveau-pc:/chemin/destination/
+```
+
+**Option C - Git + copie des données** :
+```bash
+# Sur le nouveau PC
+git clone https://github.com/ton-repo/cerfaosanalyse.git
+cd cerfaosanalyse
+
+# Copier les données depuis l'ancien PC
+scp user@ancien-pc:/chemin/backend/tmp/db.sqlite3 backend/tmp/
+scp -r user@ancien-pc:/chemin/backend/public/uploads/ backend/public/uploads/
+```
+
+### Étape 2 : Installer Podman sur le nouveau PC
+
+```bash
+# Fedora
+sudo dnf install podman podman-compose
+
+# Debian/Ubuntu
+sudo apt install podman podman-compose
+
+# Arch Linux
+sudo pacman -S podman podman-compose
+```
+
+### Étape 3 : Configurer l'environnement
+
+```bash
+cd /chemin/vers/cerfaosanalyse
+
+# Copier et éditer le fichier .env
+cp .env.example .env
+nano .env
+```
+
+**Important** : Mettre à jour l'IP si elle change :
+```env
+CORS_ORIGIN=http://localhost:8080,http://NOUVELLE_IP:8080
+VITE_API_URL=http://NOUVELLE_IP:3333
+```
+
+### Étape 4 : Construire et démarrer
+
+```bash
+# Construire les images
+podman-compose build
+
+# Démarrer les conteneurs
+podman-compose up -d
+
+# Vérifier que tout fonctionne
+podman ps
+```
+
+### Étape 5 : (Optionnel) Configurer le démarrage automatique
+
+```bash
+# Activer le linger pour l'utilisateur
+loginctl enable-linger $USER
+
+# Générer les services systemd
+mkdir -p ~/.config/systemd/user
+podman generate systemd --new --files --name cycliste-backend
+podman generate systemd --new --files --name cycliste-frontend
+mv container-cycliste-*.service ~/.config/systemd/user/
+
+# Recharger et activer
+systemctl --user daemon-reload
+systemctl --user enable container-cycliste-backend container-cycliste-frontend
+```
+
+### Étape 6 : (Optionnel) Ouvrir le pare-feu
+
+```bash
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --add-port=3333/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+### Checklist migration
+
+- [ ] Dossier du projet copié
+- [ ] `backend/tmp/db.sqlite3` présent
+- [ ] `backend/public/uploads/` copié
+- [ ] Podman et podman-compose installés
+- [ ] `.env` configuré avec la bonne IP
+- [ ] `podman-compose build` exécuté
+- [ ] `podman-compose up -d` exécuté
+- [ ] Application accessible dans le navigateur
+- [ ] Données (activités, avatar) visibles
+
+## Déplacer le dossier du projet
+
+Tu peux déplacer le dossier du projet à un autre emplacement sur le même PC. Les images Docker/Podman sont stockées séparément dans `~/.local/share/podman/` et restent intactes.
+
+### Étapes après déplacement
+
+```bash
+# 1. Arrêter les conteneurs actuels (depuis l'ancien emplacement)
+cd /ancien/chemin/cerfaosanalyse
+podman-compose down
+
+# 2. Déplacer le dossier
+mv /ancien/chemin/cerfaosanalyse /nouveau/chemin/
+
+# 3. Recréer les conteneurs (depuis le nouvel emplacement)
+cd /nouveau/chemin/cerfaosanalyse
+podman-compose up -d
+```
+
+### Mettre à jour les services systemd
+
+Si le démarrage automatique est configuré, il faut régénérer les services :
+
+```bash
+cd /nouveau/chemin/cerfaosanalyse
+
+# Régénérer les fichiers service avec les nouveaux chemins
+podman generate systemd --new --files --name cycliste-backend
+podman generate systemd --new --files --name cycliste-frontend
+mv container-cycliste-*.service ~/.config/systemd/user/
+
+# Recharger systemd
+systemctl --user daemon-reload
+```
+
+**Note** : Les images n'ont pas besoin d'être reconstruites (`podman-compose build` n'est pas nécessaire). Seuls les conteneurs doivent être recréés pour pointer vers les nouveaux chemins de volumes.

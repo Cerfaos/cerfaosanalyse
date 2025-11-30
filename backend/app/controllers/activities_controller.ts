@@ -198,6 +198,8 @@ export default class ActivitiesController {
       'maxTemperature',
       'subSport',
       'movingTime',
+      'rpe',
+      'feelingNotes',
     ])
 
     // Vérifier s'il y a un fichier GPX pour les données GPS
@@ -280,6 +282,8 @@ export default class ActivitiesController {
       fileName: gpxFile ? gpxFile.clientName : null,
       gpsData: gpsDataString,
       weather: weatherData ? JSON.stringify(weatherData) : null,
+      rpe: data.rpe ? Number(data.rpe) : null,
+      feelingNotes: data.feelingNotes || null,
     })
 
     // Vérifier et attribuer les badges
@@ -625,8 +629,10 @@ export default class ActivitiesController {
             rowing: 'Rameur',
             swimming: 'Natation',
             hiking: 'Randonnée',
-            fitness_equipment: 'Fitness',
-            training: 'Entraînement',
+            fitness_equipment: 'Musculation',
+            training: 'Musculation',
+            strength_training: 'Musculation',
+            yoga: 'Yoga',
             transition: 'Transition',
           }
           const type = session.sport ? sportMap[session.sport] || 'Cyclisme' : 'Cyclisme'

@@ -61,15 +61,15 @@ const DEFAULT_BADGE_CLASSES =
   "inline-flex items-center gap-2 rounded-2xl border border-panel-border/60 bg-bg-elevated/80 px-3 py-1 text-xs font-semibold text-text-primary dark:border-dark-border dark:bg-dark-surface dark:text-dark-text-contrast";
 
 const ACTIVITIES = [
-  { id: "Cyclisme", name: "Cyclisme", icon: "🚴" },
   { id: "Course", name: "Course à pied", icon: "🏃" },
-  { id: "Natation", name: "Natation", icon: "🏊" },
-  { id: "Marche", name: "Marche", icon: "🚶" },
-  { id: "Randonnée", name: "Randonnée", icon: "🥾" },
-  { id: "Rameur", name: "Rameur", icon: "🚣" },
-  { id: "Musculation", name: "Musculation", icon: "🏋️" },
-  { id: "Yoga", name: "Yoga", icon: "🧘" },
+  { id: "Cyclisme", name: "Cyclisme", icon: "🚴" },
   { id: "HIIT", name: "HIIT", icon: "💪" },
+  { id: "Marche", name: "Marche", icon: "🚶" },
+  { id: "Musculation", name: "Musculation", icon: "🏋️" },
+  { id: "Natation", name: "Natation", icon: "🏊" },
+  { id: "Rameur", name: "Rameur", icon: "🚣" },
+  { id: "Randonnée", name: "Randonnée", icon: "🥾" },
+  { id: "Yoga", name: "Yoga", icon: "🧘" },
 ];
 
 const GOALS = [

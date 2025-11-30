@@ -157,13 +157,6 @@ const activityTypeConfig: Record<
     bgDark: string;
   }
 > = {
-  Cyclisme: {
-    icon: "🚴",
-    color: "text-blue-600",
-    colorDark: "dark:text-blue-400",
-    bgColor: "bg-blue-50",
-    bgDark: "dark:bg-blue-950/30",
-  },
   Course: {
     icon: "🏃",
     color: "text-orange-600",
@@ -171,12 +164,33 @@ const activityTypeConfig: Record<
     bgColor: "bg-orange-50",
     bgDark: "dark:bg-orange-950/30",
   },
+  Cyclisme: {
+    icon: "🚴",
+    color: "text-blue-600",
+    colorDark: "dark:text-blue-400",
+    bgColor: "bg-blue-50",
+    bgDark: "dark:bg-blue-950/30",
+  },
   Marche: {
     icon: "🚶",
     color: "text-green-600",
     colorDark: "dark:text-green-400",
     bgColor: "bg-green-50",
     bgDark: "dark:bg-green-950/30",
+  },
+  Musculation: {
+    icon: "🏋️",
+    color: "text-indigo-600",
+    colorDark: "dark:text-indigo-400",
+    bgColor: "bg-indigo-50",
+    bgDark: "dark:bg-indigo-950/30",
+  },
+  Natation: {
+    icon: "🏊",
+    color: "text-teal-600",
+    colorDark: "dark:text-teal-400",
+    bgColor: "bg-teal-50",
+    bgDark: "dark:bg-teal-950/30",
   },
   Rameur: {
     icon: "🚣",
@@ -192,26 +206,12 @@ const activityTypeConfig: Record<
     bgColor: "bg-amber-50",
     bgDark: "dark:bg-amber-950/30",
   },
-  Natation: {
-    icon: "🏊",
-    color: "text-teal-600",
-    colorDark: "dark:text-teal-400",
-    bgColor: "bg-teal-50",
-    bgDark: "dark:bg-teal-950/30",
-  },
-  Fitness: {
-    icon: "💪",
+  Yoga: {
+    icon: "🧘",
     color: "text-purple-600",
     colorDark: "dark:text-purple-400",
     bgColor: "bg-purple-50",
     bgDark: "dark:bg-purple-950/30",
-  },
-  Entraînement: {
-    icon: "🏋️",
-    color: "text-indigo-600",
-    colorDark: "dark:text-indigo-400",
-    bgColor: "bg-indigo-50",
-    bgDark: "dark:bg-indigo-950/30",
   },
 };
 

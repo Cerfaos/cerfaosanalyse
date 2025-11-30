@@ -503,29 +503,17 @@ export default function ActivityDetail() {
       string,
       { icon: string; gradient: string; badge: string }
     > = {
-      Cyclisme: {
-        icon: "🚴",
-        gradient: "from-orange-500 to-amber-600",
-        badge:
-          "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
-      },
       Course: {
         icon: "🏃",
         gradient: "from-blue-500 to-indigo-600",
         badge:
           "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
       },
-      Natation: {
-        icon: "🏊",
-        gradient: "from-cyan-500 to-teal-600",
+      Cyclisme: {
+        icon: "🚴",
+        gradient: "from-orange-500 to-amber-600",
         badge:
-          "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
-      },
-      Randonnée: {
-        icon: "🥾",
-        gradient: "from-green-500 to-emerald-600",
-        badge:
-          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
       },
       Marche: {
         icon: "🚶",
@@ -533,22 +521,34 @@ export default function ActivityDetail() {
         badge:
           "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-300",
       },
+      Musculation: {
+        icon: "🏋️",
+        gradient: "from-indigo-500 to-purple-600",
+        badge:
+          "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
+      },
+      Natation: {
+        icon: "🏊",
+        gradient: "from-cyan-500 to-teal-600",
+        badge:
+          "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+      },
       Rameur: {
         icon: "🚣",
         gradient: "from-sky-500 to-blue-600",
         badge: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
       },
-      Fitness: {
-        icon: "💪",
+      Randonnée: {
+        icon: "🥾",
+        gradient: "from-green-500 to-emerald-600",
+        badge:
+          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+      },
+      Yoga: {
+        icon: "🧘",
         gradient: "from-purple-500 to-violet-600",
         badge:
           "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
-      },
-      Entraînement: {
-        icon: "🏋️",
-        gradient: "from-indigo-500 to-purple-600",
-        badge:
-          "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
       },
     };
     return (
@@ -883,14 +883,14 @@ export default function ActivityDetail() {
                     className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
                     required
                   >
-                    <option value="Cyclisme">Cyclisme</option>
                     <option value="Course">Course</option>
+                    <option value="Cyclisme">Cyclisme</option>
                     <option value="Marche">Marche</option>
+                    <option value="Musculation">Musculation</option>
+                    <option value="Natation">Natation</option>
                     <option value="Rameur">Rameur</option>
                     <option value="Randonnée">Randonnée</option>
-                    <option value="Natation">Natation</option>
-                    <option value="Fitness">Fitness</option>
-                    <option value="Entraînement">Entraînement</option>
+                    <option value="Yoga">Yoga</option>
                     <option value="Autre">Autre</option>
                   </select>
                 </div>

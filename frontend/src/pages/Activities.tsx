@@ -172,6 +172,8 @@ export default function Activities() {
     avgCadence: "",
     avgPower: "",
     normalizedPower: "",
+    rpe: "",
+    feelingNotes: "",
   });
 
   const inputClass =
@@ -337,6 +339,9 @@ export default function Activities() {
         formData.append("avgPower", manualFormData.avgPower);
       if (manualFormData.normalizedPower)
         formData.append("normalizedPower", manualFormData.normalizedPower);
+      if (manualFormData.rpe) formData.append("rpe", manualFormData.rpe);
+      if (manualFormData.feelingNotes)
+        formData.append("feelingNotes", manualFormData.feelingNotes);
 
       // Ajouter le fichier GPX s'il est présent
       if (manualGpxFile) {
@@ -366,6 +371,8 @@ export default function Activities() {
         avgCadence: "",
         avgPower: "",
         normalizedPower: "",
+        rpe: "",
+        feelingNotes: "",
       });
       setManualGpxFile(null);
 
@@ -975,18 +982,18 @@ export default function Activities() {
                           <SelectValue placeholder="Sélectionnez un type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Cyclisme">🚴 Cyclisme</SelectItem>
                           <SelectItem value="Course">🏃 Course</SelectItem>
+                          <SelectItem value="Cyclisme">🚴 Cyclisme</SelectItem>
                           <SelectItem value="Marche">🚶 Marche</SelectItem>
+                          <SelectItem value="Musculation">
+                            🏋️ Musculation
+                          </SelectItem>
+                          <SelectItem value="Natation">🏊 Natation</SelectItem>
                           <SelectItem value="Rameur">🚣 Rameur</SelectItem>
                           <SelectItem value="Randonnée">
                             🥾 Randonnée
                           </SelectItem>
-                          <SelectItem value="Natation">🏊 Natation</SelectItem>
-                          <SelectItem value="Fitness">💪 Fitness</SelectItem>
-                          <SelectItem value="Entraînement">
-                            🎯 Entraînement
-                          </SelectItem>
+                          <SelectItem value="Yoga">🧘 Yoga</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1053,27 +1060,29 @@ export default function Activities() {
                       </div>
                     </div>
 
-                    <div className="col-span-2">
-                      <label htmlFor="manual-distance" className={labelClass}>
-                        Distance (km) *
-                      </label>
-                      <input
-                        type="number"
-                        id="manual-distance"
-                        step="0.01"
-                        min="0"
-                        placeholder="Ex: 42.5"
-                        value={manualFormData.distance}
-                        onChange={(e) =>
-                          setManualFormData({
-                            ...manualFormData,
-                            distance: e.target.value,
-                          })
-                        }
-                        required
-                        className={inputClass}
-                      />
-                    </div>
+                    {manualFormData.type !== "Musculation" && (
+                      <div className="col-span-2">
+                        <label htmlFor="manual-distance" className={labelClass}>
+                          Distance (km) *
+                        </label>
+                        <input
+                          type="number"
+                          id="manual-distance"
+                          step="0.01"
+                          min="0"
+                          placeholder="Ex: 42.5"
+                          value={manualFormData.distance}
+                          onChange={(e) =>
+                            setManualFormData({
+                              ...manualFormData,
+                              distance: e.target.value,
+                            })
+                          }
+                          required={manualFormData.type !== "Musculation"}
+                          className={inputClass}
+                        />
+                      </div>
+                    )}
 
                     {/* Champs avancés (FC, Dénivelé, Calories) - seulement pour Cyclisme et Course */}
                     {(manualFormData.type === "Cyclisme" ||
@@ -1348,6 +1357,57 @@ export default function Activities() {
                           </p>
                         </div>
                       )}
+                    </div>
+
+                    <div className="col-span-2">
+                      <label htmlFor="manual-rpe" className={labelClass}>
+                        RPE (Effort perçu 1-10)
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="range"
+                          id="manual-rpe"
+                          min="1"
+                          max="10"
+                          step="1"
+                          value={manualFormData.rpe || "5"}
+                          onChange={(e) =>
+                            setManualFormData({
+                              ...manualFormData,
+                              rpe: e.target.value,
+                            })
+                          }
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#8BC34A]"
+                        />
+                        <span className="text-xl font-bold text-[#8BC34A] w-8 text-center">
+                          {manualFormData.rpe || "5"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Facile</span>
+                        <span>Modéré</span>
+                        <span>Difficile</span>
+                        <span>Maximal</span>
+                      </div>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label htmlFor="manual-notes" className={labelClass}>
+                        Notes de séance
+                      </label>
+                      <textarea
+                        id="manual-notes"
+                        rows={3}
+                        placeholder="Détails de la séance (ex: Squat 5x5@100kg...)"
+                        value={manualFormData.feelingNotes}
+                        onChange={(e) =>
+                          setManualFormData({
+                            ...manualFormData,
+                            feelingNotes: e.target.value,
+                          })
+                        }
+                        className={inputClass}
+                      />
                     </div>
                   </div>
 
