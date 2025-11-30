@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=CerfAOS Analyse
+Comment=Lancer l'application CerfAOS Analyse
+Exec=/home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse/scripts/start-cerfaosanalyse.sh
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
