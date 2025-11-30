@@ -1,93 +1,121 @@
 # Scripts utilitaires - Centre d'Analyse Cycliste
 
-Ce répertoire contient tous les scripts utilitaires pour gérer l'application.
+Ce répertoire contient les scripts essentiels pour gérer l'application en production avec Docker/Podman.
 
-## 🚀 Déploiement et gestion Docker/Podman
-
-### `start-cerfaosanalyse.sh`
-Lance l'application dans des terminaux Alacritty séparés (mode développement).
-```bash
-./scripts/start-cerfaosanalyse.sh
-```
-
-### `stop-cerfaosanalyse.sh`
-Arrête l'application (ferme les processus sur les ports 3333, 5173 et 8080).
-```bash
-./scripts/stop-cerfaosanalyse.sh
-```
+## 🐳 Scripts Docker/Podman
 
 ### `rebuild-containers.sh`
 Reconstruit et redémarre les conteneurs Docker/Podman backend et frontend.
-Utilise les images locales et teste les endpoints de santé.
+Utilise les images locales, rebuild les images, et teste les endpoints de santé.
+
+**Usage :**
 ```bash
 ./scripts/rebuild-containers.sh
 ```
 
-## 🔧 Développement
+**Ce que fait ce script :**
+1. Arrête les conteneurs backend et frontend
+2. Reconstruit l'image backend avec les dernières modifications
+3. Reconstruit l'image frontend avec la bonne URL API
+4. Démarre les nouveaux conteneurs
+5. Vérifie que les endpoints de santé répondent
 
-### `start-dev.sh`
-Lance le serveur backend en mode développement avec hot-reload.
+### `stop-cerfaosanalyse.sh`
+Arrête l'application en tuant tous les processus qui utilisent les ports de l'application (backend, frontend dev, frontend Docker).
+
+**Usage :**
 ```bash
-cd backend && ../scripts/start-dev.sh
+./scripts/stop-cerfaosanalyse.sh
 ```
 
-### `kill-port-backend.sh`
-Tue le processus qui utilise le port 3333 (backend).
-```bash
-./scripts/kill-port-backend.sh
-```
+**Ports nettoyés :**
+- Port 3333 (Backend API)
+- Port 5173 (Frontend Vite dev server)
+- Port 8080 (Frontend Docker/Nginx)
 
-### `kill-port-frontend.sh`
-Tue le processus qui utilise le port 5173 (frontend Vite dev server).
-```bash
-./scripts/kill-port-frontend.sh
-```
+**Processus arrêtés :**
+- `node ace serve` (Backend AdonisJS)
+- `vite` (Frontend Vite)
 
-## 🧪 Tests et vérification
-
-### `check-setup.sh`
-Vérifie que l'environnement est correctement configuré :
-- Présence de Node.js, npm
-- Présence de Docker/Podman
-- Variables d'environnement
-- Fichiers de configuration
-
-```bash
-./scripts/check-setup.sh
-```
+## 🔧 Scripts utilitaires
 
 ### `check_users.js`
 Script Node.js pour lister les utilisateurs de la base de données SQLite.
+Utile pour débugger les problèmes de connexion.
+
+**Usage :**
 ```bash
-cd backend && node ../scripts/check_users.js
-# ou
 node scripts/check_users.js
 ```
 
-### `test_date_logic.js`
-Script de test pour vérifier la logique de gestion des dates et fuseaux horaires.
-```bash
-node scripts/test_date_logic.js
+**Sortie :**
+```
+Users found: 2
+ID: 1, Email: cerfaos@gmail.com, Password Hash: $scrypt$n=16384,r=8...
+ID: 2, Email: test@example.com, Password Hash: $scrypt$n=16384,r=8...
 ```
 
-## 🗑️ Maintenance
+## 📝 Commandes Docker/Podman courantes
 
-### `reset-app.sh`
-Réinitialise complètement l'application :
-- Supprime node_modules
-- Nettoie le cache npm
-- Réinstalle les dépendances
-- Reconstruit les images Docker
-
-⚠️ **Attention** : Cette opération est destructive et prend du temps.
-
+### Démarrer l'application
 ```bash
-./scripts/reset-app.sh
+podman start cycliste-backend cycliste-frontend
 ```
 
-## 📝 Notes
+### Arrêter l'application
+```bash
+podman stop cycliste-backend cycliste-frontend
+# ou
+./scripts/stop-cerfaosanalyse.sh
+```
 
-- La plupart des scripts doivent être exécutés depuis la racine du projet
-- Les scripts shell (.sh) sont exécutables : `chmod +x scripts/*.sh`
-- Les scripts JavaScript (.js) nécessitent Node.js installé
-- Pour Docker, assurez-vous que les conteneurs sont arrêtés avant de rebuild
+### Voir les logs
+```bash
+# Logs du backend
+podman logs cycliste-backend --tail 50
+
+# Logs du frontend
+podman logs cycliste-frontend --tail 50
+
+# Logs en temps réel
+podman logs -f cycliste-backend
+```
+
+### Rebuild après modifications du code
+```bash
+./scripts/rebuild-containers.sh
+```
+
+### Vérifier l'état des conteneurs
+```bash
+podman ps
+```
+
+### Accéder à la base de données
+```bash
+# Via le conteneur
+podman exec cycliste-backend sh -c "cd /app/build && node -e \"
+const Database = require('better-sqlite3');
+const db = new Database('tmp/db.sqlite3');
+const users = db.prepare('SELECT * FROM users').all();
+console.log(users);
+\""
+
+# Ou via le script utilitaire
+node scripts/check_users.js
+```
+
+## 🗑️ Scripts supprimés
+
+Les scripts suivants ont été supprimés car obsolètes (remplacés par Docker/Podman) :
+- ~~`check-setup.sh`~~ - Vérification de l'environnement (obsolète pour Docker)
+- ~~`kill-port-backend.sh`~~ - Intégré dans `stop-cerfaosanalyse.sh`
+- ~~`kill-port-frontend.sh`~~ - Intégré dans `stop-cerfaosanalyse.sh`
+- ~~`reset-app.sh`~~ - Réinitialisation mode dev local (non applicable à Docker)
+- ~~`start-cerfaosanalyse.sh`~~ - Lance en mode dev Alacritty (remplacé par `podman start`)
+- ~~`start-dev.sh`~~ - Lance backend en mode dev (remplacé par Docker)
+- ~~`test_date_logic.js`~~ - Fichier vide inutile
+
+## 📚 Documentation supplémentaire
+
+Pour plus d'informations sur le déploiement Docker/Podman, consultez **DOCKER.md** à la racine du projet.
