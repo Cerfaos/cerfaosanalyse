@@ -41,8 +41,4 @@ uploads/
 # Local/temp files
 .antigravity/
 references/
-scripts/
-backend/scripts/
-implementation_plan.md
-walkthrough.md
 frontend/profile_tmp.txt
