@@ -185,14 +185,14 @@ export default function TrainingPlanner() {
 
   return (
     <AppLayout
-      title="Training Planner"
+      title="Planification"
       description="Planifiez et gérez vos séances d'entraînement cycliste"
       actions={actions}
     >
       <div className="space-y-8">
         <PageHeader
           eyebrow="Entraînement"
-          title="Training Planner"
+          title="Planification"
           description="Créez des séances structurées, gérez vos modèles et planifiez votre semaine d'entraînement."
           icon="🚴"
           gradient="from-[#8BC34A] to-[#5CE1E6]"

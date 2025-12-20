@@ -19,7 +19,7 @@ const navigation = [
   { label: "Cartographie FC", to: "/cycling", icon: CyclingIcon },
   { label: "Activités", to: "/activities", icon: ActivitiesIcon },
   { label: "Records", to: "/records", icon: RecordsIcon },
-  { label: "Training Planner", to: "/training", icon: () => <CalendarDays size={18} /> },
+  { label: "Planification", to: "/training", icon: () => <CalendarDays size={18} /> },
   { label: "Poids", to: "/weight", icon: WeightIcon },
   { label: "Charge d'entraînement", to: "/training-load", icon: TrainingIcon },
   { label: "Équipement", to: "/equipment", icon: EquipmentIcon },
