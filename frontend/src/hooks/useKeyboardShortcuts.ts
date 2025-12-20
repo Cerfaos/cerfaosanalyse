@@ -28,7 +28,7 @@ export function useKeyboardShortcuts() {
     {
       key: 'i',
       action: () => navigate('/insights'),
-      description: 'Analyses',
+      description: 'Prédictions',
     },
     {
       key: 'a',

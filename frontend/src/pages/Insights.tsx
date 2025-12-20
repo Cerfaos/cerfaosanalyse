@@ -248,18 +248,18 @@ export default function Insights() {
 
   if (loading) {
     return (
-      <AppLayout title="Analyses" description="Analyse intelligente de vos données">
+      <AppLayout title="Prédictions" description="Analyse intelligente de vos données">
         <div className="glass-panel p-6 text-center text-text-secondary">Chargement des analyses...</div>
       </AppLayout>
     )
   }
 
   return (
-    <AppLayout title="Analyses" description="Analyse intelligente et prédictions basées sur vos données">
+    <AppLayout title="Prédictions" description="Analyse intelligente et prédictions basées sur vos données">
       <div className="space-y-8">
         <PageHeader
           eyebrow="Intelligence"
-          title="Analyses & Prédictions"
+          title="Prédictions"
           description="Analyses personnalisées basées sur vos données d'entraînement pour optimiser vos performances."
           icon="🧠"
           gradient="from-[#5CE1E6] to-[#8BC34A]"

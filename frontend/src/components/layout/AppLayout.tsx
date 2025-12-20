@@ -15,7 +15,7 @@ type LayoutProps = {
 const navigation = [
   { label: "Accueil", to: "/", icon: HomeIcon },
   { label: "Tableau de bord", to: "/dashboard", icon: DashboardIcon },
-  { label: "Analyses", to: "/insights", icon: InsightsIcon },
+  { label: "Prédictions", to: "/insights", icon: InsightsIcon },
   { label: "Cartographie FC", to: "/cycling", icon: CyclingIcon },
   { label: "Activités", to: "/activities", icon: ActivitiesIcon },
   { label: "Records", to: "/records", icon: RecordsIcon },
