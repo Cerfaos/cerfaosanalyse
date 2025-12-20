@@ -1,4 +1,5 @@
-import { Plus, Trash2, Copy, ChevronUp, ChevronDown } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, Trash2, Copy, ChevronUp, ChevronDown, Repeat, Zap } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import {
@@ -15,10 +16,14 @@ import type {
   PpgExercise,
   BlockType,
   SessionCategory,
+  IntervalSet,
 } from '../../types/training'
 import {
   BLOCK_TYPE_LABELS,
   percentFtpToWatts,
+  intervalSetToBlocks,
+  calculateIntervalSetDuration,
+  secondsToDuration,
 } from '../../types/training'
 
 interface BlockEditorProps {
@@ -37,10 +42,48 @@ const BLOCK_TYPES: { id: BlockType; label: string }[] = [
   { id: 'cooldown', label: BLOCK_TYPE_LABELS.cooldown },
 ]
 
+// Mode d'édition des intervalles
+type EditorMode = 'simple' | 'interval'
+
+// État initial pour un nouvel intervalle
+const DEFAULT_INTERVAL: IntervalSet = {
+  effortDuration: '02:00',
+  effortPercentFtp: 110,
+  recoveryDuration: '01:00',
+  recoveryPercentFtp: 50,
+  reps: 5,
+  notes: '',
+}
+
 /**
  * Éditeur de blocs d'entraînement (cycling ou PPG)
  */
 export function BlockEditor({ blocks, onChange, category, ftp, weight }: BlockEditorProps) {
+  const [editorMode, setEditorMode] = useState<EditorMode>('simple')
+  const [intervalForm, setIntervalForm] = useState<IntervalSet>(DEFAULT_INTERVAL)
+
+  // Calculer les stats de l'intervalle
+  const intervalTotalSeconds = calculateIntervalSetDuration(intervalForm)
+  const intervalTotalDuration = secondsToDuration(intervalTotalSeconds)
+
+  // Estimer le TSS de l'intervalle (approximatif)
+  const estimatedIntervalTss = Math.round(
+    ((intervalForm.effortPercentFtp / 100) ** 2 * intervalForm.reps * parseInt(intervalForm.effortDuration.split(':')[0]) +
+      (intervalForm.recoveryPercentFtp / 100) ** 2 * (intervalForm.reps - 1) * parseInt(intervalForm.recoveryDuration.split(':')[0])) *
+      (100 / 60)
+  )
+
+  // Ajouter les blocs générés par l'intervalle
+  const addIntervalBlocks = () => {
+    if (category !== 'cycling') return
+
+    const generatedBlocks = intervalSetToBlocks(intervalForm)
+    onChange([...(blocks as CyclingBlock[]), ...generatedBlocks])
+
+    // Reset le formulaire
+    setIntervalForm(DEFAULT_INTERVAL)
+  }
+
   const addBlock = () => {
     if (category === 'cycling') {
       const newBlock: CyclingBlock = {
@@ -213,17 +256,189 @@ export function BlockEditor({ blocks, onChange, category, ftp, weight }: BlockEd
   const cyclingBlocks = blocks as CyclingBlock[]
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h4 className="font-medium text-text-primary">Blocs d'entraînement</h4>
-          <div className="text-sm text-text-secondary">
-            FTP: <span className="font-semibold text-primary">{ftp}W</span>
+    <div className="space-y-4">
+      {/* Header avec toggle de mode */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h4 className="font-medium text-text-primary">Blocs d'entraînement</h4>
+            <div className="text-sm text-text-secondary">
+              FTP: <span className="font-semibold text-primary">{ftp}W</span>
+            </div>
+          </div>
+
+          {/* Toggle Mode */}
+          <div className="flex items-center gap-2 bg-gray-100 dark:bg-dark-border rounded-lg p-1">
+            <button
+              type="button"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                editorMode === 'simple'
+                  ? 'bg-white dark:bg-dark-surface text-primary shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setEditorMode('simple')}
+            >
+              <Plus className="h-4 w-4" />
+              Simple
+            </button>
+            <button
+              type="button"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                editorMode === 'interval'
+                  ? 'bg-white dark:bg-dark-surface text-primary shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setEditorMode('interval')}
+            >
+              <Repeat className="h-4 w-4" />
+              Intervalle
+            </button>
           </div>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={addBlock}>
-          <Plus className="h-4 w-4 mr-1" /> Ajouter
-        </Button>
+
+        {/* Mode Intervalle : Créateur d'intervalles */}
+        {editorMode === 'interval' && (
+          <Card className="p-4 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border-orange-200 dark:border-orange-800">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="h-5 w-5 text-orange-500" />
+              <h5 className="font-semibold text-orange-700 dark:text-orange-300">
+                Créateur d'intervalles rapide
+              </h5>
+            </div>
+
+            <div className="grid grid-cols-12 gap-3">
+              {/* Effort */}
+              <div className="col-span-6 space-y-2">
+                <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                  Effort
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs text-text-secondary mb-1">Durée</label>
+                    <Input
+                      value={intervalForm.effortDuration}
+                      onChange={(e) =>
+                        setIntervalForm({ ...intervalForm, effortDuration: e.target.value })
+                      }
+                      placeholder="02:00"
+                      className="border-orange-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-text-secondary mb-1">% FTP</label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        value={intervalForm.effortPercentFtp}
+                        onChange={(e) =>
+                          setIntervalForm({
+                            ...intervalForm,
+                            effortPercentFtp: parseInt(e.target.value) || 0,
+                          })
+                        }
+                        className="border-orange-200"
+                      />
+                      <span className="text-sm font-semibold text-orange-600">
+                        {percentFtpToWatts(intervalForm.effortPercentFtp, ftp)}W
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Récupération */}
+              <div className="col-span-6 space-y-2">
+                <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                  Récupération
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs text-text-secondary mb-1">Durée</label>
+                    <Input
+                      value={intervalForm.recoveryDuration}
+                      onChange={(e) =>
+                        setIntervalForm({ ...intervalForm, recoveryDuration: e.target.value })
+                      }
+                      placeholder="01:00"
+                      className="border-blue-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-text-secondary mb-1">% FTP</label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        value={intervalForm.recoveryPercentFtp}
+                        onChange={(e) =>
+                          setIntervalForm({
+                            ...intervalForm,
+                            recoveryPercentFtp: parseInt(e.target.value) || 0,
+                          })
+                        }
+                        className="border-blue-200"
+                      />
+                      <span className="text-sm font-semibold text-blue-600">
+                        {percentFtpToWatts(intervalForm.recoveryPercentFtp, ftp)}W
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Répétitions */}
+              <div className="col-span-3">
+                <label className="block text-xs text-text-secondary mb-1">Répétitions</label>
+                <Input
+                  type="number"
+                  value={intervalForm.reps}
+                  onChange={(e) =>
+                    setIntervalForm({ ...intervalForm, reps: parseInt(e.target.value) || 1 })
+                  }
+                  min={1}
+                  max={20}
+                />
+              </div>
+
+              {/* Notes */}
+              <div className="col-span-5">
+                <label className="block text-xs text-text-secondary mb-1">Notes (optionnel)</label>
+                <Input
+                  value={intervalForm.notes || ''}
+                  onChange={(e) => setIntervalForm({ ...intervalForm, notes: e.target.value })}
+                  placeholder="ex: Sprint, VO2max..."
+                />
+              </div>
+
+              {/* Stats et bouton */}
+              <div className="col-span-4 flex flex-col justify-end">
+                <div className="text-sm text-text-secondary mb-2">
+                  <span className="font-semibold text-text-primary">{intervalTotalDuration}</span>
+                  <span className="mx-1">•</span>
+                  <span>{intervalForm.reps}×({intervalForm.effortDuration}+{intervalForm.recoveryDuration})</span>
+                  <span className="mx-1">•</span>
+                  <span>~{estimatedIntervalTss} TSS</span>
+                </div>
+                <Button
+                  type="button"
+                  className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white"
+                  onClick={addIntervalBlocks}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Ajouter ces {intervalForm.reps * 2 - 1} blocs
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Mode Simple : Bouton d'ajout */}
+        {editorMode === 'simple' && (
+          <div className="flex justify-end">
+            <Button type="button" variant="outline" size="sm" onClick={addBlock}>
+              <Plus className="h-4 w-4 mr-1" /> Ajouter un bloc
+            </Button>
+          </div>
+        )}
       </div>
 
       {cyclingBlocks.length > 0 && (

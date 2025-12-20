@@ -349,3 +349,238 @@ export function getIntensityZoneColor(percentFtp: number): string {
   if (percentFtp <= 120) return '#ef4444' // red
   return '#dc2626'                         // dark red
 }
+
+// -----------------------------------------------------------------------------
+// Intervalles composés (mode intervalle)
+// -----------------------------------------------------------------------------
+
+/** Configuration d'un intervalle composé (effort + récupération) */
+export interface IntervalSet {
+  /** Durée de l'effort au format "MM:SS" */
+  effortDuration: string
+  /** Intensité effort en % FTP */
+  effortPercentFtp: number
+  /** Durée de récupération au format "MM:SS" */
+  recoveryDuration: string
+  /** Intensité récupération en % FTP */
+  recoveryPercentFtp: number
+  /** Nombre de répétitions */
+  reps: number
+  /** Notes (optionnel) */
+  notes?: string
+}
+
+/**
+ * Convertir un IntervalSet en blocs CyclingBlock
+ */
+export function intervalSetToBlocks(interval: IntervalSet): CyclingBlock[] {
+  const blocks: CyclingBlock[] = []
+
+  for (let i = 0; i < interval.reps; i++) {
+    // Bloc effort
+    blocks.push({
+      type: 'effort',
+      duration: interval.effortDuration,
+      percentFtp: interval.effortPercentFtp,
+      reps: 1,
+      notes: interval.notes ? `${interval.notes} (${i + 1}/${interval.reps})` : undefined,
+    })
+
+    // Bloc récupération (sauf après le dernier effort)
+    if (i < interval.reps - 1) {
+      blocks.push({
+        type: 'recovery',
+        duration: interval.recoveryDuration,
+        percentFtp: interval.recoveryPercentFtp,
+        reps: 1,
+      })
+    }
+  }
+
+  return blocks
+}
+
+/**
+ * Calculer la durée totale d'un IntervalSet en secondes
+ */
+export function calculateIntervalSetDuration(interval: IntervalSet): number {
+  const effortSeconds = durationToSeconds(interval.effortDuration)
+  const recoverySeconds = durationToSeconds(interval.recoveryDuration)
+  // N efforts + (N-1) récupérations
+  return interval.reps * effortSeconds + (interval.reps - 1) * recoverySeconds
+}
+
+// -----------------------------------------------------------------------------
+// Bibliothèque d'exercices PPG
+// -----------------------------------------------------------------------------
+
+/** Catégorie d'exercice PPG */
+export type PpgCategory = 'jambes' | 'core' | 'bras' | 'cardio'
+
+/** Niveau de difficulté */
+export type DifficultyLevel = 'debutant' | 'intermediaire' | 'avance'
+
+/** Exercice PPG de la bibliothèque */
+export interface PpgExerciseDefinition {
+  id: number
+  name: string
+  category: PpgCategory
+  description: string | null
+  targetMuscles: string | null
+  difficulty: DifficultyLevel
+  defaultDuration: string | null
+  defaultReps: number | null
+  defaultSets: number
+  imageUrl: string | null
+  videoUrl: string | null
+  isDefault: boolean
+  userId: number | null
+  createdAt: string
+  updatedAt: string
+}
+
+/** Labels pour les catégories PPG */
+export const PPG_CATEGORY_LABELS: Record<PpgCategory, string> = {
+  jambes: 'Jambes',
+  core: 'Core / Gainage',
+  bras: 'Bras / Haut du corps',
+  cardio: 'Cardio',
+}
+
+/** Icônes pour les catégories PPG */
+export const PPG_CATEGORY_ICONS: Record<PpgCategory, string> = {
+  jambes: '🦵',
+  core: '💪',
+  bras: '💪',
+  cardio: '❤️',
+}
+
+/** Labels pour les niveaux de difficulté */
+export const DIFFICULTY_LABELS: Record<DifficultyLevel, string> = {
+  debutant: 'Débutant',
+  intermediaire: 'Intermédiaire',
+  avance: 'Avancé',
+}
+
+// -----------------------------------------------------------------------------
+// Programmes d'entraînement multi-semaines
+// -----------------------------------------------------------------------------
+
+/** Objectif du programme */
+export type ProgramObjective = 'cyclosportive' | 'ftp_boost' | 'endurance' | 'perte_poids' | 'general'
+
+/** Niveau du programme */
+export type ProgramLevel = 'debutant' | 'intermediaire' | 'avance'
+
+/** Session dans un programme */
+export interface ProgramSession {
+  dayOfWeek: number // 0-6 (Dimanche-Samedi)
+  templateId: number
+  notes?: string
+  /** Template enrichi (facultatif, retourné par l'API) */
+  template?: TrainingTemplate
+}
+
+/** Semaine de programme */
+export interface ProgramWeek {
+  weekNumber: number
+  theme: string // "Fondation", "Build", "Peak", "Taper", "Récupération"
+  sessions: ProgramSession[]
+}
+
+/** Programme d'entraînement */
+export interface TrainingProgram {
+  id: number
+  userId: number | null
+  name: string
+  description: string | null
+  durationWeeks: number
+  objective: ProgramObjective | null
+  level: ProgramLevel
+  weeklySchedule: ProgramWeek[]
+  isDefault: boolean
+  isPublic: boolean
+  estimatedWeeklyTss: number | null
+  estimatedWeeklyHours: number | null
+  createdAt: string
+  updatedAt: string
+  /** Nombre total de séances (calculé) */
+  totalSessions?: number
+  /** Moyenne de séances par semaine (calculé) */
+  averageSessionsPerWeek?: number
+}
+
+/** Données pour créer un programme */
+export interface CreateProgramData {
+  name: string
+  description?: string
+  durationWeeks?: number
+  objective?: ProgramObjective
+  level?: ProgramLevel
+  weeklySchedule: ProgramWeek[]
+  isPublic?: boolean
+  estimatedWeeklyTss?: number
+  estimatedWeeklyHours?: number
+}
+
+/** Données pour appliquer un programme */
+export interface ApplyProgramData {
+  startDate: string
+  clearExisting?: boolean
+}
+
+/** Prévisualisation d'application de programme */
+export interface ProgramPreviewSession {
+  date: string
+  dayName: string
+  weekNumber: number
+  theme: string
+  templateName: string
+  templateId: number
+  duration: number
+  tss: number
+  notes: string | null
+}
+
+/** Labels pour les objectifs de programme */
+export const PROGRAM_OBJECTIVE_LABELS: Record<ProgramObjective, string> = {
+  cyclosportive: 'Préparation Cyclosportive',
+  ftp_boost: 'Augmentation FTP',
+  endurance: 'Développement Endurance',
+  perte_poids: 'Perte de poids',
+  general: 'Forme Générale',
+}
+
+/** Labels pour les thèmes de semaine */
+export const WEEK_THEME_LABELS: Record<string, string> = {
+  'Fondation': 'Fondation - Base aérobie',
+  'Build': 'Build - Montée en charge',
+  'Intensification': 'Intensification - Pic de charge',
+  'Peak': 'Peak - Affûtage',
+  'Taper': 'Taper - Diminution progressive',
+  'Récupération': 'Récupération - Semaine light',
+  'Test': 'Test - Évaluation',
+  'Transition': 'Transition - Entre cycles',
+}
+
+/** Jours de la semaine (français) */
+export const DAYS_OF_WEEK: string[] = [
+  'Dimanche',
+  'Lundi',
+  'Mardi',
+  'Mercredi',
+  'Jeudi',
+  'Vendredi',
+  'Samedi',
+]
+
+/** Jours de la semaine courts */
+export const DAYS_OF_WEEK_SHORT: string[] = [
+  'Dim',
+  'Lun',
+  'Mar',
+  'Mer',
+  'Jeu',
+  'Ven',
+  'Sam',
+]

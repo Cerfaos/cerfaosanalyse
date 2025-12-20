@@ -33,6 +33,16 @@ export default class PlannedSession extends BaseModel {
   @column()
   declare activityId: number | null
 
+  // Champs liés aux programmes
+  @column()
+  declare programId: number | null
+
+  @column()
+  declare programWeek: number | null
+
+  @column()
+  declare programTheme: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -12,6 +12,15 @@ import type {
   PlanningResponse,
   WeekStats,
   FtpHistoryEntry,
+  PpgExerciseDefinition,
+  PpgCategory,
+  DifficultyLevel,
+  TrainingProgram,
+  CreateProgramData,
+  ApplyProgramData,
+  ProgramPreviewSession,
+  ProgramObjective,
+  ProgramLevel,
 } from '../types/training'
 
 // =============================================================================
@@ -292,6 +301,206 @@ export const planningApi = {
 }
 
 // =============================================================================
+// PPG Exercises API
+// =============================================================================
+
+interface PpgExercisesListResponse {
+  exercises: PpgExerciseDefinition[]
+  grouped: Record<PpgCategory, PpgExerciseDefinition[]>
+  categories: Record<PpgCategory, string>
+  difficulties: Record<DifficultyLevel, string>
+  total: number
+}
+
+export const ppgExercisesApi = {
+  /**
+   * Lister les exercices PPG (filtrable par catégorie/difficulté/recherche)
+   */
+  async list(params?: {
+    category?: PpgCategory
+    difficulty?: DifficultyLevel
+    search?: string
+  }): Promise<PpgExercisesListResponse> {
+    const response = await api.get<ApiResponse<PpgExercisesListResponse>>(
+      '/api/training/ppg-exercises',
+      { params }
+    )
+    return response.data.data
+  },
+
+  /**
+   * Récupérer un exercice par ID
+   */
+  async get(id: number): Promise<PpgExerciseDefinition> {
+    const response = await api.get<ApiResponse<PpgExerciseDefinition>>(
+      `/api/training/ppg-exercises/${id}`
+    )
+    return response.data.data
+  },
+
+  /**
+   * Créer un exercice personnalisé
+   */
+  async create(data: Partial<PpgExerciseDefinition>): Promise<PpgExerciseDefinition> {
+    const response = await api.post<ApiResponse<PpgExerciseDefinition>>(
+      '/api/training/ppg-exercises',
+      data
+    )
+    return response.data.data
+  },
+
+  /**
+   * Modifier un exercice personnalisé
+   */
+  async update(id: number, data: Partial<PpgExerciseDefinition>): Promise<PpgExerciseDefinition> {
+    const response = await api.put<ApiResponse<PpgExerciseDefinition>>(
+      `/api/training/ppg-exercises/${id}`,
+      data
+    )
+    return response.data.data
+  },
+
+  /**
+   * Supprimer un exercice personnalisé
+   */
+  async delete(id: number): Promise<void> {
+    await api.delete(`/api/training/ppg-exercises/${id}`)
+  },
+}
+
+// =============================================================================
+// Programs API
+// =============================================================================
+
+interface ProgramsListResponse {
+  programs: TrainingProgram[]
+  objectives: Record<ProgramObjective, string>
+  levels: Record<ProgramLevel, string>
+  weekThemes: string[]
+}
+
+interface ProgramDetailResponse extends TrainingProgram {
+  enrichedSchedule: any[]
+}
+
+interface ApplyProgramResponse {
+  programId: number
+  programName: string
+  startDate: string
+  endDate: string
+  sessionsCreated: number
+}
+
+interface ProgramPreviewResponse {
+  program: {
+    id: number
+    name: string
+    durationWeeks: number
+  }
+  startDate: string
+  endDate: string
+  preview: ProgramPreviewSession[]
+  weekSummary: Array<{
+    weekNumber: number
+    theme: string
+    sessionsCount: number
+    totalDuration: number
+    totalTss: number
+  }>
+  totalSessions: number
+  totalDuration: number
+  totalTss: number
+}
+
+export const programsApi = {
+  /**
+   * Lister les programmes (filtrable par objectif/niveau)
+   */
+  async list(params?: {
+    objective?: ProgramObjective
+    level?: ProgramLevel
+  }): Promise<ProgramsListResponse> {
+    const response = await api.get<ApiResponse<ProgramsListResponse>>(
+      '/api/training/programs',
+      { params }
+    )
+    return response.data.data
+  },
+
+  /**
+   * Récupérer un programme avec détails complets
+   */
+  async get(id: number): Promise<ProgramDetailResponse> {
+    const response = await api.get<ApiResponse<ProgramDetailResponse>>(
+      `/api/training/programs/${id}`
+    )
+    return response.data.data
+  },
+
+  /**
+   * Créer un programme
+   */
+  async create(data: CreateProgramData): Promise<TrainingProgram> {
+    const response = await api.post<ApiResponse<TrainingProgram>>(
+      '/api/training/programs',
+      data
+    )
+    return response.data.data
+  },
+
+  /**
+   * Modifier un programme
+   */
+  async update(id: number, data: Partial<CreateProgramData>): Promise<TrainingProgram> {
+    const response = await api.put<ApiResponse<TrainingProgram>>(
+      `/api/training/programs/${id}`,
+      data
+    )
+    return response.data.data
+  },
+
+  /**
+   * Supprimer un programme
+   */
+  async delete(id: number): Promise<void> {
+    await api.delete(`/api/training/programs/${id}`)
+  },
+
+  /**
+   * Dupliquer un programme
+   */
+  async duplicate(id: number, name?: string): Promise<TrainingProgram> {
+    const response = await api.post<ApiResponse<TrainingProgram>>(
+      `/api/training/programs/${id}/duplicate`,
+      { name }
+    )
+    return response.data.data
+  },
+
+  /**
+   * Appliquer un programme au calendrier
+   */
+  async apply(id: number, data: ApplyProgramData): Promise<ApplyProgramResponse> {
+    const response = await api.post<ApiResponse<ApplyProgramResponse>>(
+      `/api/training/programs/${id}/apply`,
+      data
+    )
+    return response.data.data
+  },
+
+  /**
+   * Prévisualiser l'application d'un programme
+   */
+  async preview(id: number, startDate: string): Promise<ProgramPreviewResponse> {
+    const response = await api.get<ApiResponse<ProgramPreviewResponse>>(
+      `/api/training/programs/${id}/preview`,
+      { params: { startDate } }
+    )
+    return response.data.data
+  },
+}
+
+// =============================================================================
 // Export unifié
 // =============================================================================
 
@@ -300,6 +509,8 @@ const trainingApi = {
   sessions: sessionsApi,
   planning: planningApi,
   profile: profileApi,
+  ppgExercises: ppgExercisesApi,
+  programs: programsApi,
 }
 
 export default trainingApi

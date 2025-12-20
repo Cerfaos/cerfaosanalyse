@@ -8,11 +8,13 @@ podman rm cycliste-backend cycliste-frontend 2>/dev/null
 echo ""
 echo "=== Reconstruction de l'image backend ==="
 cd /home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse
-podman build -t cerfaosanalyse_backend:latest -f backend/Dockerfile ./backend
+# --no-cache force une reconstruction complète
+podman build --no-cache -t cerfaosanalyse_backend:latest -f backend/Dockerfile ./backend
 
 echo ""
 echo "=== Reconstruction de l'image frontend ==="
-podman build -t cerfaosanalyse_frontend:latest \
+# --no-cache force une reconstruction complète
+podman build --no-cache -t cerfaosanalyse_frontend:latest \
   --build-arg VITE_API_URL=http://192.168.0.11:3333 \
   -f frontend/Dockerfile ./frontend
 

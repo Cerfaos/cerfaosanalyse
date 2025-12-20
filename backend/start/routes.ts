@@ -23,6 +23,8 @@ const TrainingSessionsController = () => import('#controllers/training_sessions_
 const TrainingTemplatesController = () => import('#controllers/training_templates_controller')
 const TrainingPlanningController = () => import('#controllers/training_planning_controller')
 const ReportsController = () => import('#controllers/reports_controller')
+const PpgExercisesController = () => import('#controllers/ppg_exercises_controller')
+const TrainingProgramsController = () => import('#controllers/training_programs_controller')
 
 // Health check
 router.get('/', async () => {
@@ -215,4 +217,31 @@ router
     router.get('/annual', [ReportsController, 'annual'])
   })
   .prefix('/api/reports')
+  .use(middleware.auth())
+
+// Routes Training Module - Exercices PPG
+router
+  .group(() => {
+    router.get('/', [PpgExercisesController, 'index'])
+    router.post('/', [PpgExercisesController, 'store'])
+    router.get('/:id', [PpgExercisesController, 'show'])
+    router.put('/:id', [PpgExercisesController, 'update'])
+    router.delete('/:id', [PpgExercisesController, 'destroy'])
+  })
+  .prefix('/api/training/ppg-exercises')
+  .use(middleware.auth())
+
+// Routes Training Module - Programmes d'entraînement
+router
+  .group(() => {
+    router.get('/', [TrainingProgramsController, 'index'])
+    router.post('/', [TrainingProgramsController, 'store'])
+    router.get('/:id', [TrainingProgramsController, 'show'])
+    router.put('/:id', [TrainingProgramsController, 'update'])
+    router.delete('/:id', [TrainingProgramsController, 'destroy'])
+    router.post('/:id/duplicate', [TrainingProgramsController, 'duplicate'])
+    router.post('/:id/apply', [TrainingProgramsController, 'apply'])
+    router.get('/:id/preview', [TrainingProgramsController, 'preview'])
+  })
+  .prefix('/api/training/programs')
   .use(middleware.auth())
