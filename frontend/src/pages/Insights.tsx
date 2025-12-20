@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
@@ -15,16 +14,6 @@ interface FatigueAnalysis {
   tsbTrend: number
 }
 
-interface GoalSuggestion {
-  type: string
-  target: number
-  unit: string
-  timeframe: string
-  difficulty: string
-  basedOn: string
-  confidence: number
-}
-
 interface PerformancePrediction {
   predictedTime: number
   predictedTimeFormatted: string
@@ -36,9 +25,7 @@ interface PerformancePrediction {
 }
 
 export default function Insights() {
-  const navigate = useNavigate()
   const [fatigue, setFatigue] = useState<FatigueAnalysis | null>(null)
-  const [suggestions, setSuggestions] = useState<GoalSuggestion[]>([])
   const [prediction, setPrediction] = useState<PerformancePrediction | null>(null)
   const [loading, setLoading] = useState(true)
   const [predictionForm, setPredictionForm] = useState({
@@ -46,7 +33,6 @@ export default function Insights() {
     targetDistance: 50,
   })
   const [predictingLoading, setPredictingLoading] = useState(false)
-  const [creatingGoal, setCreatingGoal] = useState<number | null>(null)
 
   useEffect(() => {
     fetchAnalytics()
@@ -55,13 +41,8 @@ export default function Insights() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true)
-      const [fatigueRes, suggestionsRes] = await Promise.all([
-        api.get('/api/analytics/fatigue'),
-        api.get('/api/analytics/suggest-goals'),
-      ])
-
+      const fatigueRes = await api.get('/api/analytics/fatigue')
       setFatigue(fatigueRes.data.data)
-      setSuggestions(suggestionsRes.data.data)
     } catch (error) {
       console.error('Erreur lors du chargement des analyses:', error)
     } finally {
@@ -112,138 +93,6 @@ export default function Insights() {
       },
     }
     return configs[status] || configs.normal
-  }
-
-  const getDifficultyConfig = (difficulty: string) => {
-    const configs: Record<string, { label: string; color: string }> = {
-      easy: { label: 'Facile', color: 'bg-green-100 text-green-700' },
-      moderate: { label: 'Modéré', color: 'bg-blue-100 text-blue-700' },
-      challenging: { label: 'Challengeant', color: 'bg-orange-100 text-orange-700' },
-      ambitious: { label: 'Ambitieux', color: 'bg-red-100 text-red-700' },
-    }
-    return configs[difficulty] || configs.moderate
-  }
-
-  const parseGoalType = (type: string) => {
-    // Extraire le type d'activité et le type d'objectif
-    let activityType = ''
-    let goalTypeLabel = ''
-    let icon = '🎯'
-
-    const activityIcons: Record<string, string> = {
-      cyclisme: '🚴',
-      course: '🏃',
-      marche: '🚶',
-      natation: '🏊',
-      rameur: '🚣',
-      musculation: '💪',
-      randonnée: '🥾',
-      vtt: '🚵',
-    }
-
-    if (type.includes('_distance')) {
-      activityType = type.replace('_distance', '')
-      goalTypeLabel = 'Distance'
-      icon = activityIcons[activityType] || '📏'
-    } else if (type.includes('_longest')) {
-      activityType = type.replace('_longest', '')
-      goalTypeLabel = 'Plus longue sortie'
-      icon = activityIcons[activityType] || '🏆'
-    } else if (type.includes('_frequency')) {
-      activityType = type.replace('_frequency', '')
-      goalTypeLabel = 'Fréquence'
-      icon = activityIcons[activityType] || '📅'
-    } else if (type.includes('trimp')) {
-      goalTypeLabel = 'Charge TRIMP'
-      icon = '💪'
-    } else if (type === 'activities_count') {
-      goalTypeLabel = 'Nombre d\'activités'
-      icon = '📊'
-    }
-
-    const activityLabel = activityType
-      ? activityType.charAt(0).toUpperCase() + activityType.slice(1)
-      : ''
-
-    return { activityType: activityLabel, goalTypeLabel, icon }
-  }
-
-  const createGoalFromSuggestion = async (suggestion: GoalSuggestion, index: number) => {
-    try {
-      setCreatingGoal(index)
-
-      // Extraire le type d'objectif depuis le type de suggestion
-      // Les types peuvent être: cyclisme_distance, course_frequency, weekly_trimp, etc.
-      // Types valides dans la DB: distance, duration, trimp, activities_count
-      let goalType = 'distance'
-      let activityType = ''
-
-      if (suggestion.type.includes('_distance') || suggestion.type.includes('_longest')) {
-        goalType = 'distance'
-        activityType = suggestion.type.replace('_distance', '').replace('_longest', '')
-      } else if (suggestion.type.includes('_frequency')) {
-        goalType = 'activities_count'
-        activityType = suggestion.type.replace('_frequency', '')
-      } else if (suggestion.type.includes('trimp')) {
-        goalType = 'trimp'
-      } else if (suggestion.type === 'activities_count') {
-        goalType = 'activities_count'
-      }
-
-      // Valider que target est un nombre valide
-      const targetValue = Number(suggestion.target)
-      if (isNaN(targetValue) || targetValue <= 0 || !isFinite(targetValue)) {
-        alert('La valeur cible de cet objectif est invalide. Veuillez réessayer ou choisir un autre objectif.')
-        return
-      }
-
-      // Calculer la date de fin basée sur le timeframe
-      // Périodes valides dans la DB: weekly, monthly, yearly, custom
-      const startDate = new Date()
-      const endDate = new Date()
-      let period = 'monthly'
-
-      if (suggestion.timeframe === 'semaine') {
-        endDate.setDate(endDate.getDate() + 7)
-        period = 'weekly'
-      } else if (suggestion.timeframe === 'mois') {
-        endDate.setMonth(endDate.getMonth() + 1)
-        period = 'monthly'
-      } else if (suggestion.timeframe.includes('trimestre')) {
-        endDate.setMonth(endDate.getMonth() + 3)
-        period = 'custom' // trimestre = custom avec dates spécifiques
-      } else {
-        endDate.setMonth(endDate.getMonth() + 1) // Par défaut 1 mois
-        period = 'monthly'
-      }
-
-      // Créer un titre lisible
-      const activityLabel = activityType ? activityType.charAt(0).toUpperCase() + activityType.slice(1) : ''
-      const goalLabel = goalType === 'distance' ? 'Distance' : goalType === 'activities_count' ? 'Activités' : 'TRIMP'
-      const title = activityLabel
-        ? `${goalLabel} ${activityLabel} - ${targetValue} ${suggestion.unit}`
-        : `${goalLabel} - ${targetValue} ${suggestion.unit}`
-
-      const goalData = {
-        type: goalType,
-        targetValue: targetValue,
-        period,
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
-        title,
-        description: `Objectif suggéré automatiquement : ${suggestion.basedOn}`,
-      }
-
-      await api.post('/api/goals', goalData)
-
-      // Rediriger vers la page des objectifs
-      navigate('/goals')
-    } catch (error: any) {
-      console.error('Erreur lors de la création de l\'objectif:', error)
-      alert(error.response?.data?.message || 'Erreur lors de la création de l\'objectif')
-    } finally {
-      setCreatingGoal(null)
-    }
   }
 
   if (loading) {
@@ -416,54 +265,6 @@ export default function Insights() {
           </div>
         </Section>
 
-        {/* Suggestions d'objectifs */}
-        <Section title="Objectifs suggérés" icon="🎯">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {suggestions.map((suggestion, index) => {
-              const { activityType, goalTypeLabel, icon } = parseGoalType(suggestion.type)
-              return (
-                <div key={index} className="glass-panel p-5 hover:shadow-lg transition-all">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{icon}</span>
-                      <div>
-                        <div className="font-semibold text-sm text-text-dark dark:text-dark-text-contrast">
-                          {activityType || goalTypeLabel}
-                        </div>
-                        {activityType && (
-                          <div className="text-xs text-text-muted">{goalTypeLabel}</div>
-                        )}
-                      </div>
-                    </div>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyConfig(suggestion.difficulty).color}`}>
-                      {getDifficultyConfig(suggestion.difficulty).label}
-                    </span>
-                  </div>
-
-                  <div className="mb-3">
-                    <div className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">
-                      {suggestion.target} <span className="text-lg">{suggestion.unit}</span>
-                    </div>
-                    <div className="text-sm text-text-secondary">par {suggestion.timeframe}</div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-text-muted border-t border-border-base/30 pt-3">
-                    <span>{suggestion.basedOn}</span>
-                    <span className="font-medium">{suggestion.confidence}%</span>
-                  </div>
-
-                  <button
-                    onClick={() => createGoalFromSuggestion(suggestion, index)}
-                    disabled={creatingGoal === index}
-                    className="w-full mt-3 px-3 py-2 text-sm bg-brand/10 text-brand rounded-lg hover:bg-brand/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {creatingGoal === index ? 'Création...' : 'Créer cet objectif'}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        </Section>
       </div>
     </AppLayout>
   )
