@@ -504,16 +504,3 @@ export default function TrainingLoad() {
     </AppLayout>
   )
 }
-
-function MetricCard({ label, value, helper, accent, metric }: { label: string; value: string; helper?: string; accent?: string; metric?: string }) {
-  return (
-    <div className="glass-panel p-5 border">
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-sm text-text-muted">{label}</p>
-        {metric && <MetricInfo metric={metric} />}
-      </div>
-      <p className={`text-3xl font-semibold ${accent || 'text-text-dark dark:text-dark-text-contrast'}`}>{value}</p>
-      {helper && <p className="text-xs text-text-muted mt-1">{helper}</p>}
-    </div>
-  )
-}
