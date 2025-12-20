@@ -14,7 +14,7 @@ interface SearchResult {
 const pages: SearchResult[] = [
   { type: 'page', title: 'Accueil', subtitle: 'Page principale', icon: '🏠', path: '/' },
   { type: 'page', title: 'Tableau de bord', subtitle: 'Vue d\'ensemble', icon: '📊', path: '/dashboard' },
-  { type: 'page', title: 'Insights', subtitle: 'Analyses intelligentes', icon: '🧠', path: '/insights' },
+  { type: 'page', title: 'Analyses', subtitle: 'Analyses intelligentes', icon: '🧠', path: '/insights' },
   { type: 'page', title: 'Activités', subtitle: 'Liste des activités', icon: '🏃', path: '/activities' },
   { type: 'page', title: 'Records', subtitle: 'Records personnels', icon: '🏆', path: '/records' },
   { type: 'page', title: 'Profil', subtitle: 'Paramètres utilisateur', icon: '👤', path: '/profile' },

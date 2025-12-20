@@ -28,7 +28,7 @@ export function useKeyboardShortcuts() {
     {
       key: 'i',
       action: () => navigate('/insights'),
-      description: 'Insights',
+      description: 'Analyses',
     },
     {
       key: 'a',
@@ -129,7 +129,7 @@ export function getShortcutsList() {
   return [
     { key: 'H', description: 'Accueil' },
     { key: 'D', description: 'Tableau de bord' },
-    { key: 'I', description: 'Insights' },
+    { key: 'I', description: 'Analyses' },
     { key: 'A', description: 'Activités' },
     { key: 'R', description: 'Records' },
     { key: 'P', description: 'Profil' },
