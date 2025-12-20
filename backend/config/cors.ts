@@ -7,9 +7,11 @@ import env from '#start/env'
  *
  * https://docs.adonisjs.com/guides/security/cors
  */
+const corsOrigin = env.get('CORS_ORIGIN', 'http://localhost:5173')
+
 const corsConfig = defineConfig({
   enabled: true,
-  origin: env.get('CORS_ORIGIN', 'http://localhost:5173').split(','),
+  origin: corsOrigin === '*' ? true : corsOrigin.split(','),
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   headers: true,
   exposeHeaders: [],

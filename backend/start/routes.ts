@@ -17,11 +17,12 @@ const WeightHistoriesController = () => import('#controllers/weight_histories_co
 const ActivitiesController = () => import('#controllers/activities_controller')
 const EquipmentController = () => import('#controllers/equipment_controller')
 const ExportsController = () => import('#controllers/exports_controller')
-const BadgesController = () => import('#controllers/badges_controller')
-const GoalsController = () => import('#controllers/goals_controller')
 const PersonalRecordsController = () => import('#controllers/personal_records_controller')
 const AnalyticsController = () => import('#controllers/analytics_controller')
-const TrainingPlansController = () => import('#controllers/training_plans_controller')
+const TrainingSessionsController = () => import('#controllers/training_sessions_controller')
+const TrainingTemplatesController = () => import('#controllers/training_templates_controller')
+const TrainingPlanningController = () => import('#controllers/training_planning_controller')
+const ReportsController = () => import('#controllers/reports_controller')
 
 // Health check
 router.get('/', async () => {
@@ -69,6 +70,9 @@ router
     router.get('/hr-zones', [UsersController, 'getHeartRateZones'])
     router.get('/power-zones', [UsersController, 'getPowerZones'])
     router.post('/avatar', [UsersController, 'uploadAvatar'])
+    // Profil d'entraînement (FTP, poids, FC, historique)
+    router.get('/training-profile', [UsersController, 'getTrainingProfile'])
+    router.put('/training-profile', [UsersController, 'updateTrainingProfile'])
   })
   .prefix('/api/users')
   .use(middleware.auth())
@@ -135,27 +139,6 @@ router
   .prefix('/api/exports')
   .use(middleware.auth())
 
-// Routes badges protégées
-router
-  .group(() => {
-    router.get('/', [BadgesController, 'index'])
-    router.post('/check', [BadgesController, 'check'])
-  })
-  .prefix('/api/badges')
-  .use(middleware.auth())
-
-// Routes objectifs protégées
-router
-  .group(() => {
-    router.get('/', [GoalsController, 'index'])
-    router.post('/', [GoalsController, 'store'])
-    router.get('/:id', [GoalsController, 'show'])
-    router.patch('/:id', [GoalsController, 'update'])
-    router.delete('/:id', [GoalsController, 'destroy'])
-  })
-  .prefix('/api/goals')
-  .use(middleware.auth())
-
 // Routes records personnels protégées
 router
   .group(() => {
@@ -175,21 +158,61 @@ router
     router.get('/activities/:id/similar', [AnalyticsController, 'similarActivities'])
     router.post('/predict-performance', [AnalyticsController, 'predictPerformance'])
     router.get('/fatigue', [AnalyticsController, 'fatigueAnalysis'])
-    router.get('/suggest-goals', [AnalyticsController, 'suggestGoals'])
   })
   .prefix('/api/analytics')
   .use(middleware.auth())
 
-// Routes plans d'entraînement
+// Routes Training Module - Séances d'entraînement
 router
   .group(() => {
-    router.post('/generate', [TrainingPlansController, 'generate'])
-    router.get('/next-session', [TrainingPlansController, 'nextSession'])
-    router.post('/save', [TrainingPlansController, 'save'])
-    router.get('/load', [TrainingPlansController, 'load'])
-    router.get('/load/:id', [TrainingPlansController, 'load'])
-    router.get('/list', [TrainingPlansController, 'list'])
-    router.delete('/:id', [TrainingPlansController, 'delete'])
+    router.get('/', [TrainingSessionsController, 'index'])
+    router.post('/', [TrainingSessionsController, 'store'])
+    router.get('/:id', [TrainingSessionsController, 'show'])
+    router.put('/:id', [TrainingSessionsController, 'update'])
+    router.delete('/:id', [TrainingSessionsController, 'destroy'])
   })
-  .prefix('/api/training-plans')
+  .prefix('/api/training/sessions')
+  .use(middleware.auth())
+
+// Routes Training Module - Templates de séances
+router
+  .group(() => {
+    router.get('/', [TrainingTemplatesController, 'index'])
+    router.post('/', [TrainingTemplatesController, 'store'])
+    router.get('/:id', [TrainingTemplatesController, 'show'])
+    router.put('/:id', [TrainingTemplatesController, 'update'])
+    router.delete('/:id', [TrainingTemplatesController, 'destroy'])
+    router.post('/:id/duplicate', [TrainingTemplatesController, 'duplicate'])
+  })
+  .prefix('/api/training/templates')
+  .use(middleware.auth())
+
+// Routes Training Module - Planning
+router
+  .group(() => {
+    router.get('/', [TrainingPlanningController, 'index'])
+    router.post('/', [TrainingPlanningController, 'store'])
+    router.delete('/:id', [TrainingPlanningController, 'destroy'])
+    router.post('/:id/complete', [TrainingPlanningController, 'complete'])
+    router.post('/:id/uncomplete', [TrainingPlanningController, 'uncomplete'])
+    router.post('/:id/move', [TrainingPlanningController, 'move'])
+  })
+  .prefix('/api/training/planning')
+  .use(middleware.auth())
+
+// Routes Training Module - Statistiques
+router
+  .group(() => {
+    router.get('/week', [TrainingPlanningController, 'weekStats'])
+  })
+  .prefix('/api/training/stats')
+  .use(middleware.auth())
+
+// Routes Rapports protégées
+router
+  .group(() => {
+    router.get('/monthly', [ReportsController, 'monthly'])
+    router.get('/annual', [ReportsController, 'annual'])
+  })
+  .prefix('/api/reports')
   .use(middleware.auth())

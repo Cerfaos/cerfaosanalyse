@@ -33,16 +33,6 @@ interface FatigueAnalysis {
   tsbTrend: number
 }
 
-interface GoalSuggestion {
-  type: string
-  target: number
-  unit: string
-  timeframe: string
-  difficulty: 'easy' | 'moderate' | 'challenging' | 'ambitious'
-  basedOn: string
-  confidence: number
-}
-
 export default class AnalyticsService {
   /**
    * Trouve des activités similaires pour comparaison
@@ -352,104 +342,5 @@ export default class AnalyticsService {
 
     // Normaliser le slope par la moyenne
     return avgY !== 0 ? slope / avgY : 0
-  }
-
-  /**
-   * Suggère des objectifs basés sur la progression
-   */
-  static async suggestGoals(userId: number): Promise<GoalSuggestion[]> {
-    const suggestions: GoalSuggestion[] = []
-    const now = DateTime.now()
-    const thirtyDaysAgo = now.minus({ days: 30 })
-
-    const recentActivities = await Activity.query()
-      .where('userId', userId)
-      .where('date', '>=', thirtyDaysAgo.toISO())
-      .orderBy('date', 'desc')
-
-    if (recentActivities.length < 3) {
-      return [
-        {
-          type: 'activities_count',
-          target: 12,
-          unit: 'activités',
-          timeframe: 'mois',
-          difficulty: 'easy',
-          basedOn: 'Objectif de démarrage recommandé',
-          confidence: 90,
-        },
-      ]
-    }
-
-    // Analyser par type d'activité
-    const byType: Record<string, Activity[]> = {}
-    recentActivities.forEach((a) => {
-      if (!byType[a.type]) byType[a.type] = []
-      byType[a.type].push(a)
-    })
-
-    for (const [type, activities] of Object.entries(byType)) {
-      // Objectif de distance (seulement si des distances sont enregistrées)
-      const totalDistance = activities.reduce((sum, a) => sum + (a.distance || 0), 0)
-      const avgDistancePerMonth = totalDistance / 30 * 30 // projection mensuelle
-
-      if (totalDistance > 0) {
-        suggestions.push({
-          type: `${type.toLowerCase()}_distance`,
-          target: Math.round((avgDistancePerMonth * 1.1) / 1000) || 1, // +10%, minimum 1
-          unit: 'km',
-          timeframe: 'mois',
-          difficulty: 'moderate',
-          basedOn: `Basé sur ${activities.length} activités récentes`,
-          confidence: Math.min(90, 60 + activities.length * 3),
-        })
-      }
-
-      // Objectif de fréquence
-      const currentFrequency = activities.length
-      const targetFrequency = Math.ceil(currentFrequency * 1.15)
-      // S'assurer que la valeur est un nombre valide
-      const safeTargetFrequency = Number.isFinite(targetFrequency) && targetFrequency > 0 ? targetFrequency : 1
-      suggestions.push({
-        type: `${type.toLowerCase()}_frequency`,
-        target: safeTargetFrequency,
-        unit: 'activités',
-        timeframe: 'mois',
-        difficulty: 'moderate',
-        basedOn: `Actuellement ${currentFrequency} activités/mois`,
-        confidence: 85,
-      })
-
-      // Objectif de distance max (seulement si des distances sont enregistrées)
-      const distances = activities.map((a) => a.distance || 0).filter((d) => d > 0)
-      if (distances.length > 0) {
-        const maxDistance = Math.max(...distances)
-        const targetDistance = Math.round((maxDistance * 1.2) / 1000)
-        suggestions.push({
-          type: `${type.toLowerCase()}_longest`,
-          target: targetDistance > 0 ? targetDistance : 1, // +20%, minimum 1
-          unit: 'km',
-          timeframe: 'prochain trimestre',
-          difficulty: 'challenging',
-          basedOn: `Record actuel: ${Math.round(maxDistance / 1000)} km`,
-          confidence: 75,
-        })
-      }
-    }
-
-    // Objectif global de TRIMP
-    const avgWeeklyTrimp =
-      recentActivities.reduce((sum, a) => sum + (a.trimp || 0), 0) / 4
-    suggestions.push({
-      type: 'weekly_trimp',
-      target: Math.round(avgWeeklyTrimp * 1.1),
-      unit: 'points',
-      timeframe: 'semaine',
-      difficulty: 'moderate',
-      basedOn: `TRIMP hebdomadaire moyen: ${Math.round(avgWeeklyTrimp)}`,
-      confidence: 80,
-    })
-
-    return suggestions.sort((a, b) => b.confidence - a.confidence)
   }
 }

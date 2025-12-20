@@ -793,10 +793,10 @@ export default function ActivityDetail() {
       {isReplacingFile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="glass-panel p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold text-text-dark mb-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               Remplacer le fichier
             </h2>
-            <p className="text-sm text-text-body mb-4">
+            <p className="text-sm text-gray-300 mb-4">
               Le remplacement du fichier mettra à jour toutes les données de
               l'activité (durée, distance, GPS, etc.) avec les nouvelles données
               du fichier.
@@ -806,7 +806,7 @@ export default function ActivityDetail() {
               <div>
                 <label
                   htmlFor="replacement-file"
-                  className="block text-sm font-medium text-text-body mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Nouveau fichier
                 </label>
@@ -816,19 +816,19 @@ export default function ActivityDetail() {
                   accept=".fit,.gpx,.csv"
                   onChange={handleFileChange}
                   required
-                  className="w-full px-4 py-3 border border-border-base rounded-md focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                  className="w-full px-4 py-3 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BC34A]/30 focus:border-[#8BC34A]"
                 />
-                <p className="text-sm text-text-secondary mt-2">
+                <p className="text-sm text-gray-400 mt-2">
                   Formats acceptés: FIT, GPX, CSV
                 </p>
               </div>
 
               {replacementFile && (
-                <div className="bg-info-light border border-info p-3 rounded-md">
-                  <p className="text-sm text-info-dark">
+                <div className="bg-[#5CE1E6]/10 border border-[#5CE1E6]/30 p-3 rounded-md">
+                  <p className="text-sm text-[#5CE1E6]">
                     Fichier sélectionné: <strong>{replacementFile.name}</strong>
                   </p>
-                  <p className="text-xs text-text-muted mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     Taille: {(replacementFile.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
@@ -841,14 +841,14 @@ export default function ActivityDetail() {
                     setIsReplacingFile(false);
                     setReplacementFile(null);
                   }}
-                  className="flex-1 px-4 py-2 bg-bg-gray-100 text-text-body rounded-lg hover:bg-bg-gray-200 transition-colors"
+                  className="btn-secondary flex-1"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={uploadingFile || !replacementFile}
-                  className="flex-1 px-4 py-2 bg-gradient-sport text-white dark:text-white rounded-lg hover:shadow-glow-green transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {uploadingFile ? "Remplacement..." : "Remplacer"}
                 </button>
@@ -860,14 +860,14 @@ export default function ActivityDetail() {
 
       {/* Formulaire d'édition */}
       {isEditing && (
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-lg border border-info">
-          <h2 className="text-2xl font-bold mb-4 text-text-dark">
+        <div className="mb-8 glass-panel p-6 rounded-lg shadow-lg border border-[#8BC34A]/30">
+          <h2 className="text-2xl font-bold mb-4 text-white">
             Modifier l'activité
           </h2>
           <form onSubmit={handleSubmitEdit} className="space-y-6">
             {/* Section Informations générales */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Informations générales
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -880,7 +880,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, type: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A] [&>option]:bg-[#0A191A] [&>option]:text-white"
                     required
                   >
                     <option value="Course">Course</option>
@@ -905,7 +905,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, date: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     required
                   />
                 </div>
@@ -921,7 +921,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, distanceKm: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     required
                     min="0"
                   />
@@ -948,7 +948,7 @@ export default function ActivityDetail() {
                           durationHours: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                      className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                       placeholder="HH"
                       min="0"
                       max="99"
@@ -967,7 +967,7 @@ export default function ActivityDetail() {
                           durationMinutes: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                      className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                       placeholder="MM"
                       min="0"
                       max="59"
@@ -987,7 +987,7 @@ export default function ActivityDetail() {
                           durationSeconds: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                      className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                       placeholder="SS"
                       min="0"
                       max="59"
@@ -1011,7 +1011,7 @@ export default function ActivityDetail() {
 
             {/* Section Cardio */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Fréquence cardiaque
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1025,7 +1025,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgHeartRate: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                     max="250"
                   />
@@ -1041,7 +1041,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, maxHeartRate: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                     max="250"
                   />
@@ -1051,7 +1051,7 @@ export default function ActivityDetail() {
 
             {/* Section Vitesse */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Vitesse
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1066,7 +1066,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgSpeed: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1082,7 +1082,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, maxSpeed: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1091,7 +1091,7 @@ export default function ActivityDetail() {
 
             {/* Section Puissance */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Puissance
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1105,7 +1105,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgPower: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1123,7 +1123,7 @@ export default function ActivityDetail() {
                         normalizedPower: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1132,7 +1132,7 @@ export default function ActivityDetail() {
 
             {/* Section Autres données */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Autres données
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1146,7 +1146,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgCadence: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1164,7 +1164,7 @@ export default function ActivityDetail() {
                         elevationGain: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1179,7 +1179,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, calories: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     min="0"
                   />
                 </div>
@@ -1188,7 +1188,7 @@ export default function ActivityDetail() {
 
             {/* Section Météo */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Météo
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1204,7 +1204,7 @@ export default function ActivityDetail() {
                         weatherCondition: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A] [&>option]:bg-[#0A191A] [&>option]:text-white"
                   >
                     <option value="">-- Aucune modification --</option>
                     <option value="ensoleille">☀️ Ensoleillé</option>
@@ -1235,7 +1235,7 @@ export default function ActivityDetail() {
                         weatherTemperature: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     placeholder="ex: 18"
                     min="-50"
                     max="60"
@@ -1255,7 +1255,7 @@ export default function ActivityDetail() {
                         weatherWindSpeed: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     placeholder="ex: 15"
                     min="0"
                     max="200"
@@ -1275,7 +1275,7 @@ export default function ActivityDetail() {
                         weatherWindDirection: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     placeholder="ex: 180 (Nord=0, Est=90, Sud=180, Ouest=270)"
                     min="0"
                     max="359"
@@ -1290,7 +1290,7 @@ export default function ActivityDetail() {
 
             {/* Section RPE et Sensations */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-text-dark">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Ressenti / Sensations
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1303,7 +1303,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, rpe: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A] [&>option]:bg-[#0A191A] [&>option]:text-white"
                   >
                     <option value="">-- Sélectionner --</option>
                     <option value="1">1 - Très très facile</option>
@@ -1332,7 +1332,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, feelingNotes: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-border-base rounded-lg focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     rows={3}
                     placeholder="Ex: Jambes lourdes, bonne récupération, fatigue générale..."
                     maxLength={500}
@@ -1342,8 +1342,8 @@ export default function ActivityDetail() {
             </div>
 
             {/* Note d'information */}
-            <div className="bg-info-light p-4 rounded-lg border border-info">
-              <p className="text-sm text-info-dark">
+            <div className="bg-[#5CE1E6]/10 p-4 rounded-lg border border-[#5CE1E6]/30">
+              <p className="text-sm text-[#5CE1E6]">
                 <strong>Note :</strong> Si vous modifiez la fréquence cardiaque
                 moyenne ou la durée, le TRIMP sera automatiquement recalculé par
                 le système.
@@ -1351,14 +1351,14 @@ export default function ActivityDetail() {
             </div>
 
             {/* Boutons d'action */}
-            <div className="flex gap-3 pt-4 border-t border-border-base">
+            <div className="flex gap-3 pt-4 border-t border-[#8BC34A]/20">
               <button type="submit" className="btn-primary font-display">
                 Enregistrer les modifications
               </button>
               <button
                 type="button"
                 onClick={cancelEditing}
-                className="btn-secondary text-text-dark"
+                className="btn-secondary"
               >
                 Annuler
               </button>

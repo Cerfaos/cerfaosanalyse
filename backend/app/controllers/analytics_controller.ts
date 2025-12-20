@@ -84,23 +84,6 @@ export default class AnalyticsController {
     }
   }
 
-  /**
-   * Suggérer des objectifs intelligents
-   */
-  async suggestGoals({ auth, response }: HttpContext) {
-    const userId = auth.user!.id
-
-    try {
-      const suggestions = await AnalyticsService.suggestGoals(userId)
-
-      return response.ok({
-        data: suggestions,
-      })
-    } catch (error: any) {
-      return response.badRequest({ message: error.message })
-    }
-  }
-
   private formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)

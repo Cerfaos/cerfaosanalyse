@@ -8,6 +8,14 @@ import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Activity from './activity.js'
 import WeightHistory from './weight_history.js'
 import Equipment from './equipment.js'
+import TrainingSession from './training_session.js'
+import PlannedSession from './planned_session.js'
+
+// Type pour l'historique FTP
+export interface FtpHistoryEntry {
+  ftp: number
+  date: string // ISO date string
+}
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -40,6 +48,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare weightCurrent: number | null
 
+  @column({
+    prepare: (value: FtpHistoryEntry[] | null) => (value ? JSON.stringify(value) : null),
+    consume: (value: string | FtpHistoryEntry[] | null) =>
+      typeof value === 'string' ? JSON.parse(value) : value,
+  })
+  declare ftpHistory: FtpHistoryEntry[] | null
+
   // Préférences UI
   @column()
   declare theme: 'light' | 'dark'
@@ -62,6 +77,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => Equipment)
   declare equipment: HasMany<typeof Equipment>
+
+  @hasMany(() => TrainingSession)
+  declare trainingSessions: HasMany<typeof TrainingSession>
+
+  @hasMany(() => PlannedSession)
+  declare plannedSessions: HasMany<typeof PlannedSession>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }

@@ -92,18 +92,6 @@ export const notificationService = {
     })
   },
 
-  // Notification d'objectif atteint
-  goalCompleted: (goalTitle: string) => {
-    const store = useNotificationStore.getState()
-    store.addNotification({
-      type: 'success',
-      title: 'Objectif atteint !',
-      message: `Bravo ! Vous avez complété l'objectif "${goalTitle}"`,
-      icon: '🎯',
-      link: '/goals',
-    })
-  },
-
   // Notification de repos recommandé
   restRecommended: () => {
     const store = useNotificationStore.getState()
@@ -125,18 +113,6 @@ export const notificationService = {
       message: `Impressionnant ! Vous vous êtes entraîné ${days} jours consécutifs.`,
       icon: '🔥',
       link: '/dashboard',
-    })
-  },
-
-  // Notification de badge débloqué
-  badgeUnlocked: (badgeName: string) => {
-    const store = useNotificationStore.getState()
-    store.addNotification({
-      type: 'achievement',
-      title: 'Badge débloqué !',
-      message: `Vous avez obtenu le badge "${badgeName}"`,
-      icon: '🎖️',
-      link: '/badges',
     })
   },
 

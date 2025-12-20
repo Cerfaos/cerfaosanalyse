@@ -33,6 +33,9 @@ interface ActivityZoneDuration {
 interface CyclingActivity {
   id: number
   date: string
+  type: string
+  subSport: string | null
+  isIndoor: boolean
   duration: number
   distance: number
   avgHeartRate: number | null
@@ -42,6 +45,16 @@ interface CyclingActivity {
   dominantZone: number
   dominantZoneLabel: string
   dataSource: ZoneComputationSource
+}
+
+interface TypeSummary {
+  type: string
+  count: number
+  duration: number
+  distance: number
+  trimp: number
+  indoor: number
+  outdoor: number
 }
 
 interface PolarizationSummary {
@@ -70,6 +83,8 @@ interface CyclingStatsPayload {
     period: string
     startDate: string | null
     endDate: string | null
+    types: string | null
+    indoor: string | null
   }
   summary: {
     sessions: number
@@ -78,7 +93,11 @@ interface CyclingStatsPayload {
     totalTrimp: number
     avgHeartRate: number | null
     avgSpeed: number | null
+    indoorCount: number
+    outdoorCount: number
   }
+  availableTypes: string[]
+  byType: TypeSummary[]
   heartRateZones: HeartRateZone[]
   zoneDistribution: ZoneDistribution[]
   polarization: PolarizationSummary
@@ -136,8 +155,27 @@ const formatTime = (value: string) =>
     minute: '2-digit',
   })
 
+const typeColors: Record<string, string> = {
+  Cyclisme: '#3B82F6',
+  Course: '#F97316',
+  Rameur: '#06B6D4',
+  Natation: '#0EA5E9',
+  Marche: '#22C55E',
+  Randonnée: '#A855F7',
+  Musculation: '#EF4444',
+  Yoga: '#EC4899',
+}
+
+const indoorOptions = [
+  { label: 'Tous', value: '' },
+  { label: 'Extérieur', value: 'false' },
+  { label: 'Intérieur', value: 'true' },
+]
+
 export default function CyclingStats() {
   const [period, setPeriod] = useState('90')
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [indoorFilter, setIndoorFilter] = useState('')
   const [stats, setStats] = useState<CyclingStatsPayload | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -148,16 +186,21 @@ export default function CyclingStats() {
       setLoading(true)
       setError('')
       try {
-        const response = await api.get('/api/activities/cycling-stats', {
-          params: { period },
-        })
+        const params: Record<string, string> = { period }
+        if (selectedTypes.length > 0) {
+          params.types = selectedTypes.join(',')
+        }
+        if (indoorFilter) {
+          params.indoor = indoorFilter
+        }
+        const response = await api.get('/api/activities/cycling-stats', { params })
         if (mounted) {
           setStats(response.data.data)
         }
       } catch (err) {
-        console.error('Erreur chargement stats cyclisme:', err)
+        console.error('Erreur chargement stats cardio:', err)
         if (mounted) {
-          let message = 'Impossible de charger les statistiques cyclisme'
+          let message = 'Impossible de charger les statistiques cardio'
           if (err && typeof err === 'object' && 'response' in err) {
             const axiosErr = err as { response?: { data?: { message?: string } } }
             message = axiosErr.response?.data?.message || message
@@ -178,7 +221,13 @@ export default function CyclingStats() {
     return () => {
       mounted = false
     }
-  }, [period])
+  }, [period, selectedTypes, indoorFilter])
+
+  const toggleType = (type: string) => {
+    setSelectedTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    )
+  }
 
   const durationHours = useMemo(() => {
     if (!stats) return 0
@@ -198,13 +247,13 @@ export default function CyclingStats() {
   return (
     <AppLayout
       title="Cartographie FC"
-      description="Analyse cardio, zones d'intensité et polarisation de vos sorties 🚴"
+      description="Analyse cardio, zones d'intensité et polarisation de toutes vos activités"
     >
       <div className="mb-6">
         <PageHeader
           eyebrow="Analyse cardio"
           title="Cartographie FC"
-          description="Zones d'intensité, polarisation et répartition de vos sorties cyclistes."
+          description="Zones d'intensité, polarisation et répartition de toutes vos activités (cyclisme, rameur, course, etc.)"
           icon="❤️"
           gradient="from-[#FF5252] to-[#5CE1E6]"
           accentColor="#FF5252"
@@ -237,6 +286,79 @@ export default function CyclingStats() {
             ))}
           </div>
         </div>
+
+        {/* Filtres par type d'activité */}
+        {stats?.availableTypes && stats.availableTypes.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-text-muted">Types d'activités</p>
+              <div className="flex flex-wrap gap-2">
+                {stats.availableTypes.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => toggleType(type)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                      selectedTypes.length === 0 || selectedTypes.includes(type)
+                        ? 'text-white shadow-sm'
+                        : 'bg-[#0A191A]/60 border border-gray-600 text-gray-400 hover:border-gray-400'
+                    }`}
+                    style={{
+                      backgroundColor:
+                        selectedTypes.length === 0 || selectedTypes.includes(type)
+                          ? typeColors[type] || '#6B7280'
+                          : undefined,
+                    }}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: typeColors[type] || '#6B7280' }}
+                    />
+                    {type}
+                    {stats.byType.find((t) => t.type === type)?.count && (
+                      <span className="opacity-75">
+                        ({stats.byType.find((t) => t.type === type)?.count})
+                      </span>
+                    )}
+                  </button>
+                ))}
+                {selectedTypes.length > 0 && (
+                  <button
+                    onClick={() => setSelectedTypes([])}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 transition-all"
+                  >
+                    Réinitialiser
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Filtre indoor/outdoor */}
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-text-muted">Lieu</p>
+              <div className="flex gap-2">
+                {indoorOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setIndoorFilter(option.value)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      indoorFilter === option.value
+                        ? 'bg-[#5CE1E6] text-[#0A191A] shadow-sm'
+                        : 'bg-[#0A191A]/60 border border-[#5CE1E6]/20 text-gray-400 hover:border-[#5CE1E6]/40'
+                    }`}
+                  >
+                    {option.label}
+                    {option.value === 'true' && stats.summary.indoorCount > 0 && (
+                      <span className="ml-1 opacity-75">({stats.summary.indoorCount})</span>
+                    )}
+                    {option.value === 'false' && stats.summary.outdoorCount > 0 && (
+                      <span className="ml-1 opacity-75">({stats.summary.outdoorCount})</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="p-4 border border-danger/40 bg-danger/5 rounded-xl text-danger text-sm">
@@ -417,7 +539,7 @@ export default function CyclingStats() {
           >
             {stats.activities.length === 0 ? (
               <p className="text-center text-text-secondary py-6">
-                Aucune sortie cycliste sur cette période.
+                Aucune activité sur cette période.
               </p>
             ) : (
               <div className="space-y-4">
@@ -428,6 +550,28 @@ export default function CyclingStats() {
                   >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span
+                            className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                            style={{ backgroundColor: typeColors[activity.type] || '#6B7280' }}
+                          >
+                            {activity.type}
+                          </span>
+                          {activity.subSport && (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-gray-200">
+                              {activity.subSport}
+                            </span>
+                          )}
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                              activity.isIndoor
+                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            }`}
+                          >
+                            {activity.isIndoor ? 'Intérieur' : 'Extérieur'}
+                          </span>
+                        </div>
                         <p className="text-sm text-text-secondary">
                           {formatDate(activity.date)} • {formatTime(activity.date)}
                         </p>

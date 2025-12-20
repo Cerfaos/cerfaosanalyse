@@ -2,9 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Activity from '#models/activity'
 import WeightHistory from '#models/weight_history'
 import Equipment from '#models/equipment'
-import Goal from '#models/goal'
-import UserBadge from '#models/user_badge'
-import Badge from '#models/badge'
 import { DateTime } from 'luxon'
 import type { ParsedGpsPoint } from '#types/training'
 
@@ -333,12 +330,10 @@ ${trackPoints}
     const user = auth.user!
 
     // Récupérer TOUTES les données de l'utilisateur
-    const [activities, weightHistories, equipment, goals, userBadges] = await Promise.all([
+    const [activities, weightHistories, equipment] = await Promise.all([
       Activity.query().where('user_id', user.id).orderBy('date', 'desc'),
       WeightHistory.query().where('user_id', user.id).orderBy('date', 'desc'),
       Equipment.query().where('user_id', user.id).orderBy('created_at', 'desc'),
-      Goal.query().where('user_id', user.id).orderBy('created_at', 'desc'),
-      UserBadge.query().where('user_id', user.id).preload('badge'),
     ])
 
     const backupData = {
@@ -357,18 +352,10 @@ ${trackPoints}
       activities: activities.map((a) => a.toJSON()),
       weightHistories: weightHistories.map((w) => w.toJSON()),
       equipment: equipment.map((e) => e.toJSON()),
-      goals: goals.map((g) => g.toJSON()),
-      userBadges: userBadges.map((ub) => ({
-        badgeCode: ub.badge.code,
-        unlockedAt: ub.unlockedAt.toISO(),
-        valueAtUnlock: ub.valueAtUnlock,
-      })),
       metadata: {
         totalActivities: activities.length,
         totalWeightEntries: weightHistories.length,
         totalEquipment: equipment.length,
-        totalGoals: goals.length,
-        totalBadges: userBadges.length,
       },
     }
 
@@ -408,8 +395,6 @@ ${trackPoints}
           Activity.query().where('user_id', user.id).delete(),
           WeightHistory.query().where('user_id', user.id).delete(),
           Equipment.query().where('user_id', user.id).delete(),
-          Goal.query().where('user_id', user.id).delete(),
-          UserBadge.query().where('user_id', user.id).delete(),
         ])
       }
 
@@ -418,8 +403,6 @@ ${trackPoints}
         activities: 0,
         weightHistories: 0,
         equipment: 0,
-        goals: 0,
-        badges: 0,
       }
 
       // Importer les activités
@@ -467,47 +450,6 @@ ${trackPoints}
               : null,
           })
           imported.equipment++
-        }
-      }
-
-      // Importer les objectifs
-      if (backupData.goals && Array.isArray(backupData.goals)) {
-        for (const goalData of backupData.goals) {
-          const { id, userId, createdAt, updatedAt, ...goalFields } = goalData
-
-          await Goal.create({
-            ...goalFields,
-            userId: user.id,
-            startDate: DateTime.fromISO(goalData.startDate),
-            endDate: DateTime.fromISO(goalData.endDate),
-          })
-          imported.goals++
-        }
-      }
-
-      // Importer les badges débloqués
-      if (backupData.userBadges && Array.isArray(backupData.userBadges)) {
-        for (const badgeData of backupData.userBadges) {
-          // Retrouver le badge par son code
-          const badge = await Badge.query().where('code', badgeData.badgeCode).first()
-
-          if (badge) {
-            // Vérifier si le badge n'est pas déjà débloqué
-            const existing = await UserBadge.query()
-              .where('user_id', user.id)
-              .where('badge_id', badge.id)
-              .first()
-
-            if (!existing) {
-              await UserBadge.create({
-                userId: user.id,
-                badgeId: badge.id,
-                unlockedAt: DateTime.fromISO(badgeData.unlockedAt),
-                valueAtUnlock: badgeData.valueAtUnlock,
-              })
-              imported.badges++
-            }
-          }
         }
       }
 

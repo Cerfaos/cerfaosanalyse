@@ -17,8 +17,6 @@ const pages: SearchResult[] = [
   { type: 'page', title: 'Insights', subtitle: 'Analyses intelligentes', icon: '🧠', path: '/insights' },
   { type: 'page', title: 'Activités', subtitle: 'Liste des activités', icon: '🏃', path: '/activities' },
   { type: 'page', title: 'Records', subtitle: 'Records personnels', icon: '🏆', path: '/records' },
-  { type: 'page', title: 'Badges', subtitle: 'Badges débloqués', icon: '🎖️', path: '/badges' },
-  { type: 'page', title: 'Objectifs', subtitle: 'Suivi des objectifs', icon: '🎯', path: '/goals' },
   { type: 'page', title: 'Profil', subtitle: 'Paramètres utilisateur', icon: '👤', path: '/profile' },
   { type: 'page', title: 'Cartographie FC', subtitle: 'Zones cardiaques', icon: '❤️', path: '/cycling' },
   { type: 'page', title: 'Poids', subtitle: 'Suivi du poids', icon: '⚖️', path: '/weight' },

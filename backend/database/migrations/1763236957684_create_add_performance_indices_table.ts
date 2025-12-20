@@ -13,16 +13,6 @@ export default class extends BaseSchema {
       table.index(['user_id', 'date'], 'idx_weight_histories_user_date')
     })
 
-    // Index pour user_badges - améliore requêtes de badges par utilisateur
-    this.schema.alterTable('user_badges', (table) => {
-      table.index(['user_id'], 'idx_user_badges_user_id')
-    })
-
-    // Index pour goals - améliore requêtes d'objectifs par utilisateur
-    this.schema.alterTable('goals', (table) => {
-      table.index(['user_id', 'is_active'], 'idx_goals_user_active')
-    })
-
     // Index pour equipment - améliore requêtes d'équipement par utilisateur
     this.schema.alterTable('equipment', (table) => {
       table.index(['user_id', 'is_active'], 'idx_equipment_user_active')
@@ -37,14 +27,6 @@ export default class extends BaseSchema {
 
     this.schema.alterTable('weight_histories', (table) => {
       table.dropIndex(['user_id', 'date'], 'idx_weight_histories_user_date')
-    })
-
-    this.schema.alterTable('user_badges', (table) => {
-      table.dropIndex(['user_id'], 'idx_user_badges_user_id')
-    })
-
-    this.schema.alterTable('goals', (table) => {
-      table.dropIndex(['user_id', 'is_active'], 'idx_goals_user_active')
     })
 
     this.schema.alterTable('equipment', (table) => {

@@ -1447,12 +1447,12 @@ export default function Activities() {
                     id="period"
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}
-                    className="w-full px-4 py-2 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-4 py-2 border border-border-base rounded-xl bg-[#0A191A] text-white hover:border-[#8BC34A] hover:bg-[#8BC34A]/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta [&>option]:bg-[#0A191A] [&>option]:text-white [&>option:hover]:bg-[#8BC34A] [&>option:checked]:bg-[#8BC34A]/30"
                   >
-                    <option value="7">7 derniers jours</option>
-                    <option value="30">30 derniers jours</option>
-                    <option value="90">90 derniers jours</option>
-                    <option value="365">1 an</option>
+                    <option value="7" className="hover:bg-[#8BC34A]">7 derniers jours</option>
+                    <option value="30" className="hover:bg-[#8BC34A]">30 derniers jours</option>
+                    <option value="90" className="hover:bg-[#8BC34A]">90 derniers jours</option>
+                    <option value="365" className="hover:bg-[#8BC34A]">1 an</option>
                   </select>
                 </div>
 
@@ -1467,13 +1467,13 @@ export default function Activities() {
                     id="type"
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}
-                    className="w-full px-4 py-2 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta"
+                    className="w-full px-4 py-2 border border-border-base rounded-xl bg-[#0A191A] text-white hover:border-[#8BC34A] hover:bg-[#8BC34A]/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta [&>option]:bg-[#0A191A] [&>option]:text-white [&>option:hover]:bg-[#8BC34A] [&>option:checked]:bg-[#8BC34A]/30"
                   >
-                    <option value="">Tous les types</option>
-                    <option value="Cyclisme">Cyclisme</option>
-                    <option value="Course">Course</option>
-                    <option value="Rameur">Rameur</option>
-                    <option value="Marche">Marche</option>
+                    <option value="" className="hover:bg-[#8BC34A]">Tous les types</option>
+                    <option value="Cyclisme" className="hover:bg-[#8BC34A]">Cyclisme</option>
+                    <option value="Course" className="hover:bg-[#8BC34A]">Course</option>
+                    <option value="Rameur" className="hover:bg-[#8BC34A]">Rameur</option>
+                    <option value="Marche" className="hover:bg-[#8BC34A]">Marche</option>
                   </select>
                 </div>
               </div>

@@ -1,5 +1,4 @@
 import Activity from '#models/activity'
-import BadgeService from '#services/badge_service'
 import HeartRateZoneService from '#services/heart_rate_zone_service'
 import PersonalRecordService from '#services/personal_record_service'
 import TrainingLoadService from '#services/training_load_service'
@@ -286,10 +285,6 @@ export default class ActivitiesController {
       feelingNotes: data.feelingNotes || null,
     })
 
-    // Vérifier et attribuer les badges
-    const badgeService = new BadgeService()
-    const newBadges = await badgeService.checkAndAwardBadges(user.id)
-
     // Vérifier les records personnels
     const newRecords = await PersonalRecordService.checkForNewRecords(activity)
 
@@ -297,7 +292,6 @@ export default class ActivitiesController {
       message: 'Activité créée avec succès',
       data: {
         activity,
-        newBadges: newBadges.map((b) => ({ id: b.id, name: b.name, icon: b.icon })),
         newRecords: newRecords.map((r) => ({
           recordType: r.recordType,
           recordTypeName: PersonalRecordService.formatRecordTypeName(r.recordType),
@@ -437,10 +431,6 @@ export default class ActivitiesController {
         weather: weatherData ? JSON.stringify(weatherData) : null,
       })
 
-      // Vérifier et attribuer les badges
-      const badgeService = new BadgeService()
-      const newBadges = await badgeService.checkAndAwardBadges(user.id)
-
       // Vérifier les records personnels
       const newRecords = await PersonalRecordService.checkForNewRecords(activity)
 
@@ -448,7 +438,6 @@ export default class ActivitiesController {
         message: 'Activité importée avec succès',
         data: {
           activity,
-          newBadges: newBadges.map((b) => ({ id: b.id, name: b.name, icon: b.icon })),
           newRecords: newRecords.map((r) => ({
             recordType: r.recordType,
             recordTypeName: PersonalRecordService.formatRecordTypeName(r.recordType),
@@ -1020,20 +1009,23 @@ export default class ActivitiesController {
   }
 
   /**
-   * Statistiques détaillées spécifiques au cyclisme (zones cardiaques, polarisation, etc.)
+   * Statistiques détaillées cardio (zones cardiaques, polarisation, etc.)
+   * Inclut tous les types d'activités avec distinction indoor/outdoor
    */
   async cyclingStats({ auth, request, response }: HttpContext) {
     const user = auth.user!
 
     if (!user.fcMax || !user.fcRepos) {
       return response.badRequest({
-        message: 'Configurez votre FC max et FC repos pour accéder aux statistiques de cyclisme',
+        message: 'Configurez votre FC max et FC repos pour accéder aux statistiques cardio',
       })
     }
 
     const period = request.input('period', '90')
     const startDateInput = request.input('startDate')
     const endDateInput = request.input('endDate')
+    const typesInput = request.input('types') // Filtre optionnel par types (ex: "Cyclisme,Rameur")
+    const indoorFilter = request.input('indoor') // Filtre optionnel: 'true', 'false', ou null (tous)
     const now = DateTime.now()
 
     const numericPeriod = Number(period)
@@ -1042,9 +1034,22 @@ export default class ActivitiesController {
       (!Number.isNaN(numericPeriod)
         ? now.minus({ days: numericPeriod }).startOf('day').toSQLDate()
         : null)
-    const computedEnd = endDateInput || now.toSQLDate()
+    // Utiliser endOf('day') pour inclure toutes les activités de la journée
+    const computedEnd = endDateInput || now.endOf('day').toISO()
 
-    let query = Activity.query().where('user_id', user.id).where('type', 'Cyclisme')
+    // Sous-sports considérés comme indoor
+    const indoorSubSports = ['Home Trainer', 'Virtuel', 'Tapis de course', 'Rameur intérieur', 'Piscine']
+
+    // Types d'activités indoor par défaut (quand pas de GPS)
+    const indoorByDefaultTypes = ['Rameur', 'Musculation', 'Yoga']
+
+    let query = Activity.query().where('user_id', user.id)
+
+    // Filtre par types si spécifié
+    if (typesInput) {
+      const types = typesInput.split(',').map((t: string) => t.trim())
+      query = query.whereIn('type', types)
+    }
 
     if (computedStart) {
       query = query.where('date', '>=', computedStart)
@@ -1054,7 +1059,24 @@ export default class ActivitiesController {
       query = query.where('date', '<=', computedEnd)
     }
 
-    const activities = await query.orderBy('date', 'desc')
+    let activities = await query.orderBy('date', 'desc')
+
+    // Fonction helper pour déterminer si une activité est indoor (utilisée plus tard aussi)
+    const checkIsIndoor = (activity: Activity): boolean => {
+      const hasGps = activity.gpsData && JSON.parse(activity.gpsData).length > 0
+      return (
+        indoorSubSports.includes(activity.subSport || '') ||
+        indoorByDefaultTypes.includes(activity.type) ||
+        (activity.type === 'Marche' && !hasGps)
+      )
+    }
+
+    // Filtre indoor/outdoor en mémoire (car dépend du GPS)
+    if (indoorFilter === 'true') {
+      activities = activities.filter((a) => checkIsIndoor(a))
+    } else if (indoorFilter === 'false') {
+      activities = activities.filter((a) => !checkIsIndoor(a))
+    }
 
     const hrZoneService = new HeartRateZoneService()
     const heartRateZones = hrZoneService.buildZones(user.fcMax, user.fcRepos)
@@ -1089,9 +1111,15 @@ export default class ActivitiesController {
         color: heartRateZones[idx].color,
       }))
 
+      // Déterminer si l'activité est indoor
+      const isIndoor = checkIsIndoor(activity)
+
       return {
         id: activity.id,
         date: activity.date.toISO() || activity.date.toString(),
+        type: activity.type,
+        subSport: activity.subSport,
+        isIndoor,
         duration: activity.duration,
         distance: activity.distance,
         avgHeartRate: activity.avgHeartRate,
@@ -1143,7 +1171,43 @@ export default class ActivitiesController {
       samplingCount[activity.dataSource] += 1
     })
 
-    const recentActivities = perActivity.slice(0, 12)
+    const recentActivities = perActivity.slice(0, 20)
+
+    // Résumé par type d'activité
+    const byType = new Map<string, { count: number; duration: number; distance: number; trimp: number; indoor: number; outdoor: number }>()
+    activities.forEach((activity) => {
+      const key = activity.type
+      if (!byType.has(key)) {
+        byType.set(key, { count: 0, duration: 0, distance: 0, trimp: 0, indoor: 0, outdoor: 0 })
+      }
+      const data = byType.get(key)!
+      data.count += 1
+      data.duration += activity.duration || 0
+      data.distance += activity.distance || 0
+      data.trimp += activity.trimp || 0
+      if (checkIsIndoor(activity)) {
+        data.indoor += 1
+      } else {
+        data.outdoor += 1
+      }
+    })
+
+    const typesSummary = Array.from(byType.entries()).map(([type, data]) => ({
+      type,
+      count: data.count,
+      duration: data.duration,
+      distance: data.distance,
+      trimp: data.trimp,
+      indoor: data.indoor,
+      outdoor: data.outdoor,
+    }))
+
+    // Liste des types disponibles pour le filtrage
+    const availableTypes = [...new Set(activities.map((a) => a.type))]
+
+    // Statistiques indoor vs outdoor globales
+    const indoorCount = activities.filter((a) => checkIsIndoor(a)).length
+    const outdoorCount = activities.length - indoorCount
 
     return response.ok({
       data: {
@@ -1151,6 +1215,8 @@ export default class ActivitiesController {
           period,
           startDate: computedStart,
           endDate: computedEnd,
+          types: typesInput || null,
+          indoor: indoorFilter || null,
         },
         summary: {
           sessions: activities.length,
@@ -1159,7 +1225,11 @@ export default class ActivitiesController {
           totalTrimp,
           avgHeartRate,
           avgSpeed,
+          indoorCount,
+          outdoorCount,
         },
+        availableTypes,
+        byType: typesSummary,
         heartRateZones,
         zoneDistribution,
         polarization,

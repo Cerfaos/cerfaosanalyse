@@ -372,3 +372,27 @@ html {
     transform: translateX(100%);
   }
 }
+
+/* Select dropdown styles */
+select {
+  background-color: #0a191a;
+  color: white;
+}
+
+select option {
+  background-color: #0a191a;
+  color: white;
+  padding: 8px 12px;
+}
+
+select option:hover,
+select option:focus {
+  background-color: #8bc34a !important;
+  background: linear-gradient(#8bc34a, #8bc34a);
+  color: white;
+}
+
+select option:checked {
+  background-color: rgba(139, 195, 74, 0.3);
+  background: linear-gradient(rgba(139, 195, 74, 0.3), rgba(139, 195, 74, 0.3));
+}

@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
+import { useTrainingStore } from '../store/trainingStore'
 import api from '../services/api'
 
 export function useAuth() {
   const { token, user, logout } = useAuthStore()
+  const { fetchProfile, syncProfileFromUser } = useTrainingStore()
 
   useEffect(() => {
     // Si on a un token mais pas d'utilisateur, charger l'utilisateur
@@ -11,6 +13,16 @@ export function useAuth() {
       loadCurrentUser()
     }
   }, [token, user])
+
+  // Charger le profil d'entraînement quand l'utilisateur est connecté
+  useEffect(() => {
+    if (user) {
+      // Synchroniser d'abord avec les données utilisateur de base
+      syncProfileFromUser(user)
+      // Puis charger le profil complet avec l'historique FTP
+      fetchProfile()
+    }
+  }, [user])
 
   const loadCurrentUser = async () => {
     try {

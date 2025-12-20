@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Bike, Plus, Menu } from "lucide-react";
+import { Bike, Plus, Menu, CalendarDays } from "lucide-react";
 import { getAvatarUrl } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import NotificationCenter from "../NotificationCenter";
@@ -19,14 +19,13 @@ const navigation = [
   { label: "Cartographie FC", to: "/cycling", icon: CyclingIcon },
   { label: "Activités", to: "/activities", icon: ActivitiesIcon },
   { label: "Records", to: "/records", icon: RecordsIcon },
-  { label: "Badges", to: "/badges", icon: BadgesIcon },
-  { label: "Objectifs", to: "/goals", icon: GoalsIcon },
-  { label: "Plan d'entraînement", to: "/training-plan", icon: PlanIcon },
+  { label: "Training Planner", to: "/training", icon: () => <CalendarDays size={18} /> },
   { label: "Poids", to: "/weight", icon: WeightIcon },
   { label: "Charge d'entraînement", to: "/training-load", icon: TrainingIcon },
   { label: "Équipement", to: "/equipment", icon: EquipmentIcon },
   { label: "Profil", to: "/profile", icon: ProfileIcon },
   { label: "Export", to: "/export", icon: ExportIcon },
+  { label: "Rapports", to: "/reports", icon: ReportsIcon },
 ];
 
 export default function AppLayout({
@@ -349,41 +348,6 @@ function HomeIcon() {
   );
 }
 
-function BadgesIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        d="M12 2l2.5 7.5H22L16 14l2 7-6-4.5L6 21l2-7-6-4.5h7.5z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function GoalsIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <circle cx="12" cy="12" r="5" />
-      <circle cx="12" cy="12" r="1" fill="currentColor" />
-    </svg>
-  );
-}
 
 function RecordsIcon() {
   return (
@@ -426,7 +390,7 @@ function InsightsIcon() {
   );
 }
 
-function PlanIcon() {
+function ReportsIcon() {
   return (
     <svg
       width="18"
@@ -436,25 +400,12 @@ function PlanIcon() {
       stroke="currentColor"
       strokeWidth="1.8"
     >
-      <rect
-        x="3"
-        y="4"
-        width="18"
-        height="18"
-        rx="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M16 2v4M8 2v4M3 10h18"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 8h10" strokeLinecap="round" />
+      <path d="M7 12h10" strokeLinecap="round" />
+      <path d="M7 16h6" strokeLinecap="round" />
     </svg>
   );
 }
+
+

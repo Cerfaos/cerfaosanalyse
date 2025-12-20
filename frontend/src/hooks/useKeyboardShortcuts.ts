@@ -41,16 +41,6 @@ export function useKeyboardShortcuts() {
       description: 'Records',
     },
     {
-      key: 'g',
-      action: () => navigate('/goals'),
-      description: 'Objectifs',
-    },
-    {
-      key: 'b',
-      action: () => navigate('/badges'),
-      description: 'Badges',
-    },
-    {
       key: 'p',
       action: () => navigate('/profile'),
       description: 'Profil',
@@ -142,8 +132,6 @@ export function getShortcutsList() {
     { key: 'I', description: 'Insights' },
     { key: 'A', description: 'Activités' },
     { key: 'R', description: 'Records' },
-    { key: 'G', description: 'Objectifs' },
-    { key: 'B', description: 'Badges' },
     { key: 'P', description: 'Profil' },
     { key: 'C', description: 'Cartographie FC' },
     { key: 'W', description: 'Poids' },

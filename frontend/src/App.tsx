@@ -20,11 +20,10 @@ const TrainingLoad = lazy(() => import("./pages/TrainingLoad"));
 const CyclingStats = lazy(() => import("./pages/CyclingStats"));
 const Equipment = lazy(() => import("./pages/Equipment"));
 const Export = lazy(() => import("./pages/Export"));
-const Badges = lazy(() => import("./pages/Badges"));
-const Goals = lazy(() => import("./pages/Goals"));
 const Records = lazy(() => import("./pages/Records"));
 const Insights = lazy(() => import("./pages/Insights"));
-const TrainingPlan = lazy(() => import("./pages/TrainingPlan"));
+const TrainingPlanner = lazy(() => import("./pages/TrainingPlanner"));
+const Reports = lazy(() => import("./pages/Reports"));
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -161,22 +160,6 @@ function App() {
                 }
               />
               <Route
-                path="/badges"
-                element={
-                  <ProtectedRoute>
-                    <Badges />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/goals"
-                element={
-                  <ProtectedRoute>
-                    <Goals />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/records"
                 element={
                   <ProtectedRoute>
@@ -193,10 +176,18 @@ function App() {
                 }
               />
               <Route
-                path="/training-plan"
+                path="/training"
                 element={
                   <ProtectedRoute>
-                    <TrainingPlan />
+                    <TrainingPlanner />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <ProtectedRoute>
+                    <Reports />
                   </ProtectedRoute>
                 }
               />
