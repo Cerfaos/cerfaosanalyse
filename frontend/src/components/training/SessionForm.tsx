@@ -147,13 +147,13 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
   const weight = profile.weight || 75
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Info FTP */}
-      <div className="p-3 bg-primary/10 rounded-lg flex items-center justify-between">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Info FTP - Plus compact */}
+      <div className="p-2.5 bg-primary/10 rounded-lg flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Zap className="text-primary h-5 w-5" />
+          <Zap className="text-primary h-4 w-4 flex-shrink-0" />
           <span className="text-sm text-primary">
-            FTP actuelle: <strong>{ftp}W</strong> • Poids: <strong>{weight}kg</strong>
+            FTP: <strong>{ftp}W</strong> • Poids: <strong>{weight}kg</strong>
           </span>
         </div>
         <span className="text-sm text-primary font-medium">
@@ -161,8 +161,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
         </span>
       </div>
 
-      {/* Catégorie et Template */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Catégorie et Template - Responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-2">
             Catégorie
@@ -174,14 +174,14 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
                 setFormData({ ...formData, category: 'cycling', blocks: [], exercises: [] })
                 setSelectedTemplateId('')
               }}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2.5 rounded-lg border-2 transition-all text-sm ${
                 formData.category === 'cycling'
                   ? 'border-[#8BC34A] bg-[#8BC34A]/10 text-[#8BC34A]'
                   : 'border-border hover:border-[#8BC34A]/50'
               }`}
             >
-              <Bike className="h-5 w-5" />
-              Cyclisme
+              <Bike className="h-4 w-4 flex-shrink-0" />
+              <span>Cyclisme</span>
             </button>
             <button
               type="button"
@@ -189,14 +189,14 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
                 setFormData({ ...formData, category: 'ppg', blocks: [], exercises: [] })
                 setSelectedTemplateId('')
               }}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2.5 rounded-lg border-2 transition-all text-sm ${
                 formData.category === 'ppg'
                   ? 'border-[#5CE1E6] bg-[#5CE1E6]/10 text-[#5CE1E6]'
                   : 'border-border hover:border-[#5CE1E6]/50'
               }`}
             >
-              <Dumbbell className="h-5 w-5" />
-              PPG
+              <Dumbbell className="h-4 w-4 flex-shrink-0" />
+              <span>PPG</span>
             </button>
           </div>
         </div>
@@ -206,7 +206,7 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
             Partir d'un modèle
           </label>
           <Select value={selectedTemplateId || 'none'} onValueChange={handleTemplateSelect}>
-            <SelectTrigger>
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="-- Séance vierge --" />
             </SelectTrigger>
             <SelectContent>
@@ -222,7 +222,7 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
       </div>
 
       {/* Informations de base */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">
             Nom de la séance
@@ -231,6 +231,7 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
+            className="h-10"
           />
         </div>
         <div>
@@ -239,7 +240,7 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
             value={formData.level}
             onValueChange={(value) => setFormData({ ...formData, level: value as SessionLevel })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-10">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -255,8 +256,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
 
       {/* Options cycling */}
       {formData.category === 'cycling' && (
-        <div className="grid grid-cols-3 gap-4">
-          <div>
+        <div className="flex flex-wrap gap-3">
+          <div className="w-28 sm:w-32">
             <label className="block text-sm font-medium text-text-secondary mb-1">Lieu</label>
             <Select
               value={formData.location}
@@ -264,7 +265,7 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
                 setFormData({ ...formData, location: value as SessionLocation })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -276,9 +277,9 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="w-24">
             <label className="block text-sm font-medium text-text-secondary mb-1">
-              Durée estimée
+              Durée
             </label>
             <div className="relative">
               <Input
@@ -287,20 +288,22 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
                 onChange={(e) =>
                   setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })
                 }
+                className="h-10 pr-10"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary">
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-text-secondary">
                 min
               </span>
             </div>
           </div>
-          <div>
+          <div className="w-20">
             <label className="block text-sm font-medium text-text-secondary mb-1">
-              TSS estimé
+              TSS
             </label>
             <Input
               type="number"
               value={formData.tss}
               onChange={(e) => setFormData({ ...formData, tss: parseInt(e.target.value) || 0 })}
+              className="h-10"
             />
           </div>
         </div>
@@ -312,8 +315,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
           Description / Notes
         </label>
         <textarea
-          className="w-full px-3 py-2 border border-border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none bg-background"
-          rows={3}
+          className="w-full px-3 py-2 border border-border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none bg-background text-sm"
+          rows={2}
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
