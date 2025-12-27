@@ -3,7 +3,7 @@ import TrainingProgram from '#models/training_program'
 import PlannedSession from '#models/planned_session'
 import TrainingTemplate from '#models/training_template'
 import { DateTime } from 'luxon'
-import type { ProgramLevel, ProgramObjective, ProgramWeek } from '#models/training_program'
+import type { ProgramLevel, ProgramObjective } from '#models/training_program'
 
 export default class TrainingProgramsController {
   /**

@@ -501,6 +501,154 @@ export const programsApi = {
 }
 
 // =============================================================================
+// MRC Import API
+// =============================================================================
+
+export interface MrcPreviewData {
+  name: string
+  description: string
+  category: 'cycling' | 'ppg'
+  level: 'beginner' | 'intermediate' | 'expert'
+  duration: number
+  tss: number | null
+  averageIntensity: number
+  intensityRef: string | null
+  blocks: Array<{
+    type: 'warmup' | 'interval' | 'effort' | 'recovery' | 'cooldown'
+    duration: string
+    percentFtp: number
+    reps: number
+    notes?: string
+  }> | null
+  exercises: Array<{
+    name: string
+    duration: string
+    reps: number | null
+    sets: number
+    rest: string
+    notes?: string
+  }> | null
+  rawHeader: {
+    version: number
+    units: string
+    description: string
+    fileName: string
+    format: string
+  }
+  dataPointsCount: number
+}
+
+export interface MrcImportOptions {
+  name?: string
+  level?: 'beginner' | 'intermediate' | 'expert'
+  week?: number
+  day?: number
+}
+
+export interface MrcBatchResult {
+  success: Array<{
+    fileName: string
+    id: number
+    name: string
+    type: 'template' | 'session'
+  }>
+  errors: Array<{
+    fileName: string
+    error: string
+  }>
+}
+
+export const mrcImportApi = {
+  /**
+   * Prévisualiser un fichier MRC
+   */
+  async preview(file: File): Promise<MrcPreviewData> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await api.post<ApiResponse<MrcPreviewData>>(
+      '/api/training/import-mrc/preview',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    return response.data.data
+  },
+
+  /**
+   * Importer un fichier MRC comme template
+   */
+  async importAsTemplate(file: File, options?: MrcImportOptions): Promise<TrainingTemplate> {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (options?.name) formData.append('name', options.name)
+    if (options?.level) formData.append('level', options.level)
+    if (options?.week) formData.append('week', options.week.toString())
+    if (options?.day) formData.append('day', options.day.toString())
+
+    const response = await api.post<ApiResponse<TrainingTemplate>>(
+      '/api/training/import-mrc/template',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    return response.data.data
+  },
+
+  /**
+   * Importer un fichier MRC comme séance
+   */
+  async importAsSession(file: File, options?: MrcImportOptions): Promise<TrainingSession> {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (options?.name) formData.append('name', options.name)
+    if (options?.level) formData.append('level', options.level)
+
+    const response = await api.post<ApiResponse<TrainingSession>>(
+      '/api/training/import-mrc/session',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    return response.data.data
+  },
+
+  /**
+   * Importer plusieurs fichiers MRC en batch
+   */
+  async importBatch(
+    files: File[],
+    importAs: 'template' | 'session' = 'template'
+  ): Promise<MrcBatchResult> {
+    const formData = new FormData()
+    files.forEach((file) => {
+      formData.append('files', file)
+    })
+    formData.append('importAs', importAs)
+
+    const response = await api.post<ApiResponse<MrcBatchResult>>(
+      '/api/training/import-mrc/batch',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    return response.data.data
+  },
+}
+
+// =============================================================================
 // Export unifié
 // =============================================================================
 
@@ -511,6 +659,7 @@ const trainingApi = {
   profile: profileApi,
   ppgExercises: ppgExercisesApi,
   programs: programsApi,
+  mrcImport: mrcImportApi,
 }
 
 export default trainingApi

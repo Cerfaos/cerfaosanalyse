@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Bike, Dumbbell, Plus, Zap, Calendar, FolderOpen, TrendingUp, TrendingDown, Loader2, AlertCircle } from 'lucide-react'
+import { Bike, Dumbbell, Plus, Zap, Calendar, FolderOpen, TrendingUp, TrendingDown, Loader2, AlertCircle, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
@@ -16,6 +16,7 @@ import {
   TemplateLibrary,
   PlanningCalendar,
   ProfilePanel,
+  MrcImportModal,
 } from '../components/training'
 import { useTrainingStore } from '../store/trainingStore'
 import type { TrainingSession, TrainingTemplate, CreateSessionData } from '../types/training'
@@ -84,6 +85,7 @@ export default function TrainingPlanner() {
   const [activeTab, setActiveTab] = useState<TabId>('sessions')
   const [showSessionForm, setShowSessionForm] = useState(false)
   const [showProfilePanel, setShowProfilePanel] = useState(false)
+  const [showMrcImport, setShowMrcImport] = useState(false)
   const [editingSession, setEditingSession] = useState<TrainingSession | null>(null)
   const [templateToUse, setTemplateToUse] = useState<TrainingTemplate | null>(null)
 
@@ -162,6 +164,12 @@ export default function TrainingPlanner() {
     fetchWeekStats()
   }
 
+  // Handler pour l'import MRC réussi
+  const handleMrcImportSuccess = () => {
+    fetchSessions()
+    fetchTemplates()
+  }
+
   const actions = (
     <div className="flex items-center gap-2 md:gap-3">
       <Button
@@ -174,6 +182,16 @@ export default function TrainingPlanner() {
         <span className="font-semibold hidden sm:inline">{profile.ftp || 200}W</span>
         <span className="font-semibold sm:hidden">{profile.ftp || 200}</span>
       </Button>
+      {(activeTab === 'sessions' || activeTab === 'templates') && (
+        <Button
+          variant="outline"
+          onClick={() => setShowMrcImport(true)}
+          title="Importer des fichiers MRC"
+        >
+          <Upload className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">Importer MRC</span>
+        </Button>
+      )}
       {activeTab === 'sessions' && (
         <Button onClick={handleCreateSession}>
           <Plus className="h-4 w-4 md:mr-2" />
@@ -355,7 +373,7 @@ export default function TrainingPlanner() {
 
         {/* Modal de création/édition de séance */}
         <Dialog open={showSessionForm} onOpenChange={setShowSessionForm}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingSession
@@ -382,6 +400,14 @@ export default function TrainingPlanner() {
         <ProfilePanel
           isOpen={showProfilePanel}
           onClose={() => setShowProfilePanel(false)}
+        />
+
+        {/* Modal Import MRC */}
+        <MrcImportModal
+          isOpen={showMrcImport}
+          onClose={() => setShowMrcImport(false)}
+          onImportSuccess={handleMrcImportSuccess}
+          defaultImportAs={activeTab === 'templates' ? 'template' : 'session'}
         />
       </div>
     </AppLayout>

@@ -80,20 +80,22 @@ export default class TrainingTemplatesController {
   }
 
   /**
-   * Modifier un template (seulement les templates personnels)
+   * Modifier un template (personnel ou par défaut)
    */
   async update({ auth, params, request, response }: HttpContext) {
     const user = auth.user!
 
+    // Permettre la modification des templates personnels OU par défaut
     const template = await TrainingTemplate.query()
       .where('id', params.id)
-      .where('userId', user.id)
-      .where('isDefault', false)
+      .where((q) => {
+        q.where('userId', user.id).orWhere('isDefault', true)
+      })
       .first()
 
     if (!template) {
       return response.notFound({
-        message: 'Template non trouvé ou non modifiable',
+        message: 'Template non trouvé',
       })
     }
 
@@ -109,20 +111,22 @@ export default class TrainingTemplatesController {
   }
 
   /**
-   * Supprimer un template personnel
+   * Supprimer un template (personnel ou par défaut)
    */
   async destroy({ auth, params, response }: HttpContext) {
     const user = auth.user!
 
+    // Permettre la suppression des templates personnels OU par défaut
     const template = await TrainingTemplate.query()
       .where('id', params.id)
-      .where('userId', user.id)
-      .where('isDefault', false)
+      .where((q) => {
+        q.where('userId', user.id).orWhere('isDefault', true)
+      })
       .first()
 
     if (!template) {
       return response.notFound({
-        message: 'Template non trouvé ou non supprimable',
+        message: 'Template non trouvé',
       })
     }
 

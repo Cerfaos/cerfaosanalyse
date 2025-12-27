@@ -497,7 +497,7 @@ export function BlockEditor({ blocks, onChange, category, ftp, weight }: BlockEd
       </div>
 
       {cyclingBlocks.length > 0 && (
-        <SessionGraph blocks={cyclingBlocks} ftp={ftp} />
+        <SessionGraph blocks={cyclingBlocks} ftp={ftp} height="h-32" />
       )}
 
       {cyclingBlocks.map((block, idx) => {

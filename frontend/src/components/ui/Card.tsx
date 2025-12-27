@@ -16,7 +16,7 @@ export function Card({
   className,
 }: CardProps) {
   return (
-    <section className={cn("glass-panel p-6 space-y-4", className)}>
+    <section className={cn("glass-panel p-6 space-y-4 overflow-visible", className)}>
       {(title || description || actions) && (
         <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>

@@ -57,6 +57,9 @@ export default class TrainingTemplate extends BaseModel {
   declare week: number | null
 
   @column()
+  declare day: number | null
+
+  @column()
   declare duration: number
 
   @column()

@@ -25,6 +25,7 @@ const TrainingPlanningController = () => import('#controllers/training_planning_
 const ReportsController = () => import('#controllers/reports_controller')
 const PpgExercisesController = () => import('#controllers/ppg_exercises_controller')
 const TrainingProgramsController = () => import('#controllers/training_programs_controller')
+const MrcImportController = () => import('#controllers/mrc_import_controller')
 
 // Health check
 router.get('/', async () => {
@@ -244,4 +245,15 @@ router
     router.get('/:id/preview', [TrainingProgramsController, 'preview'])
   })
   .prefix('/api/training/programs')
+  .use(middleware.auth())
+
+// Routes Training Module - Import MRC
+router
+  .group(() => {
+    router.post('/preview', [MrcImportController, 'preview'])
+    router.post('/template', [MrcImportController, 'importAsTemplate'])
+    router.post('/session', [MrcImportController, 'importAsSession'])
+    router.post('/batch', [MrcImportController, 'importBatch'])
+  })
+  .prefix('/api/training/import-mrc')
   .use(middleware.auth())

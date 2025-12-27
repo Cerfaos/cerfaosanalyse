@@ -52,7 +52,7 @@ export function TemplateCard({
   const avgWatts = percentFtpToWatts(avgPercent, ftp)
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 overflow-visible">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start gap-3">
           <div
@@ -73,7 +73,13 @@ export function TemplateCard({
             <p className="text-sm text-text-secondary mt-0.5">
               {formatDuration(template.duration)}
               {template.tss && template.tss > 0 && ` • TSS ${template.tss}`}
-              {template.week && ` • Semaine ${template.week}`}
+              {(template.week || template.day) && (
+                <span className="ml-1">
+                  •
+                  {template.week && ` S${String(template.week).padStart(2, '0')}`}
+                  {template.day && ` J${String(template.day).padStart(2, '0')}`}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -81,15 +87,15 @@ export function TemplateCard({
 
       {/* Graphique pour cycling */}
       {template.category === 'cycling' && template.blocks && template.blocks.length > 0 && (
-        <>
-          <SessionGraph blocks={template.blocks} ftp={ftp} height="h-16" />
+        <div>
+          <SessionGraph blocks={template.blocks} ftp={ftp} height="h-20" compact />
           <div className="mt-2 flex items-center gap-4 text-sm">
             <span className="text-text-secondary">
               Moy: <span className="font-medium text-text-primary">{avgPercent}% FTP</span>
             </span>
             <span className="text-primary font-medium">{avgWatts}W</span>
           </div>
-        </>
+        </div>
       )}
 
       {/* Exercices PPG */}
@@ -150,7 +156,7 @@ export function TemplateCard({
               <Copy className="h-4 w-4" />
             </Button>
           )}
-          {!template.isDefault && onEdit && (
+          {onEdit && (
             <Button
               variant="ghost"
               size="icon"
@@ -160,7 +166,7 @@ export function TemplateCard({
               <Edit2 className="h-4 w-4" />
             </Button>
           )}
-          {!template.isDefault && onDelete && (
+          {onDelete && (
             <Button
               variant="ghost"
               size="icon"

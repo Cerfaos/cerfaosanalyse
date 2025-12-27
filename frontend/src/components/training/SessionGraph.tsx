@@ -6,19 +6,42 @@ import {
   getIntensityZoneColor,
   percentFtpToWatts,
 } from '../../types/training'
+import {
+  TooltipRoot,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/Tooltip'
 
 interface SessionGraphProps {
   blocks: CyclingBlock[]
   ftp: number
   height?: string
+  showLabels?: boolean
+  compact?: boolean // Mode compact: tooltips sans légende ni labels sur blocs
+}
+
+/**
+ * Formate une durée en secondes vers un format lisible court
+ */
+function formatDurationShort(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  if (mins === 0) return `${secs}s`
+  if (secs === 0) return `${mins}'`
+  return `${mins}'${secs.toString().padStart(2, '0')}`
 }
 
 /**
  * Visualisation graphique des blocs d'entraînement
  * Affiche les blocs en fonction de leur durée et intensité
  */
-export function SessionGraph({ blocks, ftp, height = 'h-20' }: SessionGraphProps) {
-  const { graphBlocks } = useMemo(() => {
+export function SessionGraph({ blocks, ftp, height = 'h-24', showLabels = true, compact = false }: SessionGraphProps) {
+  // En mode compact: pas de labels sur blocs, pas de légende, mais tooltips actifs
+  const showBlockLabels = showLabels && !compact
+  const showLegend = showLabels && !compact
+  const showTooltips = showLabels || compact
+  const { graphBlocks, totalDuration } = useMemo(() => {
     if (!blocks || blocks.length === 0) {
       return { totalDuration: 0, graphBlocks: [] }
     }
@@ -35,6 +58,7 @@ export function SessionGraph({ blocks, ftp, height = 'h-20' }: SessionGraphProps
       const heightPercent = Math.min((block.percentFtp / 150) * 100, 100)
       const color = getIntensityZoneColor(block.percentFtp)
       const zone = getIntensityZone(block.percentFtp)
+      const zoneShort = zone.split(' ')[0] // "Z1", "Z2", etc.
       const watts = percentFtpToWatts(block.percentFtp, ftp)
 
       return {
@@ -43,7 +67,9 @@ export function SessionGraph({ blocks, ftp, height = 'h-20' }: SessionGraphProps
         heightPercent,
         color,
         zone,
+        zoneShort,
         watts,
+        totalBlockDuration,
       }
     })
 
@@ -52,33 +78,105 @@ export function SessionGraph({ blocks, ftp, height = 'h-20' }: SessionGraphProps
 
   if (!blocks || blocks.length === 0) {
     return (
-      <div className={`${height} bg-gray-100 rounded-lg flex items-center justify-center`}>
-        <span className="text-sm text-gray-400">Aucun bloc défini</span>
+      <div className={`${height} bg-black/30 rounded-xl border border-white/10 flex items-center justify-center`}>
+        <span className="text-sm text-gray-500">Aucun bloc défini</span>
       </div>
     )
   }
 
   return (
-    <div className={`${height} bg-gray-100 rounded-lg p-2 flex items-end gap-px overflow-hidden`}>
-      {graphBlocks.map((block, idx) => (
-        <div
-          key={idx}
-          className="relative flex-shrink-0 rounded-t transition-all hover:opacity-80 group"
-          style={{
-            width: `${block.widthPercent}%`,
-            height: `${block.heightPercent}%`,
-            backgroundColor: block.color,
-            minWidth: '4px',
-          }}
-        >
-          {/* Tooltip au hover */}
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-            <div className="font-medium">{block.percentFtp}% FTP = {block.watts}W</div>
-            <div className="text-gray-300">{block.zone}</div>
+    <TooltipProvider delayDuration={100}>
+      <div className="space-y-2 mt-10">
+        {/* Graphique principal */}
+        <div className={`${height} bg-black/30 rounded-xl border border-white/10 p-2 relative`}>
+          {/* Lignes de référence */}
+          <div className="absolute inset-2 pointer-events-none">
+            <div className="absolute bottom-[66.67%] left-0 right-0 border-t border-dashed border-white/10" />
+            <div className="absolute bottom-[33.33%] left-0 right-0 border-t border-dashed border-white/5" />
+          </div>
+
+          {/* Conteneur des blocs - 100% de l'espace disponible */}
+          <div className="w-full h-full flex items-end gap-px">
+            {graphBlocks.map((block, idx) => {
+              const isWide = block.widthPercent > 8
+              const isVeryWide = block.widthPercent > 15
+
+              const blockElement = (
+                <div
+                  className="relative min-w-0 rounded-t-lg transition-all duration-200 hover:brightness-110 hover:scale-y-105 cursor-default h-full"
+                  style={{
+                    flex: `${block.widthPercent} 1 0%`,
+                    background: `linear-gradient(to top, ${block.color}dd, ${block.color})`,
+                    boxShadow: `0 0 10px ${block.color}40`,
+                  }}
+                >
+                  {/* Labels sur les blocs larges */}
+                  {showBlockLabels && isWide && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden">
+                      <span className="text-[10px] font-bold text-white drop-shadow-lg leading-tight">
+                        {block.percentFtp}%
+                      </span>
+                      {isVeryWide && (
+                        <span className="text-[9px] text-white/80 drop-shadow-md">
+                          {formatDurationShort(block.totalBlockDuration)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+
+              if (!showTooltips) {
+                return <div key={idx} style={{ height: `${block.heightPercent}%`, flex: `${block.widthPercent} 1 0%`, minWidth: 0 }}>{blockElement}</div>
+              }
+
+              return (
+                <TooltipRoot key={idx}>
+                  <TooltipTrigger asChild style={{ height: `${block.heightPercent}%`, flex: `${block.widthPercent} 1 0%`, minWidth: 0 }}>
+                    {blockElement}
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded" style={{ backgroundColor: block.color }} />
+                      <span className="font-bold text-white">{block.zoneShort}</span>
+                      <span className="text-gray-300">{block.percentFtp}% FTP</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1 text-[11px]">
+                      <span className="text-[#8BC34A] font-medium">{block.watts}W</span>
+                      <span className="text-[#5CE1E6]">{formatDurationShort(block.totalBlockDuration)}</span>
+                    </div>
+                  </TooltipContent>
+                </TooltipRoot>
+              )
+            })}
           </div>
         </div>
-      ))}
-    </div>
+
+        {/* Barre d'info sous le graphique */}
+        {showLegend && (
+          <div className="flex items-center justify-between text-xs px-1 mt-2">
+            <div className="flex items-center gap-3">
+              {/* Zones utilisées */}
+              {Array.from(new Set(graphBlocks.map(b => b.zoneShort))).slice(0, 4).map((zone) => {
+                const block = graphBlocks.find(b => b.zoneShort === zone)
+                return (
+                  <span key={zone} className="flex items-center gap-1">
+                    <span
+                      className="w-2 h-2 rounded-sm"
+                      style={{ backgroundColor: block?.color }}
+                    />
+                    <span className="text-gray-400">{zone}</span>
+                  </span>
+                )
+              })}
+            </div>
+            <span className="text-gray-500">
+              {Math.floor(totalDuration / 60)} min
+            </span>
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   )
 }
 

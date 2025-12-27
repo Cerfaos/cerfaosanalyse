@@ -1,8 +1,35 @@
-import { useRef, useState, type ReactNode } from "react";
+import * as React from "react"
+import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { cn } from "./utils"
 
-interface TooltipProps {
-  content: ReactNode;
-  children: ReactNode;
+const TooltipProvider = TooltipPrimitive.Provider
+
+const TooltipRoot = TooltipPrimitive.Root
+
+const TooltipTrigger = TooltipPrimitive.Trigger
+
+const TooltipContent = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
+>(({ className, sideOffset = 4, ...props }, ref) => (
+  <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-[200] overflow-hidden rounded-lg bg-[#0a191a] border border-white/20 px-2.5 py-1.5 text-xs shadow-xl animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
+      {...props}
+    />
+  </TooltipPrimitive.Portal>
+))
+TooltipContent.displayName = TooltipPrimitive.Content.displayName
+
+// Composant Tooltip simple pour rétro-compatibilité
+interface SimpleTooltipProps {
+  content: React.ReactNode;
+  children: React.ReactNode;
   position?: "top" | "bottom" | "left" | "right";
   delay?: number;
 }
@@ -12,68 +39,27 @@ export default function Tooltip({
   children,
   position = "top",
   delay = 200,
-}: TooltipProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
-
-  const showTooltip = () => {
-    timeoutRef.current = window.setTimeout(() => {
-      setIsVisible(true);
-    }, delay);
-  };
-
-  const hideTooltip = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setIsVisible(false);
-  };
-
-  // Classes pour la position
-  const positionClasses = {
-    top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
-    bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
-    left: "right-full top-1/2 -translate-y-1/2 mr-2",
-    right: "left-full top-1/2 -translate-y-1/2 ml-2",
-  };
-
-  // Classes pour la flèche
-  const arrowClasses = {
-    top: "top-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-gray-900 dark:border-t-gray-100",
-    bottom:
-      "bottom-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent border-b-gray-900 dark:border-b-gray-100",
-    left: "left-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent border-l-gray-900 dark:border-l-gray-100",
-    right:
-      "right-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent border-r-gray-900 dark:border-r-gray-100",
-  };
+}: SimpleTooltipProps) {
+  const sideMap = {
+    top: "top" as const,
+    bottom: "bottom" as const,
+    left: "left" as const,
+    right: "right" as const,
+  }
 
   return (
-    <div
-      className="relative inline-block"
-      onMouseEnter={showTooltip}
-      onMouseLeave={hideTooltip}
-      onFocus={showTooltip}
-      onBlur={hideTooltip}
-    >
-      {children}
-
-      {isVisible && (
-        <div
-          className={`
-            absolute z-100 min-w-max max-w-[280px] px-3 py-2 text-sm
-            bg-[var(--color-card)] text-[var(--color-foreground)]
-            rounded-lg shadow-xl border border-[var(--color-border)]
-            pointer-events-none whitespace-normal
-            animate-in fade-in zoom-in-95 duration-150
-            ${positionClasses[position]}
-          `}
-        >
+    <TooltipProvider delayDuration={delay}>
+      <TooltipRoot>
+        <TooltipTrigger asChild>
+          <span className="inline-block">{children}</span>
+        </TooltipTrigger>
+        <TooltipContent side={sideMap[position]}>
           {content}
-          <div
-            className={`absolute w-0 h-0 border-[6px] ${arrowClasses[position]}`}
-          />
-        </div>
-      )}
-    </div>
-  );
+        </TooltipContent>
+      </TooltipRoot>
+    </TooltipProvider>
+  )
 }
+
+// Exports nommés pour usage avancé
+export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent }

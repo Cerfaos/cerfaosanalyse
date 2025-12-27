@@ -537,7 +537,7 @@ export default class ReportsService {
     return false
   }
 
-  private calculateMonthlyBreakdown(activities: Activity[], year: number): MonthlyBreakdown[] {
+  private calculateMonthlyBreakdown(activities: Activity[], _year: number): MonthlyBreakdown[] {
     const monthNames = [
       'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
       'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',

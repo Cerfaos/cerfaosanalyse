@@ -113,7 +113,7 @@ export function SessionCard({
       {/* Graphique pour les séances cycling */}
       {session.category === 'cycling' && session.blocks && session.blocks.length > 0 && (
         <div className="mt-3">
-          <SessionGraph blocks={session.blocks} ftp={ftp} height="h-16" />
+          <SessionGraph blocks={session.blocks} ftp={ftp} height="h-20" compact />
           <div className="mt-2 text-sm text-text-secondary">
             Intensité moy:{' '}
             <span className="font-medium text-primary">

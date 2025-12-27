@@ -68,6 +68,7 @@ export interface TrainingTemplate {
   location: SessionLocation | null
   intensityRef: string
   week: number | null
+  day: number | null
   duration: number
   tss: number | null
   description: string | null
