@@ -1,4 +1,4 @@
-import { Bike, Dumbbell, Plus, Copy, Edit2, Trash2 } from 'lucide-react'
+import { Bike, Dumbbell, Plus, Copy, Edit2, Trash2, PlayCircle } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Card } from '../ui/Card'
@@ -14,6 +14,7 @@ interface TemplateCardProps {
   onDelete?: (id: number) => void
   onDuplicate?: (template: TrainingTemplate) => void
   onUse?: (template: TrainingTemplate) => void
+  onPlay?: (template: TrainingTemplate) => void
 }
 
 /**
@@ -36,6 +37,7 @@ export function TemplateCard({
   onDelete,
   onDuplicate,
   onUse,
+  onPlay,
 }: TemplateCardProps) {
   void _weight // Unused but kept for API compatibility
   const CategoryIcon = template.category === 'cycling' ? Bike : Dumbbell
@@ -136,6 +138,17 @@ export function TemplateCard({
         </div>
 
         <div className="flex gap-1">
+          {onPlay && template.category === 'cycling' && template.blocks && template.blocks.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onPlay(template)}
+              title="Lancer la séance"
+              className="text-[#8BC34A] hover:text-[#8BC34A] hover:bg-[#8BC34A]/10"
+            >
+              <PlayCircle className="h-5 w-5" />
+            </Button>
+          )}
           {onUse && (
             <Button
               variant="ghost"

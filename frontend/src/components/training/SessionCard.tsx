@@ -1,4 +1,4 @@
-import { Bike, Dumbbell, Edit2, Trash2, Star } from 'lucide-react'
+import { Bike, Dumbbell, Edit2, Trash2, Star, PlayCircle } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Card } from '../ui/Card'
@@ -16,6 +16,7 @@ interface SessionCardProps {
   onEdit?: (session: TrainingSession) => void
   onDelete?: (id: number) => void
   onSaveAsTemplate?: (session: TrainingSession) => void
+  onPlay?: (session: TrainingSession) => void
   compact?: boolean
 }
 
@@ -38,6 +39,7 @@ export function SessionCard({
   onEdit,
   onDelete,
   onSaveAsTemplate,
+  onPlay,
   compact = false,
 }: SessionCardProps) {
   void _weight // Unused but kept for API compatibility
@@ -87,6 +89,17 @@ export function SessionCard({
         </div>
 
         <div className="flex gap-1">
+          {onPlay && session.category === 'cycling' && session.blocks && session.blocks.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onPlay(session)}
+              title="Lancer la séance"
+              className="text-[#8BC34A] hover:text-[#8BC34A] hover:bg-[#8BC34A]/10"
+            >
+              <PlayCircle className="h-5 w-5" />
+            </Button>
+          )}
           {onSaveAsTemplate && (
             <Button
               variant="ghost"

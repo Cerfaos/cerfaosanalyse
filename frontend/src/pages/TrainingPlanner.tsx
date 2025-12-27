@@ -17,6 +17,7 @@ import {
   PlanningCalendar,
   ProfilePanel,
   MrcImportModal,
+  SessionPlayer,
 } from '../components/training'
 import { useTrainingStore } from '../store/trainingStore'
 import type { TrainingSession, TrainingTemplate, CreateSessionData } from '../types/training'
@@ -88,6 +89,7 @@ export default function TrainingPlanner() {
   const [showMrcImport, setShowMrcImport] = useState(false)
   const [editingSession, setEditingSession] = useState<TrainingSession | null>(null)
   const [templateToUse, setTemplateToUse] = useState<TrainingTemplate | null>(null)
+  const [playingSession, setPlayingSession] = useState<TrainingSession | null>(null)
 
   // Charger les données au montage
   useEffect(() => {
@@ -321,6 +323,7 @@ export default function TrainingPlanner() {
                               weight={profile.weight || 75}
                               onEdit={handleEditSession}
                               onDelete={handleDeleteSession}
+                              onPlay={setPlayingSession}
                             />
                           ))}
                         </div>
@@ -345,6 +348,7 @@ export default function TrainingPlanner() {
                               weight={profile.weight || 75}
                               onEdit={handleEditSession}
                               onDelete={handleDeleteSession}
+                              onPlay={setPlayingSession}
                             />
                           ))}
                         </div>
@@ -409,6 +413,16 @@ export default function TrainingPlanner() {
           onImportSuccess={handleMrcImportSuccess}
           defaultImportAs={activeTab === 'templates' ? 'template' : 'session'}
         />
+
+        {/* Session Player */}
+        {playingSession && (
+          <SessionPlayer
+            session={playingSession}
+            ftp={profile.ftp || 200}
+            open={!!playingSession}
+            onOpenChange={(open) => !open && setPlayingSession(null)}
+          />
+        )}
       </div>
     </AppLayout>
   )

@@ -16,6 +16,7 @@ import {
 } from '../ui/dialog'
 import { TemplateCard } from './TemplateCard'
 import { TemplateForm } from './TemplateForm'
+import { SessionPlayer } from './SessionPlayer'
 import { useTrainingStore } from '../../store/trainingStore'
 import type { TrainingTemplate, CreateTemplateData } from '../../types/training'
 
@@ -38,6 +39,7 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
 
   const [showForm, setShowForm] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<TrainingTemplate | null>(null)
+  const [playingTemplate, setPlayingTemplate] = useState<TrainingTemplate | null>(null)
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [filterWeek, setFilterWeek] = useState<string>('all')
 
@@ -155,6 +157,7 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
               onDelete={handleDelete}
               onDuplicate={handleDuplicate}
               onUse={onCreateSession}
+              onPlay={setPlayingTemplate}
             />
           ))}
         </div>
@@ -178,6 +181,16 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Session Player */}
+      {playingTemplate && (
+        <SessionPlayer
+          session={playingTemplate}
+          ftp={ftp}
+          open={!!playingTemplate}
+          onOpenChange={(open) => !open && setPlayingTemplate(null)}
+        />
+      )}
     </div>
   )
 }
