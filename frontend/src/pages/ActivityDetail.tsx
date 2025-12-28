@@ -107,6 +107,7 @@ export default function ActivityDetail() {
   const [editForm, setEditForm] = useState({
     type: "",
     date: "",
+    time: "",
     durationHours: "",
     durationMinutes: "",
     durationSeconds: "",
@@ -193,9 +194,19 @@ export default function ActivityDetail() {
       }
     }
 
+    // Extraire la date et l'heure
+    const activityDate = new Date(activity.date);
+    const dateStr = activityDate.toISOString().split("T")[0];
+    const timeStr = activityDate.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
     setEditForm({
       type: activity.type,
-      date: new Date(activity.date).toISOString().split("T")[0],
+      date: dateStr,
+      time: timeStr,
       durationHours: hours.toString(),
       durationMinutes: minutes.toString(),
       durationSeconds: seconds.toString(),
@@ -236,9 +247,14 @@ export default function ActivityDetail() {
       // Convertir km en mètres
       const distanceInMeters = Math.round(Number(editForm.distanceKm) * 1000);
 
+      // Combiner date et heure
+      const dateTimeStr = editForm.time
+        ? `${editForm.date}T${editForm.time}:00`
+        : `${editForm.date}T00:00:00`;
+
       const updateData: any = {
         type: editForm.type,
-        date: editForm.date,
+        date: dateTimeStr,
         duration: totalSeconds,
         distance: distanceInMeters,
       };
@@ -870,7 +886,7 @@ export default function ActivityDetail() {
               <h3 className="text-lg font-semibold mb-3 text-white">
                 Informations générales
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-text-body mb-1">
                     Type *
@@ -907,6 +923,20 @@ export default function ActivityDetail() {
                     }
                     className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-body mb-1">
+                    Heure
+                  </label>
+                  <input
+                    type="time"
+                    value={editForm.time}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, time: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
                   />
                 </div>
 

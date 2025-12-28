@@ -18,6 +18,7 @@ import {
   ProfilePanel,
   MrcImportModal,
   SessionPlayer,
+  PpgSessionPlayer,
 } from '../components/training'
 import { useTrainingStore } from '../store/trainingStore'
 import type { TrainingSession, TrainingTemplate, CreateSessionData } from '../types/training'
@@ -414,11 +415,20 @@ export default function TrainingPlanner() {
           defaultImportAs={activeTab === 'templates' ? 'template' : 'session'}
         />
 
-        {/* Session Player */}
-        {playingSession && (
+        {/* Session Player - Cycling */}
+        {playingSession && playingSession.category === 'cycling' && (
           <SessionPlayer
             session={playingSession}
             ftp={profile.ftp || 200}
+            open={!!playingSession}
+            onOpenChange={(open) => !open && setPlayingSession(null)}
+          />
+        )}
+
+        {/* Session Player - PPG */}
+        {playingSession && playingSession.category === 'ppg' && (
+          <PpgSessionPlayer
+            session={playingSession}
             open={!!playingSession}
             onOpenChange={(open) => !open && setPlayingSession(null)}
           />

@@ -149,6 +149,17 @@ export function TemplateCard({
               <PlayCircle className="h-5 w-5" />
             </Button>
           )}
+          {onPlay && template.category === 'ppg' && template.exercises && template.exercises.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onPlay(template)}
+              title="Lancer la séance"
+              className="text-[#5CE1E6] hover:text-[#5CE1E6] hover:bg-[#5CE1E6]/10"
+            >
+              <PlayCircle className="h-5 w-5" />
+            </Button>
+          )}
           {onUse && (
             <Button
               variant="ghost"

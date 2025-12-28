@@ -17,6 +17,7 @@ import {
 import { TemplateCard } from './TemplateCard'
 import { TemplateForm } from './TemplateForm'
 import { SessionPlayer } from './SessionPlayer'
+import { PpgSessionPlayer } from './PpgSessionPlayer'
 import { useTrainingStore } from '../../store/trainingStore'
 import type { TrainingTemplate, CreateTemplateData } from '../../types/training'
 
@@ -182,11 +183,20 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Session Player */}
-      {playingTemplate && (
+      {/* Session Player - Cycling */}
+      {playingTemplate && playingTemplate.category === 'cycling' && (
         <SessionPlayer
           session={playingTemplate}
           ftp={ftp}
+          open={!!playingTemplate}
+          onOpenChange={(open) => !open && setPlayingTemplate(null)}
+        />
+      )}
+
+      {/* Session Player - PPG */}
+      {playingTemplate && playingTemplate.category === 'ppg' && (
+        <PpgSessionPlayer
+          session={playingTemplate}
           open={!!playingTemplate}
           onOpenChange={(open) => !open && setPlayingTemplate(null)}
         />
