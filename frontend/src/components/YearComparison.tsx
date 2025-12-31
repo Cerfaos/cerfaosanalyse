@@ -37,40 +37,37 @@ export default function YearComparison() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // On prépare 2026, donc on compare 2026 (current) vs 2025 (previous)
-  const currentYear = new Date().getFullYear() + 1;
-  const previousYear = currentYear - 1;
+  // Années sélectionnables
+  const thisYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(thisYear);
+  const [comparedYear, setComparedYear] = useState(thisYear - 1);
+
+  // Générer la liste des années disponibles (de 2020 à année courante + 1)
+  const availableYears = Array.from(
+    { length: thisYear - 2019 + 2 },
+    (_, i) => 2020 + i
+  );
 
   useEffect(() => {
     fetchComparison();
-  }, []);
+  }, [selectedYear, comparedYear]);
 
   const fetchComparison = async () => {
     try {
       setLoading(true);
 
       const [currentRes, previousRes] = await Promise.all([
-        api.get(`/api/activities?year=${currentYear}&limit=1000`),
-        api.get(`/api/activities?year=${previousYear}&limit=1000`),
+        api.get(`/api/activities?year=${selectedYear}&limit=1000`),
+        api.get(`/api/activities?year=${comparedYear}&limit=1000`),
       ]);
 
-      const currentActivities = currentRes.data.data.activities || [];
-      const previousActivities = previousRes.data.data.activities || [];
+      const currentActivities = currentRes.data.data.activities || currentRes.data.data.data || [];
+      const previousActivities = previousRes.data.data.activities || previousRes.data.data.data || [];
 
       // Grouper par mois
       const monthNames = [
-        "Jan",
-        "Fév",
-        "Mar",
-        "Avr",
-        "Mai",
-        "Jun",
-        "Jul",
-        "Aoû",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Déc",
+        "Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
+        "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc",
       ];
 
       const monthlyData: MonthData[] = monthNames.map((month, index) => {
@@ -151,7 +148,6 @@ export default function YearComparison() {
 
   useEffect(() => {
     if (!loading && yearStats) {
-      // Recalculer les données mensuelles avec la nouvelle métrique
       fetchComparison();
     }
   }, [metric]);
@@ -170,7 +166,7 @@ export default function YearComparison() {
   };
 
   const formatDifference = (current: number, previous: number) => {
-    if (previous === 0) return current > 0 ? "+∞" : "0";
+    if (previous === 0) return current > 0 ? "+∞" : "—";
     const diff = ((current - previous) / previous) * 100;
     const sign = diff > 0 ? "+" : "";
     return `${sign}${diff.toFixed(1)}%`;
@@ -178,7 +174,7 @@ export default function YearComparison() {
 
   if (loading) {
     return (
-      <div className="text-center py-8 text-text-muted">
+      <div className="text-center py-8 text-[var(--text-tertiary)]">
         Chargement de la comparaison...
       </div>
     );
@@ -186,128 +182,181 @@ export default function YearComparison() {
 
   return (
     <div className="space-y-6">
-      {/* Sélecteur de métrique */}
-      <div className="flex flex-wrap gap-2">
-        {[
-          { value: "distance", label: "Distance" },
-          { value: "duration", label: "Durée" },
-          { value: "trimp", label: "TRIMP" },
-          { value: "count", label: "Activités" },
-        ].map((option) => (
-          <button
-            key={option.value}
-            onClick={() => setMetric(option.value as typeof metric)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              metric === option.value
-                ? "bg-brand text-white"
-                : "bg-bg-gray-100 dark:bg-dark-border text-text-secondary hover:bg-bg-gray-200"
-            }`}
+      {/* Sélecteurs d'années */}
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-[var(--text-tertiary)]">Comparer</span>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="px-3 py-1.5 rounded-lg bg-[var(--surface-input)] border border-[var(--border-default)] text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/50"
           >
-            {option.label}
-          </button>
-        ))}
+            {availableYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+          <span className="text-sm text-[var(--text-tertiary)]">vs</span>
+          <select
+            value={comparedYear}
+            onChange={(e) => setComparedYear(Number(e.target.value))}
+            className="px-3 py-1.5 rounded-lg bg-[var(--surface-input)] border border-[var(--border-default)] text-[var(--text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/50"
+          >
+            {availableYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sélecteur de métrique */}
+        <div className="flex flex-wrap gap-2 ml-auto">
+          {[
+            { value: "distance", label: "Distance" },
+            { value: "duration", label: "Durée" },
+            { value: "trimp", label: "TRIMP" },
+            { value: "count", label: "Activités" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setMetric(option.value as typeof metric)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                metric === option.value
+                  ? "bg-[var(--accent-primary)] text-white"
+                  : "bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:bg-[var(--surface-active)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Stats annuelles comparées */}
       {yearStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="glass-panel p-4 text-center">
-            <div className="text-sm text-text-muted mb-1">Activités</div>
-            <div className="text-xl font-bold">
+          <div className="glass-panel p-4 rounded-xl border border-[var(--border-subtle)]">
+            <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Activités</div>
+            <div className="text-2xl font-display font-bold text-[var(--text-primary)]">
               {yearStats.current.totalActivities}
-              <span className="text-sm text-text-muted ml-1">
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-[var(--text-tertiary)]">
                 vs {yearStats.previous.totalActivities}
               </span>
-            </div>
-            <div
-              className={`text-sm font-medium ${
-                yearStats.current.totalActivities >=
-                yearStats.previous.totalActivities
-                  ? "text-green-600"
-                  : "text-red-500"
-              }`}
-            >
-              {formatDifference(
-                yearStats.current.totalActivities,
-                yearStats.previous.totalActivities
-              )}
+              <span
+                className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                  yearStats.current.totalActivities >= yearStats.previous.totalActivities
+                    ? "bg-[var(--status-success)]/20 text-[var(--status-success)]"
+                    : "bg-[var(--status-error)]/20 text-[var(--status-error)]"
+                }`}
+              >
+                {formatDifference(
+                  yearStats.current.totalActivities,
+                  yearStats.previous.totalActivities
+                )}
+              </span>
             </div>
           </div>
 
-          <div className="glass-panel p-4 text-center">
-            <div className="text-sm text-text-muted mb-1">Distance totale</div>
-            <div className="text-xl font-bold">
+          <div className="glass-panel p-4 rounded-xl border border-[var(--border-subtle)]">
+            <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Distance</div>
+            <div className="text-2xl font-display font-bold text-[var(--accent-primary)]">
               {Math.round(yearStats.current.totalDistance / 1000)} km
             </div>
-            <div
-              className={`text-sm font-medium ${
-                yearStats.current.totalDistance >=
-                yearStats.previous.totalDistance
-                  ? "text-green-600"
-                  : "text-red-500"
-              }`}
-            >
-              {formatDifference(
-                yearStats.current.totalDistance,
-                yearStats.previous.totalDistance
-              )}
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-[var(--text-tertiary)]">
+                vs {Math.round(yearStats.previous.totalDistance / 1000)} km
+              </span>
+              <span
+                className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                  yearStats.current.totalDistance >= yearStats.previous.totalDistance
+                    ? "bg-[var(--status-success)]/20 text-[var(--status-success)]"
+                    : "bg-[var(--status-error)]/20 text-[var(--status-error)]"
+                }`}
+              >
+                {formatDifference(
+                  yearStats.current.totalDistance,
+                  yearStats.previous.totalDistance
+                )}
+              </span>
             </div>
           </div>
 
-          <div className="glass-panel p-4 text-center">
-            <div className="text-sm text-text-muted mb-1">Durée totale</div>
-            <div className="text-xl font-bold">
+          <div className="glass-panel p-4 rounded-xl border border-[var(--border-subtle)]">
+            <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Durée</div>
+            <div className="text-2xl font-display font-bold text-[var(--accent-secondary)]">
               {Math.round(yearStats.current.totalDuration / 3600)} h
             </div>
-            <div
-              className={`text-sm font-medium ${
-                yearStats.current.totalDuration >=
-                yearStats.previous.totalDuration
-                  ? "text-green-600"
-                  : "text-red-500"
-              }`}
-            >
-              {formatDifference(
-                yearStats.current.totalDuration,
-                yearStats.previous.totalDuration
-              )}
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-[var(--text-tertiary)]">
+                vs {Math.round(yearStats.previous.totalDuration / 3600)} h
+              </span>
+              <span
+                className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                  yearStats.current.totalDuration >= yearStats.previous.totalDuration
+                    ? "bg-[var(--status-success)]/20 text-[var(--status-success)]"
+                    : "bg-[var(--status-error)]/20 text-[var(--status-error)]"
+                }`}
+              >
+                {formatDifference(
+                  yearStats.current.totalDuration,
+                  yearStats.previous.totalDuration
+                )}
+              </span>
             </div>
           </div>
 
-          <div className="glass-panel p-4 text-center">
-            <div className="text-sm text-text-muted mb-1">TRIMP total</div>
-            <div className="text-xl font-bold">
+          <div className="glass-panel p-4 rounded-xl border border-[var(--border-subtle)]">
+            <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2">TRIMP</div>
+            <div className="text-2xl font-display font-bold text-[var(--status-error)]">
               {Math.round(yearStats.current.totalTrimp)}
             </div>
-            <div
-              className={`text-sm font-medium ${
-                yearStats.current.totalTrimp >= yearStats.previous.totalTrimp
-                  ? "text-green-600"
-                  : "text-red-500"
-              }`}
-            >
-              {formatDifference(
-                yearStats.current.totalTrimp,
-                yearStats.previous.totalTrimp
-              )}
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-[var(--text-tertiary)]">
+                vs {Math.round(yearStats.previous.totalTrimp)}
+              </span>
+              <span
+                className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                  yearStats.current.totalTrimp >= yearStats.previous.totalTrimp
+                    ? "bg-[var(--status-success)]/20 text-[var(--status-success)]"
+                    : "bg-[var(--status-error)]/20 text-[var(--status-error)]"
+                }`}
+              >
+                {formatDifference(
+                  yearStats.current.totalTrimp,
+                  yearStats.previous.totalTrimp
+                )}
+              </span>
             </div>
           </div>
         </div>
       )}
 
       {/* Graphique comparatif */}
-      <div className="h-80">
+      <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={currentYearData} barGap={2}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="month" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+          <BarChart data={currentYearData} barGap={4}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" />
+            <XAxis
+              dataKey="month"
+              stroke="var(--text-tertiary)"
+              tick={{ fill: 'var(--text-tertiary)', fontSize: 11 }}
+            />
+            <YAxis
+              stroke="var(--text-tertiary)"
+              tick={{ fill: 'var(--text-tertiary)', fontSize: 11 }}
+            />
             <Tooltip
               contentStyle={{
-                backgroundColor: "var(--panel-bg)",
-                border: "1px solid var(--panel-border)",
-                borderRadius: "8px",
+                backgroundColor: "rgba(15, 23, 42, 0.95)",
+                border: "1px solid rgba(148, 163, 184, 0.2)",
+                borderRadius: "12px",
+                backdropFilter: "blur(10px)",
               }}
+              labelStyle={{ color: "var(--text-secondary)", fontWeight: 600 }}
               formatter={(value: number, name: string) => [
                 `${value} ${
                   metric === "distance"
@@ -318,23 +367,24 @@ export default function YearComparison() {
                     ? "pts"
                     : ""
                 }`,
-                name === "currentYear" ? currentYear : previousYear,
+                name === "currentYear" ? `${selectedYear}` : `${comparedYear}`,
               ]}
             />
             <Legend
               formatter={(value) =>
-                value === "currentYear" ? `${currentYear}` : `${previousYear}`
+                value === "currentYear" ? `${selectedYear}` : `${comparedYear}`
               }
+              wrapperStyle={{ color: 'var(--text-secondary)' }}
             />
             <Bar
               dataKey="previousYear"
-              fill="#9CA3AF"
+              fill="#64748b"
               name="previousYear"
               radius={[4, 4, 0, 0]}
             />
             <Bar
               dataKey="currentYear"
-              fill="#059669"
+              fill="#f8712f"
               name="currentYear"
               radius={[4, 4, 0, 0]}
             />
@@ -342,8 +392,8 @@ export default function YearComparison() {
         </ResponsiveContainer>
       </div>
 
-      <div className="text-center text-sm text-text-muted">
-        {getMetricLabel()} par mois
+      <div className="text-center text-sm text-[var(--text-tertiary)]">
+        {getMetricLabel()} par mois — <span className="text-[#f8712f] font-medium">{selectedYear}</span> vs <span className="text-[#64748b] font-medium">{comparedYear}</span>
       </div>
     </div>
   );

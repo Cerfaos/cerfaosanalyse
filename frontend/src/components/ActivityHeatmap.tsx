@@ -198,8 +198,7 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
           <span className="text-2xl font-bold text-white">{selectedYear}</span>
           <button
             onClick={() => setSelectedYear((y) => y + 1)}
-            disabled={selectedYear >= new Date().getFullYear()}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-white"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
             title="Année suivante"
           >
             →
