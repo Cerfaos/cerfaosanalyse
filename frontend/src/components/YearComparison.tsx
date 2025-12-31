@@ -356,8 +356,11 @@ export default function YearComparison() {
                 border: "1px solid rgba(148, 163, 184, 0.2)",
                 borderRadius: "12px",
                 backdropFilter: "blur(10px)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
               }}
+              itemStyle={{ color: "var(--text-primary)" }}
               labelStyle={{ color: "var(--text-secondary)", fontWeight: 600 }}
+              cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
               formatter={(value: number, name: string) => [
                 `${value} ${
                   metric === "distance"
@@ -371,18 +374,22 @@ export default function YearComparison() {
                 name === "currentYear" ? `${selectedYear}` : `${comparedYear}`,
               ]}
             />
-            <Legend
-              formatter={(value) =>
-                value === "currentYear" ? `${selectedYear}` : `${comparedYear}`
-              }
-              wrapperStyle={{ color: 'var(--text-secondary)' }}
-            />
-            <Bar
-              dataKey="previousYear"
-              fill="#64748b"
-              name="previousYear"
-              radius={[4, 4, 0, 0]}
-            />
+            {selectedYear !== comparedYear && (
+              <Legend
+                formatter={(value) =>
+                  value === "currentYear" ? `${selectedYear}` : `${comparedYear}`
+                }
+                wrapperStyle={{ color: 'var(--text-secondary)' }}
+              />
+            )}
+            {selectedYear !== comparedYear && (
+              <Bar
+                dataKey="previousYear"
+                fill="#64748b"
+                name="previousYear"
+                radius={[4, 4, 0, 0]}
+              />
+            )}
             <Bar
               dataKey="currentYear"
               fill="#f8712f"
@@ -394,7 +401,16 @@ export default function YearComparison() {
       </div>
 
       <div className="text-center text-sm text-[var(--text-tertiary)]">
-        {getMetricLabel()} par mois — <span className="text-[#f8712f] font-medium">{selectedYear}</span> vs <span className="text-[#64748b] font-medium">{comparedYear}</span>
+        {selectedYear !== comparedYear ? (
+          <>
+            {getMetricLabel()} par mois — <span className="text-[#f8712f] font-medium">{selectedYear}</span> vs <span className="text-[#64748b] font-medium">{comparedYear}</span>
+          </>
+        ) : (
+          <>
+            {getMetricLabel()} par mois — <span className="text-[#f8712f] font-medium">{selectedYear}</span>
+            <span className="block mt-1 text-xs opacity-75">Sélectionnez une autre année pour comparer</span>
+          </>
+        )}
       </div>
     </div>
   );
