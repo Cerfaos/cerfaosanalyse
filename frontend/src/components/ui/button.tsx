@@ -5,25 +5,27 @@ import * as React from "react";
 import { cn } from "./utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-organic-gold/50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)]",
   {
     variants: {
       variant: {
         default:
-          "bg-linear-to-br from-organic-gold to-organic-gold/80 text-organic-bg hover:from-organic-gold/90 hover:to-organic-gold/70 shadow-lg",
+          "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary-hover)] active:bg-[var(--accent-primary-active)] shadow-[0_4px_14px_rgba(248,113,47,0.3)] hover:shadow-[0_6px_20px_rgba(248,113,47,0.4)] hover:-translate-y-0.5",
         secondary:
-          "bg-linear-to-br from-organic-green to-organic-green/80 text-organic-bg hover:from-organic-green/90 hover:to-organic-green/70 shadow-lg",
+          "bg-[var(--accent-secondary)] text-[var(--text-inverse)] hover:bg-[var(--accent-secondary-hover)] active:bg-[var(--accent-secondary-active)] shadow-[0_4px_14px_rgba(245,158,11,0.3)] hover:shadow-[0_6px_20px_rgba(245,158,11,0.4)] hover:-translate-y-0.5",
         outline:
-          "border border-organic-text/20 bg-organic-card/50 text-white hover:bg-organic-card/70 hover:border-organic-gold/50",
+          "border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)] hover:border-[var(--border-strong)]",
         ghost:
-          "hover:bg-organic-card/30 hover:text-organic-gold text-organic-text",
-        link: "text-organic-gold underline-offset-4 hover:underline",
+          "hover:bg-[var(--surface-hover)] hover:text-[var(--accent-primary)] text-[var(--text-secondary)]",
+        link: "text-[var(--text-link)] underline-offset-4 hover:underline hover:text-[var(--text-link-hover)]",
+        destructive:
+          "bg-[var(--status-error)] text-white hover:bg-[var(--status-error)]/90 shadow-[0_4px_14px_rgba(255,82,82,0.3)]",
       },
       size: {
         default: "h-10 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-xl gap-1.5 px-3 has-[>svg]:px-2.5 text-xs",
-        lg: "h-12 rounded-2xl px-6 has-[>svg]:px-4 text-base",
-        icon: "size-10 rounded-xl",
+        sm: "h-8 rounded-[var(--radius-md)] gap-1.5 px-3 has-[>svg]:px-2.5 text-xs",
+        lg: "h-12 rounded-[var(--radius-xl)] px-6 has-[>svg]:px-4 text-base",
+        icon: "size-10 rounded-[var(--radius-md)]",
       },
     },
     defaultVariants: {

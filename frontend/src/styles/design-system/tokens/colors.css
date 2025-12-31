@@ -1,0 +1,111 @@
+/*
+ * =============================================================================
+ * DESIGN TOKENS - COULEURS
+ * =============================================================================
+ *
+ * Système de couleurs sémantique et rationalisé.
+ * Toutes les couleurs sont définies ici et UNIQUEMENT ici.
+ *
+ * Convention de nommage :
+ * - surface-*   : Backgrounds et surfaces
+ * - text-*      : Couleurs de texte
+ * - accent-*    : Couleurs d'accent/action
+ * - border-*    : Bordures
+ * - status-*    : États (success, warning, error)
+ * - chart-*     : Couleurs pour graphiques
+ */
+
+:root {
+  /* ==========================================================================
+   * PROPOSITION A - "CARBON SPORT" (Actuel amélioré)
+   * Thème sombre professionnel avec vert citron et cyan
+   * ========================================================================== */
+
+  /* -- Surface (Backgrounds) -- */
+  --surface-base: #0a1915;
+  --surface-raised: #0f2420;
+  --surface-overlay: rgba(15, 36, 32, 0.95);
+  --surface-card: rgba(15, 36, 32, 0.6);
+  --surface-input: #1a2f2a;
+  --surface-hover: rgba(139, 195, 74, 0.08);
+  --surface-active: rgba(139, 195, 74, 0.12);
+
+  /* -- Text -- */
+  --text-primary: #f0f0f0;
+  --text-secondary: #a8b5b0;
+  --text-tertiary: #6b7a74;
+  --text-disabled: #4a5753;
+  --text-inverse: #0a1915;
+
+  /* -- Accent (Actions principales) -- */
+  --accent-primary: #8bc34a;
+  --accent-primary-hover: #9ccc65;
+  --accent-primary-active: #7cb342;
+  --accent-secondary: #5ce1e6;
+  --accent-secondary-hover: #7de8ec;
+  --accent-secondary-active: #4dd0d5;
+
+  /* -- Borders -- */
+  --border-subtle: rgba(139, 195, 74, 0.15);
+  --border-default: rgba(139, 195, 74, 0.25);
+  --border-strong: rgba(139, 195, 74, 0.4);
+  --border-focus: rgba(139, 195, 74, 0.6);
+
+  /* -- Status -- */
+  --status-success: #8bc34a;
+  --status-success-bg: rgba(139, 195, 74, 0.15);
+  --status-warning: #ffab40;
+  --status-warning-bg: rgba(255, 171, 64, 0.15);
+  --status-error: #ff5252;
+  --status-error-bg: rgba(255, 82, 82, 0.15);
+  --status-info: #448aff;
+  --status-info-bg: rgba(68, 138, 255, 0.15);
+
+  /* -- Chart (Zones cardiaques) -- */
+  --chart-zone1: #448aff;  /* Récupération - Bleu */
+  --chart-zone2: #5ce1e6;  /* Endurance - Cyan */
+  --chart-zone3: #8bc34a;  /* Tempo - Vert */
+  --chart-zone4: #ffab40;  /* Seuil - Orange */
+  --chart-zone5: #ff5252;  /* VO2max - Rouge */
+
+  /* -- Effects -- */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --glow-primary: rgba(139, 195, 74, 0.4);
+  --glow-secondary: rgba(92, 225, 230, 0.4);
+
+  /* -- Gradients -- */
+  --gradient-primary: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-active) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-secondary-active) 100%);
+  --gradient-surface: linear-gradient(180deg, var(--surface-raised) 0%, var(--surface-base) 100%);
+}
+
+/* =============================================================================
+ * THÈME CLAIR (à activer avec classe .light)
+ * ============================================================================= */
+.light {
+  --surface-base: #f8faf9;
+  --surface-raised: #ffffff;
+  --surface-overlay: rgba(255, 255, 255, 0.95);
+  --surface-card: rgba(255, 255, 255, 0.8);
+  --surface-input: #f0f4f2;
+  --surface-hover: rgba(139, 195, 74, 0.08);
+  --surface-active: rgba(139, 195, 74, 0.15);
+
+  --text-primary: #1a2e28;
+  --text-secondary: #4a5d56;
+  --text-tertiary: #7a8d86;
+  --text-disabled: #b0bdb7;
+  --text-inverse: #f0f0f0;
+
+  --accent-primary: #7cb342;
+  --accent-primary-hover: #8bc34a;
+  --accent-primary-active: #689f38;
+
+  --border-subtle: rgba(26, 46, 40, 0.08);
+  --border-default: rgba(26, 46, 40, 0.15);
+  --border-strong: rgba(26, 46, 40, 0.25);
+  --border-focus: rgba(124, 179, 66, 0.5);
+
+  --shadow-color: rgba(26, 46, 40, 0.1);
+  --glow-primary: rgba(124, 179, 66, 0.3);
+}

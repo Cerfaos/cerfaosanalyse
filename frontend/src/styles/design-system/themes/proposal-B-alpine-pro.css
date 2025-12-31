@@ -1,0 +1,115 @@
+/*
+ * =============================================================================
+ * PROPOSITION B - "ALPINE PRO"
+ * =============================================================================
+ *
+ * Style : Élégant, premium, montagne
+ * Inspiration : Rapha, POC, marques premium suisses
+ *
+ * Palette :
+ * - Base slate profond (#0f172a → #1e293b)
+ * - Accent bleu glacier (#38bdf8)
+ * - Accent secondaire orange alpin (#fb923c)
+ *
+ * Caractéristiques :
+ * ✓ Lignes épurées
+ * ✓ Contrastes forts
+ * ✓ Ombres douces
+ * ✓ Aspect premium/luxe
+ * ✓ Style "haute montagne"
+ */
+
+:root {
+  /* Surface - Slate profond */
+  --surface-base: #0f172a;
+  --surface-raised: #1e293b;
+  --surface-overlay: rgba(30, 41, 59, 0.95);
+  --surface-card: rgba(30, 41, 59, 0.7);
+  --surface-input: #334155;
+  --surface-hover: rgba(56, 189, 248, 0.08);
+  --surface-active: rgba(56, 189, 248, 0.12);
+
+  /* Text - Blanc glacé */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-disabled: #475569;
+  --text-inverse: #0f172a;
+
+  /* Accent - Bleu glacier */
+  --accent-primary: #38bdf8;
+  --accent-primary-hover: #7dd3fc;
+  --accent-primary-active: #0ea5e9;
+  /* Accent secondaire - Orange alpin */
+  --accent-secondary: #fb923c;
+  --accent-secondary-hover: #fdba74;
+  --accent-secondary-active: #f97316;
+
+  /* Borders - Subtiles */
+  --border-subtle: rgba(148, 163, 184, 0.1);
+  --border-default: rgba(148, 163, 184, 0.2);
+  --border-strong: rgba(148, 163, 184, 0.3);
+  --border-focus: rgba(56, 189, 248, 0.5);
+
+  /* Radius - Plus carré, élégant */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+
+  /* Shadows - Douces */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.16);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.24);
+  --shadow-glow: 0 0 24px rgba(56, 189, 248, 0.25);
+
+  /* Glass Effect - Minimal */
+  --glass-blur: 16px;
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(148, 163, 184, 0.15);
+
+  /* Status - Zones HR */
+  --chart-zone1: #38bdf8;  /* Récupération - Bleu */
+  --chart-zone2: #22d3ee;  /* Endurance - Cyan */
+  --chart-zone3: #a3e635;  /* Tempo - Lime */
+  --chart-zone4: #fb923c;  /* Seuil - Orange */
+  --chart-zone5: #f43f5e;  /* VO2max - Rose */
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Style - Alpine Pro */
+.theme-alpine .card {
+  background: var(--surface-card);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.theme-alpine .card:hover {
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Button Style - Alpine Pro */
+.theme-alpine .btn-primary {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.theme-alpine .btn-primary:hover {
+  background: var(--accent-primary-hover);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}

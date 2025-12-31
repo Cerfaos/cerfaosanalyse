@@ -1,0 +1,110 @@
+/*
+ * =============================================================================
+ * PROPOSITION A - "CARBON SPORT"
+ * =============================================================================
+ *
+ * Style : Professionnel, technique, performance
+ * Inspiration : Garmin Connect, Strava Pro, équipement carbone
+ *
+ * Palette :
+ * - Base sombre carbone (#0a1915 → #0f2420)
+ * - Accent vert citron énergique (#8BC34A)
+ * - Accent secondaire cyan sport (#5CE1E6)
+ *
+ * Caractéristiques :
+ * ✓ Glassmorphism subtil
+ * ✓ Ombres profondes
+ * ✓ Bordures vertes lumineuses
+ * ✓ Gradients dynamiques
+ * ✓ Style "high-tech cycling"
+ */
+
+:root {
+  /* Surface */
+  --surface-base: #0a1915;
+  --surface-raised: #0f2420;
+  --surface-overlay: rgba(15, 36, 32, 0.95);
+  --surface-card: rgba(15, 36, 32, 0.6);
+  --surface-input: #1a2f2a;
+  --surface-hover: rgba(139, 195, 74, 0.08);
+  --surface-active: rgba(139, 195, 74, 0.12);
+
+  /* Text */
+  --text-primary: #f0f0f0;
+  --text-secondary: #a8b5b0;
+  --text-tertiary: #6b7a74;
+  --text-disabled: #4a5753;
+  --text-inverse: #0a1915;
+
+  /* Accent */
+  --accent-primary: #8bc34a;
+  --accent-primary-hover: #9ccc65;
+  --accent-primary-active: #7cb342;
+  --accent-secondary: #5ce1e6;
+  --accent-secondary-hover: #7de8ec;
+  --accent-secondary-active: #4dd0d5;
+
+  /* Borders */
+  --border-subtle: rgba(139, 195, 74, 0.15);
+  --border-default: rgba(139, 195, 74, 0.25);
+  --border-strong: rgba(139, 195, 74, 0.4);
+  --border-focus: rgba(139, 195, 74, 0.6);
+
+  /* Radius - Arrondi généreux */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(139, 195, 74, 0.3);
+
+  /* Glass Effect */
+  --glass-blur: 12px;
+  --glass-bg: rgba(15, 36, 32, 0.6);
+  --glass-border: rgba(139, 195, 74, 0.25);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Style - Carbon Sport */
+.theme-carbon .card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-normal),
+              box-shadow var(--transition-normal),
+              border-color var(--transition-fast);
+}
+
+.theme-carbon .card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border-color: var(--border-strong);
+}
+
+/* Button Style - Carbon Sport */
+.theme-carbon .btn-primary {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(139, 195, 74, 0.35);
+  transition: all var(--transition-normal);
+}
+
+.theme-carbon .btn-primary:hover {
+  background: var(--accent-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 195, 74, 0.45);
+}

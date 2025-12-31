@@ -832,7 +832,7 @@ export default function ActivityDetail() {
                   accept=".fit,.gpx,.csv"
                   onChange={handleFileChange}
                   required
-                  className="w-full px-4 py-3 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BC34A]/30 focus:border-[#8BC34A]"
+                  className="w-full px-4 py-3 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                 />
                 <p className="text-sm text-gray-400 mt-2">
                   Formats acceptés: FIT, GPX, CSV
@@ -840,8 +840,8 @@ export default function ActivityDetail() {
               </div>
 
               {replacementFile && (
-                <div className="bg-[#5CE1E6]/10 border border-[#5CE1E6]/30 p-3 rounded-md">
-                  <p className="text-sm text-[#5CE1E6]">
+                <div className="bg-[var(--accent-secondary-subtle)] border border-[var(--accent-secondary)]/30 p-3 rounded-md">
+                  <p className="text-sm text-[var(--accent-secondary)]">
                     Fichier sélectionné: <strong>{replacementFile.name}</strong>
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
@@ -876,7 +876,7 @@ export default function ActivityDetail() {
 
       {/* Formulaire d'édition */}
       {isEditing && (
-        <div className="mb-8 glass-panel p-6 rounded-lg shadow-lg border border-[#8BC34A]/30">
+        <div className="mb-8 glass-panel p-6 rounded-lg shadow-lg border border-[var(--border-default)]">
           <h2 className="text-2xl font-bold mb-4 text-white">
             Modifier l'activité
           </h2>
@@ -896,7 +896,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, type: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A] [&>option]:bg-[#0A191A] [&>option]:text-white"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)] [&>option]:bg-[var(--surface-raised)] [&>option]:text-white"
                     required
                   >
                     <option value="Course">Course</option>
@@ -921,7 +921,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, date: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     required
                   />
                 </div>
@@ -936,7 +936,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, time: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -951,7 +951,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, distanceKm: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     required
                     min="0"
                   />
@@ -978,7 +978,7 @@ export default function ActivityDetail() {
                           durationHours: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                      className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                       placeholder="HH"
                       min="0"
                       max="99"
@@ -997,7 +997,7 @@ export default function ActivityDetail() {
                           durationMinutes: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                      className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                       placeholder="MM"
                       min="0"
                       max="59"
@@ -1017,7 +1017,7 @@ export default function ActivityDetail() {
                           durationSeconds: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                      className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                       placeholder="SS"
                       min="0"
                       max="59"
@@ -1055,7 +1055,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgHeartRate: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                     max="250"
                   />
@@ -1071,7 +1071,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, maxHeartRate: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                     max="250"
                   />
@@ -1096,7 +1096,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgSpeed: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1112,7 +1112,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, maxSpeed: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1135,7 +1135,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgPower: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1153,7 +1153,7 @@ export default function ActivityDetail() {
                         normalizedPower: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1176,7 +1176,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgCadence: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1194,7 +1194,7 @@ export default function ActivityDetail() {
                         elevationGain: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1209,7 +1209,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, calories: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     min="0"
                   />
                 </div>
@@ -1234,7 +1234,7 @@ export default function ActivityDetail() {
                         weatherCondition: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A] [&>option]:bg-[#0A191A] [&>option]:text-white"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)] [&>option]:bg-[var(--surface-raised)] [&>option]:text-white"
                   >
                     <option value="">-- Aucune modification --</option>
                     <option value="ensoleille">☀️ Ensoleillé</option>
@@ -1265,7 +1265,7 @@ export default function ActivityDetail() {
                         weatherTemperature: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     placeholder="ex: 18"
                     min="-50"
                     max="60"
@@ -1285,7 +1285,7 @@ export default function ActivityDetail() {
                         weatherWindSpeed: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     placeholder="ex: 15"
                     min="0"
                     max="200"
@@ -1305,7 +1305,7 @@ export default function ActivityDetail() {
                         weatherWindDirection: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     placeholder="ex: 180 (Nord=0, Est=90, Sud=180, Ouest=270)"
                     min="0"
                     max="359"
@@ -1333,7 +1333,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, rpe: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A] [&>option]:bg-[#0A191A] [&>option]:text-white"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)] [&>option]:bg-[var(--surface-raised)] [&>option]:text-white"
                   >
                     <option value="">-- Sélectionner --</option>
                     <option value="1">1 - Très très facile</option>
@@ -1362,7 +1362,7 @@ export default function ActivityDetail() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, feelingNotes: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white rounded-lg focus:ring-2 focus:ring-[#8BC34A]/20 focus:border-[#8BC34A]"
+                    className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
                     rows={3}
                     placeholder="Ex: Jambes lourdes, bonne récupération, fatigue générale..."
                     maxLength={500}
@@ -1372,8 +1372,8 @@ export default function ActivityDetail() {
             </div>
 
             {/* Note d'information */}
-            <div className="bg-[#5CE1E6]/10 p-4 rounded-lg border border-[#5CE1E6]/30">
-              <p className="text-sm text-[#5CE1E6]">
+            <div className="bg-[var(--status-info-subtle)] p-4 rounded-lg border border-[var(--status-info)]/30">
+              <p className="text-sm text-[var(--status-info)]">
                 <strong>Note :</strong> Si vous modifiez la fréquence cardiaque
                 moyenne ou la durée, le TRIMP sera automatiquement recalculé par
                 le système.
@@ -1381,7 +1381,7 @@ export default function ActivityDetail() {
             </div>
 
             {/* Boutons d'action */}
-            <div className="flex gap-3 pt-4 border-t border-[#8BC34A]/20">
+            <div className="flex gap-3 pt-4 border-t border-[var(--border-subtle)]">
               <button type="submit" className="btn-primary font-display">
                 Enregistrer les modifications
               </button>

@@ -20,8 +20,8 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-[#8BC34A]/30 bg-[#0A191A]/60 backdrop-blur-[12px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300",
-        !noHover && "hover:-translate-y-[5px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)]",
+        "relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--surface-card)] backdrop-blur-[var(--glass-blur)] shadow-[var(--shadow-md)] transition-all duration-300",
+        !noHover && "hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] hover:border-[var(--border-strong)]",
         noPadding ? "" : "p-6",
         className
       )}

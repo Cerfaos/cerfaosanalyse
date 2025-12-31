@@ -1,0 +1,124 @@
+/*
+ * =============================================================================
+ * PROPOSITION C - "VELODROME"
+ * =============================================================================
+ *
+ * Style : Dynamique, moderne, compétition
+ * Inspiration : TrainerRoad, Zwift, piste cycliste
+ *
+ * Palette :
+ * - Base noir profond (#09090b → #18181b)
+ * - Accent violet électrique (#a855f7)
+ * - Accent secondaire rose performance (#ec4899)
+ *
+ * Caractéristiques :
+ * ✓ Contraste maximal
+ * ✓ Couleurs vives électriques
+ * ✓ Bordures fines et nettes
+ * ✓ Effet néon subtil
+ * ✓ Style "indoor training / esport"
+ */
+
+:root {
+  /* Surface - Noir absolu */
+  --surface-base: #09090b;
+  --surface-raised: #18181b;
+  --surface-overlay: rgba(24, 24, 27, 0.98);
+  --surface-card: rgba(24, 24, 27, 0.8);
+  --surface-input: #27272a;
+  --surface-hover: rgba(168, 85, 247, 0.08);
+  --surface-active: rgba(168, 85, 247, 0.15);
+
+  /* Text - Blanc pur */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-disabled: #52525b;
+  --text-inverse: #09090b;
+
+  /* Accent - Violet électrique */
+  --accent-primary: #a855f7;
+  --accent-primary-hover: #c084fc;
+  --accent-primary-active: #9333ea;
+  /* Accent secondaire - Rose performance */
+  --accent-secondary: #ec4899;
+  --accent-secondary-hover: #f472b6;
+  --accent-secondary-active: #db2777;
+
+  /* Borders - Nettes */
+  --border-subtle: rgba(161, 161, 170, 0.1);
+  --border-default: rgba(161, 161, 170, 0.2);
+  --border-strong: rgba(168, 85, 247, 0.4);
+  --border-focus: rgba(168, 85, 247, 0.6);
+
+  /* Radius - Sharp modern */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows - Avec glow coloré */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 30px rgba(168, 85, 247, 0.35);
+  --shadow-glow-secondary: 0 0 30px rgba(236, 72, 153, 0.25);
+
+  /* Glass Effect - Minimal mais net */
+  --glass-blur: 8px;
+  --glass-bg: rgba(24, 24, 27, 0.8);
+  --glass-border: rgba(168, 85, 247, 0.2);
+
+  /* Status - Zones HR avec gradient */
+  --chart-zone1: #60a5fa;  /* Récupération - Bleu */
+  --chart-zone2: #34d399;  /* Endurance - Émeraude */
+  --chart-zone3: #fbbf24;  /* Tempo - Ambre */
+  --chart-zone4: #f97316;  /* Seuil - Orange vif */
+  --chart-zone5: #ef4444;  /* VO2max - Rouge */
+
+  /* Transitions */
+  --transition-fast: 100ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Style - Velodrome */
+.theme-velodrome .card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+}
+
+.theme-velodrome .card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* Button Style - Velodrome */
+.theme-velodrome .btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-sm), var(--shadow-glow);
+  transition: all var(--transition-fast);
+}
+
+.theme-velodrome .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+/* Neon effect on focus */
+.theme-velodrome *:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-glow);
+}
