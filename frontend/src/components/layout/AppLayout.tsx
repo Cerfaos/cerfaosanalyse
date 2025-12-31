@@ -1,6 +1,6 @@
+import { Bike, CalendarDays, Menu, Plus } from "lucide-react";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Bike, Plus, Menu, CalendarDays } from "lucide-react";
 import { getAvatarUrl } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import NotificationCenter from "../NotificationCenter";
@@ -19,7 +19,11 @@ const navigation = [
   { label: "Cartographie FC", to: "/cycling", icon: CyclingIcon },
   { label: "Activités", to: "/activities", icon: ActivitiesIcon },
   { label: "Records", to: "/records", icon: RecordsIcon },
-  { label: "Planification", to: "/training", icon: () => <CalendarDays size={18} /> },
+  {
+    label: "Planification",
+    to: "/training",
+    icon: () => <CalendarDays size={18} />,
+  },
   { label: "Poids", to: "/weight", icon: WeightIcon },
   { label: "Charge d'entraînement", to: "/training-load", icon: TrainingIcon },
   { label: "Équipement", to: "/equipment", icon: EquipmentIcon },
@@ -75,11 +79,16 @@ export default function AppLayout({
         }`}
       >
         {/* Logo area */}
-        <div className="flex items-center gap-3 px-5 h-16 shrink-0 cursor-pointer group" onClick={() => navigate("/dashboard")}>
+        <div
+          className="flex items-center gap-3 px-5 h-16 shrink-0 cursor-pointer group"
+          onClick={() => navigate("/dashboard")}
+        >
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--accent-primary)] text-white">
             <Bike size={20} strokeWidth={2.5} />
           </div>
-          <span className="text-[15px] font-semibold text-[var(--text-primary)]">Centre d'Analyse</span>
+          <span className="text-[15px] font-semibold text-[var(--text-primary)]">
+            Centre d'Analyse
+          </span>
         </div>
 
         {/* Main Action */}
@@ -105,14 +114,20 @@ export default function AppLayout({
                 className={({ isActive }) =>
                   `group flex w-full items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
                     isActive
-                      ? "bg-[var(--surface-hover)] text-[var(--text-primary)]"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]"
+                      ? "bg-[var(--surface-hover)] text-white"
+                      : "text-white/70 hover:bg-[var(--surface-hover)] hover:text-white"
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <span className={`transition-colors ${isActive ? "text-[var(--accent-primary)]" : "text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]"}`}>
+                    <span
+                      className={`transition-colors ${
+                        isActive
+                          ? "text-[var(--accent-primary)]"
+                          : "text-white/60 group-hover:text-white"
+                      }`}
+                    >
                       <Icon />
                     </span>
                     <span>{label}</span>
@@ -125,13 +140,22 @@ export default function AppLayout({
 
         {/* User Info & Logout */}
         <div className="px-3 py-4 shrink-0 border-t border-[var(--border-subtle)]">
-          <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[var(--surface-hover)] transition-colors cursor-pointer" onClick={() => navigate("/profile")}>
+          <div
+            className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            onClick={() => navigate("/profile")}
+          >
             <div className="h-8 w-8 rounded-full bg-[var(--surface-input)] flex items-center justify-center text-xs font-semibold text-[var(--text-secondary)]">
-              {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "C"}
+              {user?.fullName?.charAt(0)?.toUpperCase() ||
+                user?.email?.charAt(0)?.toUpperCase() ||
+                "C"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-[var(--text-primary)] truncate">{user?.fullName || "Athlète"}</p>
-              <p className="text-[var(--text-tertiary)] text-xs truncate">{user?.email}</p>
+              <p className="text-sm text-[var(--text-primary)] truncate">
+                {user?.fullName || "Athlète"}
+              </p>
+              <p className="text-[var(--text-tertiary)] text-xs truncate">
+                {user?.email}
+              </p>
             </div>
           </div>
           <button
@@ -139,7 +163,16 @@ export default function AppLayout({
             onClick={handleLogout}
             className="flex items-center gap-2 w-full text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors mt-2 px-2 py-1.5"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -150,21 +183,28 @@ export default function AppLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden bg-[var(--surface-card)] shadow-2xl ring-1 ring-[var(--border-subtle)] backdrop-blur-3xl md:rounded-l-[3rem]">
+      <main className="flex-1 overflow-hidden bg-[#0f1419] shadow-2xl ring-1 ring-[var(--border-subtle)] md:rounded-l-[3rem]">
         <div className="h-full w-full overflow-y-auto p-6 md:p-8 space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{title}</h1>
+              <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+                {title}
+              </h1>
               {description && (
-                <p className="text-sm text-[var(--text-tertiary)]">{description}</p>
+                <p className="text-sm text-[var(--text-tertiary)]">
+                  {description}
+                </p>
               )}
             </div>
             <div className="flex items-center gap-4">
               <NotificationCenter />
               {actions}
               {/* User Profile Mini */}
-              <NavLink to="/profile" className="flex items-center gap-3 bg-[var(--surface-card)] rounded-full p-1 pr-4 border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-colors">
+              <NavLink
+                to="/profile"
+                className="flex items-center gap-3 bg-[var(--surface-card)] rounded-full p-1 pr-4 border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-colors"
+              >
                 {user?.avatarUrl ? (
                   <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] p-[1px] overflow-hidden">
                     <img
@@ -175,10 +215,14 @@ export default function AppLayout({
                   </div>
                 ) : (
                   <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-sm font-bold text-[var(--text-primary)]">
-                    {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "C"}
+                    {user?.fullName?.charAt(0)?.toUpperCase() ||
+                      user?.email?.charAt(0)?.toUpperCase() ||
+                      "C"}
                   </div>
                 )}
-                <span className="text-sm font-medium text-[var(--text-secondary)]">{user?.fullName || "Cycliste"}</span>
+                <span className="text-sm font-medium text-[var(--text-secondary)]">
+                  {user?.fullName || "Cycliste"}
+                </span>
               </NavLink>
             </div>
           </div>
@@ -353,7 +397,6 @@ function HomeIcon() {
   );
 }
 
-
 function RecordsIcon() {
   return (
     <svg
@@ -405,12 +448,18 @@ function ReportsIcon() {
       stroke="currentColor"
       strokeWidth="1.8"
     >
-      <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       <path d="M7 8h10" strokeLinecap="round" />
       <path d="M7 12h10" strokeLinecap="round" />
       <path d="M7 16h6" strokeLinecap="round" />
     </svg>
   );
 }
-
-

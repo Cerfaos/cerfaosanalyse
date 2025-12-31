@@ -38,7 +38,7 @@ function formatNumber(value: number, decimals: number = 0): string {
 const COLORS = {
   primary: '#8BC34A',
   primaryDark: '#689F38',
-  bgDark: '#0a1915',
+  bgDark: '#0c1017',
   bgCard: '#142320',
   textPrimary: '#ffffff',
   textSecondary: '#9CA3AF',
@@ -535,7 +535,7 @@ function generateHtmlReport(report: ReportData): string {
     :root {
       --primary: #8BC34A;
       --primary-dark: #689F38;
-      --bg-dark: #0a1915;
+      --bg-dark: #0c1017;
       --bg-card: rgba(255, 255, 255, 0.05);
       --text-primary: #ffffff;
       --text-secondary: #9CA3AF;

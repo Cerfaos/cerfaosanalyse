@@ -281,7 +281,7 @@ html {
 }
 
 body {
-  background: var(--surface-base);
+  background: #0c1017 !important;
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: var(--font-size-base);

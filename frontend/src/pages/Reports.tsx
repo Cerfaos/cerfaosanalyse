@@ -183,7 +183,7 @@ export default function Reports() {
               className="appearance-none pl-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-medium focus:outline-none focus:border-[#8BC34A]/50 focus:ring-2 focus:ring-[#8BC34A]/20 transition-all cursor-pointer"
             >
               {months.map((month, index) => (
-                <option key={index} value={index + 1} className="bg-[#0a1915] text-white">
+                <option key={index} value={index + 1} className="bg-[#0c1017] text-white">
                   {month}
                 </option>
               ))}
@@ -201,7 +201,7 @@ export default function Reports() {
             className="appearance-none pl-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-medium focus:outline-none focus:border-[#8BC34A]/50 focus:ring-2 focus:ring-[#8BC34A]/20 transition-all cursor-pointer"
           >
             {years.map((year) => (
-              <option key={year} value={year} className="bg-[#0a1915] text-white">
+              <option key={year} value={year} className="bg-[#0c1017] text-white">
                 {year}
               </option>
             ))}

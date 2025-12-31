@@ -4,17 +4,18 @@ import { useEffect, useState } from "react";
 import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import SimilarActivities from "../components/SimilarActivities";
+import { GlassCard } from "../components/ui/GlassCard";
 import MetricInfo from "../components/ui/MetricInfo";
 import { useActivityExport } from "../hooks/useActivityExport";
 import api from "../services/api";
@@ -627,15 +628,20 @@ export default function ActivityDetail() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* En-tête */}
-      <div className="mb-8">
+    <div className="relative min-h-screen">
+      {/* Background Ambience - Gradients flous */}
+      <div className="pointer-events-none absolute top-0 -left-64 h-[800px] w-[800px] rounded-full bg-[var(--accent-primary)]/5 blur-[120px]" />
+      <div className="pointer-events-none absolute bottom-0 -right-64 h-[600px] w-[600px] rounded-full bg-[var(--accent-secondary)]/5 blur-[120px]" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-slate-900/30 blur-[100px]" />
+
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        {/* Bouton retour */}
         <button
           onClick={() => navigate("/activities")}
-          className="text-cta hover:text-cta/80 mb-4 flex items-center gap-2"
+          className="group flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] mb-6 transition-colors duration-200"
         >
           <svg
-            className="w-5 h-5"
+            className="w-5 h-5 transition-transform group-hover:-translate-x-1"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -650,160 +656,178 @@ export default function ActivityDetail() {
           Retour aux activités
         </button>
 
+        {/* Messages de succès/erreur */}
         {success && (
-          <div className="glass-panel border border-success/40 text-success px-4 py-3 mb-6">
-            {success}
+          <div className="glass-panel border border-[var(--status-success)]/40 text-[var(--status-success)] px-4 py-3 mb-6 animate-in fade-in duration-300">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-[var(--status-success)] rounded-full animate-pulse" />
+              {success}
+            </div>
           </div>
         )}
 
         {error && (
-          <div className="glass-panel border border-danger/40 text-danger px-4 py-3 mb-6">
-            {error}
+          <div className="glass-panel border border-[var(--status-error)]/40 text-[var(--status-error)] px-4 py-3 mb-6 animate-in fade-in duration-300">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-[var(--status-error)] rounded-full" />
+              {error}
+            </div>
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            {activityConfig && (
-              <div
-                className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${activityConfig.gradient} flex items-center justify-center text-4xl shadow-lg transform hover:scale-110 transition-transform duration-300`}
-              >
-                {activityConfig.icon}
-              </div>
-            )}
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">
-                  {activity.type}
+        {/* En-tête de l'activité */}
+        <GlassCard className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            {/* Section gauche : Type + Date */}
+            <div className="flex items-center gap-6">
+              {activityConfig && (
+                <div
+                  className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${activityConfig.gradient} flex items-center justify-center text-4xl shadow-lg shadow-[var(--accent-primary)]/20 transition-all duration-300 hover:scale-110 hover:rotate-3 hover:shadow-xl`}
+                >
+                  {activityConfig.icon}
+                </div>
+              )}
+              <div>
+                {/* Badge type */}
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20">
+                    <span className="text-sm font-medium text-[var(--accent-primary)]">
+                      {activity.type}
+                    </span>
+                  </div>
+                  {activity.subSport && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-[var(--surface-hover)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
+                      {activity.subSport}
+                    </span>
+                  )}
+                </div>
+
+                {/* Date principale */}
+                <h1 className="text-2xl md:text-3xl font-display font-bold text-[var(--text-primary)] mb-1">
+                  {new Date(activity.date).toLocaleDateString("fr-FR", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
                 </h1>
-                {activity.subSport && (
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${activityConfig?.badge}`}
-                  >
-                    {activity.subSport}
-                  </span>
+                <p className="text-[var(--text-secondary)]">
+                  {new Date(activity.date).toLocaleTimeString("fr-FR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+
+                {/* Fichier source */}
+                {activity.fileName && (
+                  <p className="text-sm text-[var(--text-tertiary)] mt-2 flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    {activity.fileName}
+                  </p>
                 )}
               </div>
-              <p className="text-text-body dark:text-dark-text-secondary text-lg">
-                {new Date(activity.date).toLocaleDateString("fr-FR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-                {" à "}
-                {new Date(activity.date).toLocaleTimeString("fr-FR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              {activity.fileName && (
-                <p className="text-sm text-text-secondary dark:text-dark-text-muted mt-1 flex items-center gap-2">
+            </div>
+
+            {/* Section droite : Actions */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {activity.gpsData && (
+                <button
+                  onClick={handleExportGpx}
+                  disabled={downloadingGpx}
+                  className="btn-secondary flex items-center gap-2"
+                >
                   <svg
-                    className="w-4 h-4"
-                    fill="none"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
+                    fill="none"
                     stroke="currentColor"
+                    strokeWidth="2"
                   >
                     <path
+                      d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                    <polyline
+                      points="7 10 12 15 17 10"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <line
+                      x1="12"
+                      y1="15"
+                      x2="12"
+                      y2="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </svg>
-                  {activity.fileName}
-                </p>
+                  {downloadingGpx ? "Export..." : "GPX"}
+                </button>
               )}
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {activity.gpsData && (
-              <button
-                onClick={handleExportGpx}
-                disabled={downloadingGpx}
-                className="btn-secondary flex items-center gap-2"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <polyline
-                    points="7 10 12 15 17 10"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <line
-                    x1="12"
-                    y1="15"
-                    x2="12"
-                    y2="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                {downloadingGpx ? "Export GPX..." : "Exporter GPX"}
-              </button>
-            )}
-            {activity.fileName && (
-              <button
-                onClick={() => setIsReplacingFile(true)}
-                className="btn-secondary"
-              >
-                Remplacer le fichier
-              </button>
-            )}
-            <button onClick={startEditing} className="btn-primary">
-              Modifier l'activité
-            </button>
-            <div className="relative group">
-              <button
-                disabled={exportingImage}
-                className="btn-secondary flex items-center gap-2"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-                {exportingImage ? "Export..." : "Exporter"}
-              </button>
-              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-dark-surface rounded-lg shadow-lg border border-border-base dark:border-dark-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+              {activity.fileName && (
                 <button
-                  onClick={() => handleExportImage("png")}
-                  disabled={exportingImage}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-bg-gray-100 dark:hover:bg-dark-border rounded-t-lg"
+                  onClick={() => setIsReplacingFile(true)}
+                  className="btn-secondary"
                 >
-                  Exporter en PNG
+                  Remplacer
                 </button>
+              )}
+              <button onClick={startEditing} className="btn-primary">
+                Modifier
+              </button>
+              <div className="relative group">
                 <button
-                  onClick={() => handleExportImage("pdf")}
                   disabled={exportingImage}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-bg-gray-100 dark:hover:bg-dark-border rounded-b-lg"
+                  className="btn-secondary flex items-center gap-2"
                 >
-                  Exporter en PDF
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  {exportingImage ? "..." : "Image"}
                 </button>
+                <div className="absolute right-0 mt-2 w-40 glass-panel opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                  <button
+                    onClick={() => handleExportImage("png")}
+                    disabled={exportingImage}
+                    className="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] rounded-t-lg transition-colors"
+                  >
+                    Exporter PNG
+                  </button>
+                  <button
+                    onClick={() => handleExportImage("pdf")}
+                    disabled={exportingImage}
+                    className="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] rounded-b-lg transition-colors"
+                  >
+                    Exporter PDF
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </GlassCard>
 
       {/* Modal de remplacement de fichier */}
       {isReplacingFile && (
@@ -1400,185 +1424,213 @@ export default function ActivityDetail() {
       {/* Contenu exportable */}
       <div
         id="activity-content"
-        className="bg-white dark:bg-dark-bg p-4 rounded-xl"
+        className="space-y-6"
       >
         {/* Statistiques principales */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-brand/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Distance */}
+          <GlassCard
+            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{ animationDelay: '0ms' }}
+          >
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-primary)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="text-2xl mb-2">🛣️</div>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
+              <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--accent-primary)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                🛣️
+              </div>
+              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
                 Distance
               </p>
-              <p className="text-2xl font-bold text-brand">
+              <p className="text-2xl font-display font-bold text-[var(--accent-primary)]">
                 {formatDistance(activity.distance)}
               </p>
             </div>
-          </div>
+          </GlassCard>
 
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-orange-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          {/* Durée */}
+          <GlassCard
+            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{ animationDelay: '50ms' }}
+          >
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-secondary)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="text-2xl mb-2">⏱️</div>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
+              <div className="w-12 h-12 rounded-xl bg-[var(--accent-secondary)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--accent-secondary)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                ⏱️
+              </div>
+              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
                 Durée
               </p>
-              <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">
+              <p className="text-2xl font-display font-bold text-[var(--text-primary)]">
                 {formatDuration(activity.duration)}
               </p>
             </div>
-          </div>
+          </GlassCard>
 
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          {/* Vitesse */}
+          <GlassCard
+            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{ animationDelay: '100ms' }}
+          >
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-info)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="text-2xl mb-2">🚀</div>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
+              <div className="w-12 h-12 rounded-xl bg-[var(--status-info)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-info)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                🚀
+              </div>
+              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
                 Vitesse moy
               </p>
-              <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">
+              <p className="text-2xl font-display font-bold text-[var(--text-primary)]">
                 {formatSpeed(activity.avgSpeed)}
               </p>
-              <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">
                 {formatPace(activity.avgSpeed)}
               </p>
             </div>
-          </div>
+          </GlassCard>
 
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          {/* FC moyenne */}
+          <GlassCard
+            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{ animationDelay: '150ms' }}
+          >
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-error)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="text-2xl mb-2">❤️</div>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
+              <div className="w-12 h-12 rounded-xl bg-[var(--status-error)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-error)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                ❤️
+              </div>
+              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
                 FC moyenne
               </p>
-              <p className="text-2xl font-bold text-red-500 dark:text-red-400">
-                {activity.avgHeartRate ? `${activity.avgHeartRate} bpm` : "-"}
+              <p className="text-2xl font-display font-bold text-[var(--status-error)]">
+                {activity.avgHeartRate ? `${activity.avgHeartRate}` : "-"}
+                <span className="text-sm font-normal text-[var(--text-tertiary)] ml-1">bpm</span>
               </p>
-              <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
-                Max:{" "}
-                {activity.maxHeartRate ? `${activity.maxHeartRate} bpm` : "-"}
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                Max: {activity.maxHeartRate ? `${activity.maxHeartRate} bpm` : "-"}
               </p>
             </div>
-          </div>
+          </GlassCard>
 
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          {/* Dénivelé */}
+          <GlassCard
+            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{ animationDelay: '200ms' }}
+          >
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-success)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="text-2xl mb-2">⛰️</div>
-              <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
-                Dénivelé
+              <div className="w-12 h-12 rounded-xl bg-[var(--status-success)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-success)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                ⛰️
+              </div>
+              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                Dénivelé +
               </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-2xl font-display font-bold text-[var(--status-success)]">
                 {formatElevation(activity.elevationGain)}
               </p>
               {activity.elevationLoss && (
-                <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">
                   Descente: {formatElevation(activity.elevationLoss)}
                 </p>
               )}
             </div>
-          </div>
+          </GlassCard>
 
-          <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+          {/* TRIMP */}
+          <GlassCard
+            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{ animationDelay: '250ms' }}
+          >
+            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
-              <div className="text-2xl mb-2">💪</div>
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-xl mb-3 border border-purple-500/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                💪
+              </div>
               <div className="flex items-center gap-1 mb-1">
-                <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold">
                   TRIMP
                 </p>
                 <MetricInfo metric="trimp" />
               </div>
-              <p
-                className={`text-2xl font-bold ${getTrimpColor(
-                  activity.trimp
-                )}`}
-              >
+              <p className={`text-2xl font-display font-bold ${getTrimpColor(activity.trimp)}`}>
                 {activity.trimp || "-"}
               </p>
             </div>
-          </div>
+          </GlassCard>
 
+          {/* RPE */}
           {activity.rpe && (
-            <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+            <GlassCard
+              className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+              style={{ animationDelay: '300ms' }}
+            >
+              <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
               <div className="relative z-10">
-                <div className="text-2xl mb-2">🎯</div>
-                <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
-                  RPE (Effort Perçu)
+                <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-xl mb-3 border border-amber-500/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  🎯
+                </div>
+                <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                  RPE
                 </p>
-                <p
-                  className={`text-2xl font-bold ${getRpeColor(activity.rpe)}`}
-                >
-                  {activity.rpe}/10
+                <p className={`text-2xl font-display font-bold ${getRpeColor(activity.rpe)}`}>
+                  {activity.rpe}<span className="text-sm font-normal text-[var(--text-tertiary)]">/10</span>
                 </p>
-                <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
-                  {activity.rpe <= 3
-                    ? "Facile"
-                    : activity.rpe <= 6
-                    ? "Modéré"
-                    : activity.rpe <= 8
-                    ? "Difficile"
-                    : "Extrême"}
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                  {activity.rpe <= 3 ? "Facile" : activity.rpe <= 6 ? "Modéré" : activity.rpe <= 8 ? "Difficile" : "Extrême"}
                 </p>
               </div>
-            </div>
+            </GlassCard>
           )}
 
+          {/* Température */}
           {activity.avgTemperature && (
-            <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-cyan-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
+            <GlassCard
+              className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+              style={{ animationDelay: '350ms' }}
+            >
+              <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
               <div className="relative z-10">
-                <div className="text-2xl mb-2">🌡️</div>
-                <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-xl mb-3 border border-cyan-500/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  🌡️
+                </div>
+                <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
                   Température
                 </p>
-                <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">
+                <p className="text-2xl font-display font-bold text-[var(--text-primary)]">
                   {activity.avgTemperature}°C
                 </p>
                 {activity.maxTemperature && (
-                  <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
                     Max: {activity.maxTemperature}°C
                   </p>
                 )}
               </div>
-            </div>
+            </GlassCard>
           )}
 
-          {activity.movingTime && (
-            <div className="glass-panel p-4 rounded-lg border border-border-base shadow-card relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-slate-500/10 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative z-10">
-                <div className="text-2xl mb-2">⏸️</div>
-                <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
-                  Temps en pause
-                </p>
-                <p className="text-2xl font-bold text-text-dark dark:text-dark-text-contrast">
-                  {formatDuration(activity.duration - activity.movingTime)}
-                </p>
-                <p className="text-xs text-text-tertiary dark:text-dark-text-muted">
-                  En mouvement: {formatDuration(activity.movingTime)}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Notes de sensations */}
         {activity.feelingNotes && (
-          <div className="glass-panel p-6 rounded-lg border border-amber-200 dark:border-amber-800/30 shadow-card mb-8 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/10 dark:to-orange-900/10">
-            <h3 className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast mb-3 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xl">
-                📝
+          <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '450ms' }}>
+            <div className="relative overflow-hidden">
+              {/* Gradient décoratif */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-secondary)]/5 via-transparent to-[var(--accent-primary)]/5" />
+
+              <div className="relative z-10 flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[var(--accent-secondary)]/10 flex items-center justify-center text-xl flex-shrink-0 border border-[var(--accent-secondary)]/20">
+                  📝
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-display font-bold text-[var(--text-primary)] mb-2">
+                    Notes sur les sensations
+                  </h3>
+                  <p className="text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
+                    {activity.feelingNotes}
+                  </p>
+                </div>
               </div>
-              Notes sur les sensations
-            </h3>
-            <p className="text-text-body dark:text-dark-text-secondary whitespace-pre-wrap leading-relaxed pl-13">
-              {activity.feelingNotes}
-            </p>
-          </div>
+            </div>
+          </GlassCard>
         )}
 
         {/* Météo */}
@@ -1594,102 +1646,99 @@ export default function ActivityDetail() {
               };
 
               return (
-                <div className="glass-panel p-6 mb-8 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-500/5" />
-                  <div className="relative z-10">
-                    <h2 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast mb-6 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-xl">
-                        🌤️
-                      </div>
-                      Météo lors de l'activité
-                    </h2>
+                <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '500ms' }}>
+                  <div className="relative overflow-hidden">
+                    {/* Gradient sky */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-500/5" />
 
-                    {/* Carte principale avec icône et condition */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                      <div className="glass-panel p-6 rounded-xl shadow-sm flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 border border-sky-200/50 dark:border-sky-800/30">
-                        <img
-                          src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-                          alt={weather.description}
-                          className="w-20 h-20"
-                        />
-                        <p className="text-lg font-semibold text-text-dark dark:text-dark-text-contrast capitalize mt-2">
-                          {weather.description}
-                        </p>
-                      </div>
-
-                      <div className="glass-panel p-6 rounded-xl shadow-sm relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-orange-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
-                        <div className="relative z-10">
-                          <div className="text-3xl mb-3">🌡️</div>
-                          <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
-                            Température
-                          </p>
-                          <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">
-                            {weather.temperature}°C
-                          </p>
-                          <p className="text-sm text-text-muted dark:text-dark-text-muted mt-2">
-                            Ressenti{" "}
-                            <span className="font-semibold">
-                              {weather.feelsLike}°C
-                            </span>
-                          </p>
+                    <div className="relative z-10">
+                      {/* Header */}
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-2xl bg-sky-500/10 flex items-center justify-center text-2xl border border-sky-500/20">
+                          🌤️
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.3em] text-sky-400 font-semibold">Conditions</p>
+                          <h3 className="text-xl font-display font-bold text-[var(--text-primary)]">
+                            Météo lors de l'activité
+                          </h3>
                         </div>
                       </div>
 
-                      <div className="glass-panel p-6 rounded-xl shadow-sm relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
-                        <div className="relative z-10">
-                          <div className="text-3xl mb-3">💨</div>
-                          <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-1">
-                            Vent
-                          </p>
-                          <p className="text-3xl font-bold text-text-dark dark:text-dark-text-contrast">
-                            {weather.windSpeed} km/h
-                          </p>
-                          <p className="text-sm text-text-muted dark:text-dark-text-muted mt-2">
-                            Direction{" "}
-                            <span className="font-semibold">
-                              {getWindDirection(weather.windDirection)} (
-                              {weather.windDirection}°)
-                            </span>
+                      {/* Grid météo 3 colonnes */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        {/* Condition principale */}
+                        <div className="glass-panel p-6 text-center bg-gradient-to-br from-sky-500/5 to-blue-500/5 border border-sky-500/10 rounded-xl">
+                          <img
+                            src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                            alt={weather.description}
+                            className="w-20 h-20 mx-auto"
+                          />
+                          <p className="text-lg font-semibold text-[var(--text-primary)] capitalize">
+                            {weather.description}
                           </p>
                         </div>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-center">
-                        <div className="text-2xl mb-2">💧</div>
-                        <p className="text-xs text-text-muted dark:text-dark-text-muted uppercase tracking-wide">
-                          Humidité
-                        </p>
-                        <p className="text-xl font-bold text-text-dark dark:text-dark-text-contrast mt-1">
-                          {weather.humidity}%
-                        </p>
+                        {/* Température */}
+                        <div className="glass-panel p-6 rounded-xl relative overflow-hidden group">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-secondary)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+                          <div className="relative z-10">
+                            <div className="w-10 h-10 rounded-lg bg-[var(--accent-secondary)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--accent-secondary)]/20">
+                              🌡️
+                            </div>
+                            <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                              Température
+                            </p>
+                            <p className="text-3xl font-display font-bold text-[var(--text-primary)]">
+                              {weather.temperature}°C
+                            </p>
+                            <p className="text-sm text-[var(--text-tertiary)] mt-2">
+                              Ressenti <span className="font-semibold text-[var(--text-secondary)]">{weather.feelsLike}°C</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Vent */}
+                        <div className="glass-panel p-6 rounded-xl relative overflow-hidden group">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+                          <div className="relative z-10">
+                            <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-xl mb-3 border border-cyan-500/20">
+                              💨
+                            </div>
+                            <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                              Vent
+                            </p>
+                            <p className="text-3xl font-display font-bold text-[var(--text-primary)]">
+                              {weather.windSpeed} <span className="text-lg font-normal">km/h</span>
+                            </p>
+                            <p className="text-sm text-[var(--text-tertiary)] mt-2">
+                              Direction <span className="font-semibold text-[var(--text-secondary)]">{getWindDirection(weather.windDirection)}</span>
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-center">
-                        <div className="text-2xl mb-2">🌡️</div>
-                        <p className="text-xs text-text-muted dark:text-dark-text-muted uppercase tracking-wide">
-                          Pression
-                        </p>
-                        <p className="text-xl font-bold text-text-dark dark:text-dark-text-contrast mt-1">
-                          {weather.pressure} hPa
-                        </p>
-                      </div>
-
-                      <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-center">
-                        <div className="text-2xl mb-2">☁️</div>
-                        <p className="text-xs text-text-muted dark:text-dark-text-muted uppercase tracking-wide">
-                          Nuages
-                        </p>
-                        <p className="text-xl font-bold text-text-dark dark:text-dark-text-contrast mt-1">
-                          {weather.clouds}%
-                        </p>
+                      {/* Infos secondaires */}
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="glass-panel p-4 rounded-xl text-center bg-white/[0.02]">
+                          <div className="text-2xl mb-2">💧</div>
+                          <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">Humidité</p>
+                          <p className="text-xl font-display font-bold text-[var(--text-primary)] mt-1">{weather.humidity}%</p>
+                        </div>
+                        <div className="glass-panel p-4 rounded-xl text-center bg-white/[0.02]">
+                          <div className="text-2xl mb-2">📊</div>
+                          <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">Pression</p>
+                          <p className="text-xl font-display font-bold text-[var(--text-primary)] mt-1">{weather.pressure} <span className="text-sm font-normal">hPa</span></p>
+                        </div>
+                        <div className="glass-panel p-4 rounded-xl text-center bg-white/[0.02]">
+                          <div className="text-2xl mb-2">☁️</div>
+                          <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">Nuages</p>
+                          <p className="text-xl font-display font-bold text-[var(--text-primary)] mt-1">{weather.clouds}%</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </GlassCard>
               );
             } catch (e) {
               console.error("Error parsing weather data:", e);
@@ -1699,11 +1748,27 @@ export default function ActivityDetail() {
 
         {/* Carte GPS */}
         {gpsData.length > 0 && (
-          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
-            <h2 className="text-xl font-semibold text-text-dark dark:text-dark-text-contrast mb-4 font-display">
-              Tracé GPS
-            </h2>
-            <div className="h-96 rounded-lg overflow-hidden border-4 border-panel-border shadow-lg">
+          <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '550ms' }}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-2xl border border-[var(--accent-primary)]/20">
+                  📍
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent-primary)] font-semibold">Parcours</p>
+                  <h3 className="text-xl font-display font-bold text-[var(--text-primary)]">
+                    Tracé GPS
+                  </h3>
+                </div>
+              </div>
+              <span className="text-sm text-[var(--text-tertiary)] bg-[var(--surface-hover)] px-3 py-1 rounded-full">
+                {gpsData.length} points
+              </span>
+            </div>
+
+            {/* Carte avec effet glow au hover */}
+            <div className="h-96 rounded-xl overflow-hidden border-2 border-[var(--border-default)] hover:border-[var(--accent-primary)]/30 hover:shadow-[0_0_30px_rgba(248,113,47,0.15)] transition-all duration-300">
               <MapContainer
                 center={[gpsData[0].lat, gpsData[0].lon]}
                 zoom={13}
@@ -1714,242 +1779,351 @@ export default function ActivityDetail() {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                {/* Ajustement automatique des limites de la carte */}
                 <FitBounds
                   positions={gpsData.map((point) => [point.lat, point.lon])}
                 />
-                {/* Ligne d'ombre/bordure noire pour meilleur contraste */}
+                {/* Ligne d'ombre */}
                 <Polyline
                   positions={gpsData.map((point) => [point.lat, point.lon])}
                   color="#000000"
                   weight={8}
                   opacity={0.3}
                 />
-                {/* Ligne principale en rouge vif */}
+                {/* Ligne principale orange */}
                 <Polyline
                   positions={gpsData.map((point) => [point.lat, point.lon])}
-                  color="#FF3B30"
+                  color="#f8712f"
                   weight={5}
                   opacity={0.9}
                 />
               </MapContainer>
             </div>
-            <p className="text-xs text-text-secondary dark:text-dark-text-secondary mt-3">
-              📍 {gpsData.length} points GPS • Distance totale:{" "}
-              {activity?.distance.toFixed(2)} km
-            </p>
-          </div>
+
+            {/* Footer avec indicateur */}
+            <div className="flex items-center gap-2 mt-4 text-sm text-[var(--text-tertiary)]">
+              <span className="w-2 h-2 bg-[var(--accent-primary)] rounded-full animate-pulse" />
+              Distance totale: <span className="font-semibold text-[var(--text-secondary)]">{formatDistance(activity.distance)}</span>
+            </div>
+          </GlassCard>
         )}
 
         {/* Graphique d'élévation */}
         {elevationChartData.length > 0 && (
-          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
-            <h2 className="text-xl font-semibold text-text-dark mb-4">
-              Profil d'élévation
-            </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={elevationChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="index" stroke="#6B7280" hide />
-                <YAxis stroke="#6B7280" style={{ fontSize: "12px" }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#fdf7e5",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "12px",
-                  }}
-                  formatter={(value: any) => [`${value} m`, "Altitude"]}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="elevation"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                  dot={false}
-                  fill="#10B981"
-                  fillOpacity={0.1}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '600ms' }}>
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--status-success)]/10 flex items-center justify-center text-2xl border border-[var(--status-success)]/20">
+                ⛰️
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-[var(--status-success)] font-semibold">Altitude</p>
+                <h3 className="text-xl font-display font-bold text-[var(--text-primary)]">
+                  Profil d'élévation
+                </h3>
+              </div>
+            </div>
+
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={elevationChartData}>
+                  <defs>
+                    <linearGradient id="elevationGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" />
+                  <XAxis dataKey="index" stroke="var(--text-tertiary)" hide />
+                  <YAxis
+                    stroke="var(--text-tertiary)"
+                    style={{ fontSize: "11px" }}
+                    tickFormatter={(value) => `${value}m`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.95)",
+                      border: "1px solid rgba(148, 163, 184, 0.2)",
+                      borderRadius: "12px",
+                      backdropFilter: "blur(10px)",
+                      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
+                    }}
+                    labelStyle={{ color: "var(--text-tertiary)", fontSize: "11px" }}
+                    formatter={(value: any) => [
+                      <span style={{ color: "#10B981", fontWeight: 600 }}>{value} m</span>,
+                      "Altitude"
+                    ]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="elevation"
+                    stroke="#10B981"
+                    strokeWidth={2}
+                    fill="url(#elevationGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Footer stats */}
+            {activity.elevationGain && (
+              <div className="flex items-center gap-6 mt-4 pt-4 border-t border-[var(--border-subtle)]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[var(--status-success)] rounded-full" />
+                  <span className="text-sm text-[var(--text-tertiary)]">Dénivelé +</span>
+                  <span className="font-semibold text-[var(--status-success)]">{formatElevation(activity.elevationGain)}</span>
+                </div>
+                {activity.elevationLoss && (
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[var(--status-error)] rounded-full" />
+                    <span className="text-sm text-[var(--text-tertiary)]">Dénivelé -</span>
+                    <span className="font-semibold text-[var(--status-error)]">{formatElevation(activity.elevationLoss)}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </GlassCard>
         )}
 
         {/* Zones de FC */}
         {hrZonesData && (
-          <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card mb-8">
-            <h2 className="text-xl font-semibold text-text-dark mb-4">
-              Analyse des zones FC
-            </h2>
-
-            <div className="mb-6 p-4 bg-info-light border border-info rounded-md">
-              <p className="text-sm text-info-dark">
-                <strong>Zone d'entraînement:</strong>{" "}
-                {hrZonesData.currentZone.name} ({hrZonesData.currentZone.min}-
-                {hrZonesData.currentZone.max} bpm)
-              </p>
-              <p className="text-sm text-info-dark mt-1">
-                FC moyenne: <strong>{activity.avgHeartRate} bpm</strong> | FC
-                max: <strong>{activity.maxHeartRate} bpm</strong>
-              </p>
+          <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '650ms' }}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--status-error)]/10 flex items-center justify-center text-2xl border border-[var(--status-error)]/20">
+                  ❤️
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-[var(--status-error)] font-semibold">Entraînement</p>
+                  <h3 className="text-xl font-display font-bold text-[var(--text-primary)]">
+                    Analyse des zones FC
+                  </h3>
+                </div>
+              </div>
+              {/* Badge zone actuelle */}
+              <div
+                className="px-4 py-2 rounded-xl border text-sm font-semibold"
+                style={{
+                  backgroundColor: `${hrZonesData.currentZone.color}15`,
+                  borderColor: `${hrZonesData.currentZone.color}40`,
+                  color: hrZonesData.currentZone.color
+                }}
+              >
+                {hrZonesData.currentZone.name}
+              </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={hrZonesData.zones}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis
-                  dataKey="name"
-                  stroke="#6B7280"
-                  style={{ fontSize: "12px" }}
-                />
-                <YAxis
-                  stroke="#6B7280"
-                  style={{ fontSize: "12px" }}
-                  label={{ value: "BPM", angle: -90, position: "insideLeft" }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#fdf7e5",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "12px",
-                  }}
-                />
-                <Bar dataKey="min" fill="#7FBBB3" name="Min" />
-                <Bar dataKey="max" fill="#E69875" name="Max" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+            {/* Info box avec stats */}
+            <div className="glass-panel p-4 rounded-xl mb-6 bg-gradient-to-r from-[var(--status-error)]/5 via-transparent to-[var(--accent-secondary)]/5 border border-[var(--status-error)]/10">
+              <div className="flex items-center gap-3">
+                <span className="w-2 h-2 bg-[var(--status-error)] rounded-full animate-pulse" />
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                  <span className="text-[var(--text-tertiary)]">
+                    Zone: <strong className="text-[var(--text-primary)]">{hrZonesData.currentZone.min}-{hrZonesData.currentZone.max} bpm</strong>
+                  </span>
+                  <span className="text-[var(--text-tertiary)]">
+                    FC moyenne: <strong className="text-[var(--status-error)]">{activity.avgHeartRate} bpm</strong>
+                  </span>
+                  <span className="text-[var(--text-tertiary)]">
+                    FC max: <strong className="text-[var(--text-secondary)]">{activity.maxHeartRate} bpm</strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Graphique zones */}
+            <div className="h-52">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={hrZonesData.zones} barGap={4}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" />
+                  <XAxis
+                    dataKey="name"
+                    stroke="var(--text-tertiary)"
+                    style={{ fontSize: "10px" }}
+                    tick={{ fill: 'var(--text-tertiary)' }}
+                  />
+                  <YAxis
+                    stroke="var(--text-tertiary)"
+                    style={{ fontSize: "10px" }}
+                    tick={{ fill: 'var(--text-tertiary)' }}
+                    tickFormatter={(value) => `${value}`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.95)",
+                      border: "1px solid rgba(148, 163, 184, 0.2)",
+                      borderRadius: "12px",
+                      backdropFilter: "blur(10px)",
+                      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
+                    }}
+                    labelStyle={{ color: "var(--text-secondary)", fontSize: "12px", fontWeight: 600 }}
+                  />
+                  <Bar dataKey="min" fill="#3B82F6" name="Min BPM" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="max" fill="#f8712f" name="Max BPM" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Légende zones */}
+            <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[var(--border-subtle)]">
+              {hrZonesData.zones.map((zone) => (
+                <div
+                  key={zone.zone}
+                  className="flex items-center gap-2 text-xs px-2 py-1 rounded-lg"
+                  style={{ backgroundColor: `${zone.color}10` }}
+                >
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: zone.color }} />
+                  <span className="text-[var(--text-tertiary)]">{zone.name}</span>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
         )}
 
         {/* Données supplémentaires */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Cardio */}
           {(activity.avgHeartRate || activity.maxHeartRate) && (
-            <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
-              <h3 className="text-lg font-semibold text-text-dark mb-4">
-                Cardio
-              </h3>
+            <GlassCard className="group animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '700ms' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[var(--status-error)]/10 flex items-center justify-center text-lg border border-[var(--status-error)]/20 group-hover:scale-110 transition-transform duration-300">
+                  ❤️
+                </div>
+                <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
+                  Cardio
+                </h3>
+              </div>
               <div className="space-y-3">
                 {activity.avgHeartRate && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">FC moyenne</span>
-                    <span className="font-medium text-text-dark">
-                      {activity.avgHeartRate} bpm
+                  <div className="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">FC moyenne</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {activity.avgHeartRate} <span className="text-xs text-[var(--text-tertiary)]">bpm</span>
                     </span>
                   </div>
                 )}
                 {activity.maxHeartRate && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">FC maximale</span>
-                    <span className="font-medium text-text-dark">
-                      {activity.maxHeartRate} bpm
+                  <div className="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">FC maximale</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {activity.maxHeartRate} <span className="text-xs text-[var(--text-tertiary)]">bpm</span>
                     </span>
                   </div>
                 )}
                 {activity.trimp && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">TRIMP</span>
-                    <span className="font-medium text-accent-500">
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-sm text-[var(--text-tertiary)]">TRIMP</span>
+                    <span className={`font-semibold ${getTrimpColor(activity.trimp)}`}>
                       {activity.trimp}
                     </span>
                   </div>
                 )}
               </div>
-            </div>
+            </GlassCard>
           )}
 
           {/* Vitesse */}
           {(activity.avgSpeed || activity.maxSpeed) && (
-            <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
-              <h3 className="text-lg font-semibold text-text-dark mb-4">
-                Vitesse
-              </h3>
+            <GlassCard className="group animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '750ms' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[var(--status-info)]/10 flex items-center justify-center text-lg border border-[var(--status-info)]/20 group-hover:scale-110 transition-transform duration-300">
+                  🚀
+                </div>
+                <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
+                  Vitesse
+                </h3>
+              </div>
               <div className="space-y-3">
                 {activity.avgSpeed && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Vitesse moyenne</span>
-                    <span className="font-medium text-text-dark">
+                  <div className="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">Vitesse moyenne</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
                       {formatSpeed(activity.avgSpeed)}
                     </span>
                   </div>
                 )}
                 {activity.maxSpeed && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">
-                      Vitesse maximale
-                    </span>
-                    <span className="font-medium text-text-dark">
+                  <div className="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">Vitesse maximale</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
                       {formatSpeed(activity.maxSpeed)}
                     </span>
                   </div>
                 )}
                 {activity.avgSpeed && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Allure moyenne</span>
-                    <span className="font-medium text-text-dark">
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-sm text-[var(--text-tertiary)]">Allure moyenne</span>
+                    <span className="font-semibold text-[var(--accent-primary)]">
                       {formatPace(activity.avgSpeed)}
                     </span>
                   </div>
                 )}
               </div>
-            </div>
+            </GlassCard>
           )}
 
           {/* Puissance */}
           {(activity.avgPower || activity.normalizedPower) && (
-            <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
-              <h3 className="text-lg font-semibold text-text-dark mb-4">
-                Puissance
-              </h3>
+            <GlassCard className="group animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '800ms' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[var(--accent-secondary)]/10 flex items-center justify-center text-lg border border-[var(--accent-secondary)]/20 group-hover:scale-110 transition-transform duration-300">
+                  ⚡
+                </div>
+                <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
+                  Puissance
+                </h3>
+              </div>
               <div className="space-y-3">
                 {activity.avgPower && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">
-                      Puissance moyenne
-                    </span>
-                    <span className="font-medium text-text-dark">
-                      {activity.avgPower} W
+                  <div className="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">Puissance moyenne</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {activity.avgPower} <span className="text-xs text-[var(--text-tertiary)]">W</span>
                     </span>
                   </div>
                 )}
                 {activity.normalizedPower && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">
-                      Puissance normalisée
-                    </span>
-                    <span className="font-medium text-text-dark">
-                      {activity.normalizedPower} W
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-sm text-[var(--text-tertiary)]">Puissance normalisée</span>
+                    <span className="font-semibold text-[var(--accent-secondary)]">
+                      {activity.normalizedPower} <span className="text-xs text-[var(--text-tertiary)]">W</span>
                     </span>
                   </div>
                 )}
               </div>
-            </div>
+            </GlassCard>
           )}
 
           {/* Autres */}
           {(activity.avgCadence || activity.calories) && (
-            <div className="glass-panel p-6 rounded-lg border border-border-base shadow-card">
-              <h3 className="text-lg font-semibold text-text-dark mb-4">
-                Autres données
-              </h3>
+            <GlassCard className="group animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '850ms' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg border border-purple-500/20 group-hover:scale-110 transition-transform duration-300">
+                  📊
+                </div>
+                <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
+                  Autres données
+                </h3>
+              </div>
               <div className="space-y-3">
                 {activity.avgCadence && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Cadence moyenne</span>
-                    <span className="font-medium text-text-dark">
-                      {activity.avgCadence} rpm
+                  <div className="flex justify-between items-center py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-sm text-[var(--text-tertiary)]">Cadence moyenne</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {activity.avgCadence} <span className="text-xs text-[var(--text-tertiary)]">rpm</span>
                     </span>
                   </div>
                 )}
                 {activity.calories && (
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Calories</span>
-                    <span className="font-medium text-text-dark">
-                      {activity.calories} kcal
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-sm text-[var(--text-tertiary)]">Calories</span>
+                    <span className="font-semibold text-[var(--accent-primary)]">
+                      {activity.calories} <span className="text-xs text-[var(--text-tertiary)]">kcal</span>
                     </span>
                   </div>
                 )}
               </div>
-            </div>
+            </GlassCard>
           )}
         </div>
       </div>
@@ -1957,5 +2131,6 @@ export default function ActivityDetail() {
       {/* Similar Activities Section */}
       {activity && <SimilarActivities activityId={activity.id} />}
     </div>
+  </div>
   );
 }

@@ -34,7 +34,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Composant de chargement pour Suspense
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a1915]">
+    <div className="min-h-screen flex items-center justify-center bg-[#0c1017]">
       <div className="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         <p className="text-gray-300 font-medium animate-pulse">
@@ -53,7 +53,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen transition-colors duration-300 bg-[#0a1915]">
+      <div className="min-h-screen transition-colors duration-300 bg-[#0c1017]">
         {/* Raccourcis clavier globaux */}
         <GlobalShortcuts />
         {/* Recherche globale */}
