@@ -42,9 +42,9 @@ export default function YearComparison() {
   const [selectedYear, setSelectedYear] = useState(thisYear);
   const [comparedYear, setComparedYear] = useState(thisYear - 1);
 
-  // Générer la liste des années disponibles (de 2020 à année courante + 1)
+  // Générer la liste des années disponibles (de 2020 à année courante)
   const availableYears = Array.from(
-    { length: thisYear - 2019 + 2 },
+    { length: thisYear - 2019 },
     (_, i) => 2020 + i
   );
 
