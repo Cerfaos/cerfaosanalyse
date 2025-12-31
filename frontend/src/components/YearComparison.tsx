@@ -37,15 +37,16 @@ export default function YearComparison() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Années sélectionnables
+  // Années sélectionnables (à partir de 2025, année de création de l'app)
   const thisYear = new Date().getFullYear();
+  const startYear = 2025;
   const [selectedYear, setSelectedYear] = useState(thisYear);
-  const [comparedYear, setComparedYear] = useState(thisYear - 1);
+  const [comparedYear, setComparedYear] = useState(Math.max(thisYear - 1, startYear));
 
-  // Générer la liste des années disponibles (de 2020 à année courante)
+  // Générer la liste des années disponibles (de 2025 à année courante + 1 pour anticiper)
   const availableYears = Array.from(
-    { length: thisYear - 2019 },
-    (_, i) => 2020 + i
+    { length: thisYear - startYear + 2 },
+    (_, i) => startYear + i
   );
 
   useEffect(() => {
