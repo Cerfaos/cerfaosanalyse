@@ -40,8 +40,10 @@ export default function YearComparison() {
   // Années sélectionnables (à partir de 2025, année de création de l'app)
   const thisYear = new Date().getFullYear();
   const startYear = 2025;
-  const [selectedYear, setSelectedYear] = useState(thisYear);
-  const [comparedYear, setComparedYear] = useState(Math.max(thisYear - 1, startYear));
+  // Par défaut, afficher la dernière année complète (ou 2025 si on est en 2025)
+  const defaultYear = thisYear > startYear ? thisYear - 1 : startYear;
+  const [selectedYear, setSelectedYear] = useState(defaultYear);
+  const [comparedYear, setComparedYear] = useState(defaultYear);
 
   // Générer la liste des années disponibles (de 2025 à année courante + 1 pour anticiper)
   const availableYears = Array.from(
