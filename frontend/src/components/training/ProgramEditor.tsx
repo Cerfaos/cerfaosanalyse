@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import {
@@ -59,7 +60,7 @@ export function ProgramEditor({ program, onSave, onCancel }: ProgramEditorProps)
       const data = await trainingApi.templates.list()
       setTemplates(data)
     } catch (error) {
-      console.error('Erreur chargement templates:', error)
+      // Silencieux
     }
   }
 
@@ -142,7 +143,7 @@ export function ProgramEditor({ program, onSave, onCancel }: ProgramEditorProps)
 
   const handleSave = async () => {
     if (!name.trim()) {
-      alert('Le nom du programme est requis')
+      toast.error('Le nom du programme est requis')
       return
     }
 
@@ -166,8 +167,8 @@ export function ProgramEditor({ program, onSave, onCancel }: ProgramEditorProps)
 
       onSave(savedProgram)
     } catch (error) {
-      console.error('Erreur sauvegarde programme:', error)
-      alert('Erreur lors de la sauvegarde')
+      // Erreur gérée par toast
+      toast.error('Erreur lors de la sauvegarde')
     } finally {
       setSaving(false)
     }

@@ -50,7 +50,7 @@ export function PpgExerciseLibrary({ onSelect }: PpgExerciseLibraryProps) {
       const response = await trainingApi.ppgExercises.list(params)
       setExercises(response.exercises)
     } catch (error) {
-      console.error('Erreur chargement exercices PPG:', error)
+      // Silencieux
     } finally {
       setLoading(false)
     }

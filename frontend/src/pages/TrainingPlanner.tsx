@@ -3,6 +3,7 @@ import { Bike, Dumbbell, Plus, Zap, Calendar, FolderOpen, TrendingUp, TrendingDo
 import toast from 'react-hot-toast'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Button } from '../components/ui/button'
 import {
   Dialog,
@@ -91,6 +92,10 @@ export default function TrainingPlanner() {
   const [editingSession, setEditingSession] = useState<TrainingSession | null>(null)
   const [templateToUse, setTemplateToUse] = useState<TrainingTemplate | null>(null)
   const [playingSession, setPlayingSession] = useState<TrainingSession | null>(null)
+  const [deleteSessionConfirm, setDeleteSessionConfirm] = useState<{ isOpen: boolean; id: number | null }>({
+    isOpen: false,
+    id: null,
+  })
 
   // Charger les données au montage
   useEffect(() => {
@@ -112,14 +117,19 @@ export default function TrainingPlanner() {
     setShowSessionForm(true)
   }
 
-  const handleDeleteSession = async (id: number) => {
-    if (confirm('Supprimer cette séance ?')) {
-      try {
-        await deleteSession(id)
-        toast.success('Séance supprimée')
-      } catch (err) {
-        toast.error('Erreur lors de la suppression')
-      }
+  const handleDeleteSessionClick = (id: number) => {
+    setDeleteSessionConfirm({ isOpen: true, id })
+  }
+
+  const handleDeleteSessionConfirm = async () => {
+    if (!deleteSessionConfirm.id) return
+    try {
+      await deleteSession(deleteSessionConfirm.id)
+      toast.success('Séance supprimée')
+    } catch {
+      toast.error('Erreur lors de la suppression')
+    } finally {
+      setDeleteSessionConfirm({ isOpen: false, id: null })
     }
   }
 
@@ -323,7 +333,7 @@ export default function TrainingPlanner() {
                               ftp={profile.ftp || 200}
                               weight={profile.weight || 75}
                               onEdit={handleEditSession}
-                              onDelete={handleDeleteSession}
+                              onDelete={handleDeleteSessionClick}
                               onPlay={setPlayingSession}
                             />
                           ))}
@@ -348,7 +358,7 @@ export default function TrainingPlanner() {
                               ftp={profile.ftp || 200}
                               weight={profile.weight || 75}
                               onEdit={handleEditSession}
-                              onDelete={handleDeleteSession}
+                              onDelete={handleDeleteSessionClick}
                               onPlay={setPlayingSession}
                             />
                           ))}
@@ -434,6 +444,16 @@ export default function TrainingPlanner() {
           />
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteSessionConfirm.isOpen}
+        onClose={() => setDeleteSessionConfirm({ isOpen: false, id: null })}
+        onConfirm={handleDeleteSessionConfirm}
+        title="Supprimer la séance"
+        message="Voulez-vous vraiment supprimer cette séance ?"
+        confirmLabel="Supprimer"
+        variant="danger"
+      />
     </AppLayout>
   )
 }

@@ -99,7 +99,7 @@ export function PpgSessionPlayer({ session, open, onOpenChange }: PpgSessionPlay
       oscillator.start(ctx.currentTime)
       oscillator.stop(ctx.currentTime + duration / 1000)
     } catch (e) {
-      console.warn('Audio not available:', e)
+      // Audio non disponible
     }
   }, [soundEnabled])
 

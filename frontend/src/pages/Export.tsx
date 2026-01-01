@@ -33,7 +33,7 @@ export default function Export() {
       const response = await api.get('/api/exports/stats')
       setStats(response.data.data)
     } catch (error) {
-      console.error('Erreur lors du chargement des statistiques:', error)
+      // Erreur gérée par toast
     } finally {
       setLoading(false)
     }
@@ -56,8 +56,8 @@ export default function Export() {
       link.remove()
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error)
-      alert('Erreur lors du téléchargement')
+      // Erreur gérée par toast
+      toast.error('Erreur lors du téléchargement')
     } finally {
       setDownloading(null)
     }
@@ -89,7 +89,7 @@ export default function Export() {
 
       toast.success('Sauvegarde téléchargée avec succès')
     } catch (error) {
-      console.error('Erreur lors du téléchargement de la sauvegarde:', error)
+      // Erreur gérée par toast
       toast.error('Erreur lors du téléchargement de la sauvegarde')
     } finally {
       setDownloading(null)
@@ -143,7 +143,7 @@ export default function Export() {
         window.location.reload()
       }, 2000)
     } catch (error: any) {
-      console.error('Erreur lors de la restauration:', error)
+      // Erreur gérée par toast
       toast.error(error.response?.data?.message || 'Erreur lors de la restauration de la sauvegarde')
     } finally {
       setImporting(false)

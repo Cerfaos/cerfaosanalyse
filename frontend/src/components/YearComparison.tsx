@@ -99,7 +99,7 @@ export default function YearComparison() {
         previous: calculateYearStats(previousActivities),
       });
     } catch (error) {
-      console.error("Erreur lors du chargement de la comparaison:", error);
+      // Silencieux
     } finally {
       setLoading(false);
     }

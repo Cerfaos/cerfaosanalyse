@@ -119,7 +119,7 @@ export function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
       onClose()
     } catch (error) {
       toast.error('Erreur lors de l\'enregistrement du profil')
-      console.error('Erreur save profile:', error)
+      // Erreur gérée par toast
     } finally {
       setSaving(false)
     }

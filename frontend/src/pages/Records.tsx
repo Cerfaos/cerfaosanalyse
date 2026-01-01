@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import api from '../services/api'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 
 interface PersonalRecord {
   id: number
@@ -67,6 +68,7 @@ export default function Records() {
   const [loading, setLoading] = useState(true)
   const [selectedType, setSelectedType] = useState<string>('all')
   const [recalculating, setRecalculating] = useState(false)
+  const [showRecalculateConfirm, setShowRecalculateConfirm] = useState(false)
 
   useEffect(() => {
     fetchRecords()
@@ -84,23 +86,24 @@ export default function Records() {
       setRecentRecords(recentRes.data.data)
       setStats(statsRes.data.data)
     } catch (error) {
-      console.error('Erreur lors du chargement des records:', error)
+      // Erreur gérée par toast
     } finally {
       setLoading(false)
     }
   }
 
-  const handleRecalculate = async () => {
-    if (!confirm('Recalculer tous vos records ? Cette opération peut prendre du temps.')) {
-      return
-    }
+  const handleRecalculateClick = () => {
+    setShowRecalculateConfirm(true)
+  }
 
+  const handleRecalculateConfirm = async () => {
+    setShowRecalculateConfirm(false)
     try {
       setRecalculating(true)
       await api.get('/api/records/recalculate')
       await fetchRecords()
-    } catch (error) {
-      console.error('Erreur lors du recalcul:', error)
+    } catch {
+      // Erreur silencieuse
     } finally {
       setRecalculating(false)
     }
@@ -181,7 +184,7 @@ export default function Records() {
           accentColor="#FFAB40"
           actions={
             <button
-              onClick={handleRecalculate}
+              onClick={handleRecalculateClick}
               disabled={recalculating}
               className="px-4 py-2 bg-[#8BC34A] text-white rounded-lg hover:bg-[#7CB342] transition-colors disabled:opacity-50"
             >
@@ -364,6 +367,16 @@ export default function Records() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={showRecalculateConfirm}
+        onClose={() => setShowRecalculateConfirm(false)}
+        onConfirm={handleRecalculateConfirm}
+        title="Recalculer les records"
+        message="Recalculer tous vos records ? Cette opération peut prendre du temps."
+        confirmLabel="Recalculer"
+        variant="warning"
+      />
     </AppLayout>
   )
 }

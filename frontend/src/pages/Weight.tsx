@@ -5,6 +5,7 @@ import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
 import { Input, Textarea, Label } from '../components/ui/input'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 
 interface WeightEntry {
   id: number
@@ -40,6 +41,10 @@ export default function Weight() {
     weight: '',
     notes: '',
   })
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: number | null }>({
+    isOpen: false,
+    id: null,
+  })
 
   useEffect(() => {
     loadData()
@@ -56,7 +61,7 @@ export default function Weight() {
       setWeightHistories(historiesRes.data.data.data || [])
       setStats(statsRes.data.data)
     } catch (err) {
-      console.error('Erreur chargement données:', err)
+      // Erreur silencieuse
       setError('Impossible de charger les données')
     } finally {
       setLoading(false)
@@ -90,15 +95,20 @@ export default function Weight() {
     }
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Voulez-vous vraiment supprimer cette pesée ?')) return
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirm({ isOpen: true, id })
+  }
 
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.id) return
     try {
-      await api.delete(`/api/weight-histories/${id}`)
+      await api.delete(`/api/weight-histories/${deleteConfirm.id}`)
       setSuccess('Pesée supprimée')
       loadData()
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors de la suppression')
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null })
     }
   }
 
@@ -300,7 +310,7 @@ export default function Weight() {
                     <TableCell className="text-gray-400">{entry.notes || '—'}</TableCell>
                     <TableCell className="text-right">
                       <button
-                        onClick={() => handleDelete(entry.id)}
+                        onClick={() => handleDeleteClick(entry.id)}
                         className="text-red-400 hover:text-red-300 transition-colors"
                       >
                         Supprimer
@@ -313,6 +323,16 @@ export default function Weight() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer la pesée"
+        message="Voulez-vous vraiment supprimer cette pesée ?"
+        confirmLabel="Supprimer"
+        variant="danger"
+      />
     </AppLayout>
   )
 }

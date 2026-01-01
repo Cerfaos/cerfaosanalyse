@@ -40,7 +40,7 @@ export default function TrainingLoad() {
       setCurrentLoad(response.data.data.current)
       setHistory(response.data.data.history)
     } catch (error) {
-      console.error("Erreur lors du chargement de la charge d'entraînement:", error)
+      // Erreur gérée par toast
     } finally {
       setLoading(false)
     }

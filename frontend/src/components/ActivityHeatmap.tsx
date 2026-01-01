@@ -46,8 +46,6 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
         const dateKey = activity.date.split('T')[0]
         // Debug: vérifier le format des dates
         if (activities.length > 0 && activities.indexOf(activity) === 0) {
-          console.log('Premier activité - date brute:', activity.date)
-          console.log('Premier activité - dateKey:', dateKey)
         }
         if (!grouped[dateKey]) {
           grouped[dateKey] = {
@@ -70,7 +68,7 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
 
       setData(grouped)
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error)
+      // Silencieux
     } finally {
       setLoading(false)
     }

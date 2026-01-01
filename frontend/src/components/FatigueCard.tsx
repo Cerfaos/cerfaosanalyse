@@ -83,7 +83,7 @@ export default function FatigueCard() {
         const response = await api.get("/api/analytics/fatigue");
         setAnalysis(response.data.data);
       } catch (error) {
-        console.error("Erreur chargement fatigue:", error);
+        // Silencieux
       } finally {
         setLoading(false);
       }

@@ -51,7 +51,6 @@ export default function Profile() {
 
   useEffect(() => {
     if (!avatarFile) {
-      console.log('useEffect: Mise à jour avatarPreview avec user.avatarUrl =', user?.avatarUrl)
       setAvatarPreview(user?.avatarUrl || '')
     }
   }, [user?.avatarUrl, avatarFile])
@@ -68,8 +67,8 @@ export default function Profile() {
     try {
       const response = await api.get('/api/users/hr-zones')
       setHrZones(response.data.data)
-    } catch (err) {
-      console.error('Erreur chargement zones FC:', err)
+    } catch {
+      // Silencieux - zones FC optionnelles
     }
   }
 
@@ -89,12 +88,8 @@ export default function Profile() {
         theme: formData.theme,
       }
 
-      console.log('Envoi du payload:', payload)
-
       const response = await api.patch('/api/users/profile', payload)
       const updatedUser = response.data.data
-
-      console.log('Utilisateur mis à jour:', updatedUser)
 
       updateUser(updatedUser)
       setSuccess('Profil mis à jour avec succès !')
@@ -104,8 +99,6 @@ export default function Profile() {
         loadHeartRateZones()
       }
     } catch (err: any) {
-      console.error('Erreur complète:', err)
-      console.error('Réponse erreur:', err.response?.data)
       setError(err.response?.data?.message || err.message || 'Erreur lors de la mise à jour')
     } finally {
       setLoading(false)
@@ -154,10 +147,8 @@ export default function Profile() {
       })
       const newAvatar =
         response.data?.data?.avatarUrl || response.data?.data?.avatar || response.data?.avatarUrl || ''
-      console.log('Avatar uploadé:', newAvatar)
       if (newAvatar) {
         updateUser({ avatarUrl: newAvatar })
-        console.log('User mis à jour avec avatarUrl:', newAvatar)
         setSuccess('Avatar mis à jour avec succès !')
         // Révoquer l'ancienne URL blob
         if (avatarObjectUrl) {

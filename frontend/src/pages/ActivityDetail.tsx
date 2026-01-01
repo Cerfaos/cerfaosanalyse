@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import toast from "react-hot-toast";
 import SimilarActivities from "../components/SimilarActivities";
 import { GlassCard } from "../components/ui/GlassCard";
 import MetricInfo from "../components/ui/MetricInfo";
@@ -158,11 +159,11 @@ export default function ActivityDetail() {
           );
           setGpsData(validPoints);
         } catch (err) {
-          console.error("Erreur parsing GPS:", err);
+          // GPS parsing silencieux
         }
       }
     } catch (err: any) {
-      console.error("Erreur chargement activité:", err);
+      // Erreur gérée par redirect
       setError("Impossible de charger l'activité");
     } finally {
       setLoading(false);
@@ -304,8 +305,8 @@ export default function ActivityDetail() {
       setIsEditing(false);
       loadActivity(); // Recharger l'activité mise à jour
     } catch (err) {
-      console.error("Erreur lors de la mise à jour:", err);
-      alert("Erreur lors de la mise à jour de l'activité");
+      // Erreur gérée par toast
+      toast.error("Erreur lors de la mise à jour");
     }
   };
 
@@ -1741,7 +1742,7 @@ export default function ActivityDetail() {
                 </GlassCard>
               );
             } catch (e) {
-              console.error("Error parsing weather data:", e);
+              // Weather parsing silencieux
               return null;
             }
           })()}

@@ -68,7 +68,7 @@ export default function MrcImportModal({
         setCustomName(previewData.name)
         setStep('preview')
       } catch (error) {
-        console.error('Erreur preview:', error)
+        // Silencieux
         toast.error('Erreur lors de la lecture du fichier MRC')
       } finally {
         setLoading(false)
@@ -99,7 +99,7 @@ export default function MrcImportModal({
         setCustomName(previewData.name)
         setStep('preview')
       } catch (error) {
-        console.error('Erreur preview:', error)
+        // Silencieux
         toast.error('Erreur lors de la lecture du fichier MRC')
       } finally {
         setLoading(false)
@@ -144,7 +144,7 @@ export default function MrcImportModal({
       setStep('done')
       onImportSuccess()
     } catch (error) {
-      console.error('Erreur import:', error)
+      // Erreur gérée par toast
       toast.error("Erreur lors de l'importation")
       setStep('preview')
     } finally {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import toast from 'react-hot-toast'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Section } from '../components/ui/Section'
@@ -44,7 +45,7 @@ export default function Insights() {
       const fatigueRes = await api.get('/api/analytics/fatigue')
       setFatigue(fatigueRes.data.data)
     } catch (error) {
-      console.error('Erreur lors du chargement des analyses:', error)
+      // Erreur gérée par toast
     } finally {
       setLoading(false)
     }
@@ -57,8 +58,7 @@ export default function Insights() {
       const response = await api.post('/api/analytics/predict-performance', predictionForm)
       setPrediction(response.data.data)
     } catch (error: any) {
-      console.error('Erreur de prédiction:', error)
-      alert(error.response?.data?.message || 'Erreur lors de la prédiction')
+      toast.error(error.response?.data?.message || 'Erreur lors de la prédiction')
     } finally {
       setPredictingLoading(false)
     }

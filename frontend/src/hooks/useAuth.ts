@@ -32,7 +32,7 @@ export function useAuth() {
       // Mettre à jour le store avec les données utilisateur
       useAuthStore.setState({ user: userData })
     } catch (error) {
-      console.error('Erreur chargement utilisateur:', error)
+      // Silencieux - sera redirigé
       // Si le token n'est plus valide, déconnecter
       logout()
     }

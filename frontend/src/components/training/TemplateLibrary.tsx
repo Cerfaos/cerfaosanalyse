@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import { FolderPlus } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { Button } from '../ui/button'
+import { ConfirmDialog } from '../ui/ConfirmDialog'
 import {
   Select,
   SelectContent,
@@ -43,6 +45,10 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
   const [playingTemplate, setPlayingTemplate] = useState<TrainingTemplate | null>(null)
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [filterWeek, setFilterWeek] = useState<string>('all')
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: number | null }>({
+    isOpen: false,
+    id: null,
+  })
 
   // Obtenir les semaines uniques
   const weeks = useMemo(() => {
@@ -69,17 +75,23 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
       setShowForm(false)
       setEditingTemplate(null)
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du template:', error)
+      // Erreur gérée par toast
     }
   }
 
-  const handleDelete = async (id: number) => {
-    if (confirm('Supprimer ce modèle ?')) {
-      try {
-        await deleteTemplate(id)
-      } catch (error) {
-        console.error('Erreur lors de la suppression du template:', error)
-      }
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirm({ isOpen: true, id })
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.id) return
+    try {
+      await deleteTemplate(deleteConfirm.id)
+      toast.success('Modèle supprimé')
+    } catch {
+      toast.error('Erreur lors de la suppression')
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null })
     }
   }
 
@@ -87,7 +99,7 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
     try {
       await duplicateTemplate(template.id)
     } catch (error) {
-      console.error('Erreur lors de la duplication du template:', error)
+      // Erreur gérée par toast
     }
   }
 
@@ -155,7 +167,7 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
               ftp={ftp}
               weight={weight}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={handleDeleteClick}
               onDuplicate={handleDuplicate}
               onUse={onCreateSession}
               onPlay={setPlayingTemplate}
@@ -201,6 +213,16 @@ export function TemplateLibrary({ onCreateSession }: TemplateLibraryProps) {
           onOpenChange={(open) => !open && setPlayingTemplate(null)}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer le modèle"
+        message="Voulez-vous vraiment supprimer ce modèle ?"
+        confirmLabel="Supprimer"
+        variant="danger"
+      />
     </div>
   )
 }

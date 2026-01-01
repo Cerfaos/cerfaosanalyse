@@ -80,7 +80,7 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
       oscillator.start(ctx.currentTime)
       oscillator.stop(ctx.currentTime + duration / 1000)
     } catch (e) {
-      console.warn('Audio not available:', e)
+      // Audio non disponible
     }
   }, [soundEnabled])
 

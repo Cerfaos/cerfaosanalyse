@@ -58,7 +58,7 @@ export default function Reports() {
       }
       setReport(data)
     } catch (error) {
-      console.error('Erreur lors du chargement du rapport:', error)
+      // Erreur gérée par toast
       toast.error('Erreur lors du chargement du rapport')
     } finally {
       setLoading(false)
@@ -73,7 +73,7 @@ export default function Reports() {
       exportReportToPdf(report, filename)
       toast.success('PDF exporté avec succès')
     } catch (error) {
-      console.error('Erreur lors de l\'export PDF:', error)
+      // Erreur gérée par toast
       toast.error('Erreur lors de l\'export PDF')
     } finally {
       setExporting(null)
@@ -88,7 +88,7 @@ export default function Reports() {
       exportReportToHtml(report, filename)
       toast.success('HTML exporté avec succès')
     } catch (error) {
-      console.error('Erreur lors de l\'export HTML:', error)
+      // Erreur gérée par toast
       toast.error('Erreur lors de l\'export HTML')
     } finally {
       setExporting(null)

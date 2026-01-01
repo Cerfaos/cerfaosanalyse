@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import { Card } from "../components/ui/Card";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import CustomDatePicker from "../components/ui/DatePicker";
 import { Label } from "../components/ui/input";
 import { PageHeader } from "../components/ui/PageHeader";
@@ -149,6 +150,10 @@ export default function Activities() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: number | null }>({
+    isOpen: false,
+    id: null,
+  });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedGpxFile, setSelectedGpxFile] = useState<File | null>(null);
   const [manualGpxFile, setManualGpxFile] = useState<File | null>(null);
@@ -203,7 +208,7 @@ export default function Activities() {
       setActivities(activitiesRes.data.data.data || []);
       setStats(statsRes.data.data);
     } catch (err) {
-      console.error("Erreur chargement données:", err);
+      // Erreur gérée par toast
       setError("Impossible de charger les données");
     } finally {
       setLoading(false);
@@ -276,15 +281,20 @@ export default function Activities() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Voulez-vous vraiment supprimer cette activité ?")) return;
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirm({ isOpen: true, id });
+  };
 
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.id) return;
     try {
-      await api.delete(`/api/activities/${id}`);
+      await api.delete(`/api/activities/${deleteConfirm.id}`);
       setSuccess("Activité supprimée");
       loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur lors de la suppression");
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null });
     }
   };
 
@@ -1611,7 +1621,7 @@ export default function Activities() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDelete(activity.id);
+                                handleDeleteClick(activity.id);
                               }}
                               className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all duration-200"
                               title="Supprimer"
@@ -1749,6 +1759,16 @@ export default function Activities() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer l'activité"
+        message="Voulez-vous vraiment supprimer cette activité ? Cette action est irréversible."
+        confirmLabel="Supprimer"
+        variant="danger"
+      />
     </AppLayout>
   );
 }

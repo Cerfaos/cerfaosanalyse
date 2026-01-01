@@ -275,7 +275,7 @@ export default function Dashboard() {
         loadWeightData(),
       ]);
     } catch (error) {
-      console.error("Erreur lors du chargement du dashboard:", error);
+      // Erreur gérée par toast
     } finally {
       setLoading(false);
     }
@@ -298,7 +298,7 @@ export default function Dashboard() {
       setWeightEntries(historiesRes.data.data.data || []);
       setWeightStats(statsRes.data.data);
     } catch (error) {
-      console.error("Erreur lors du chargement des données de poids:", error);
+      // Silencieux - données optionnelles
     }
   };
 
@@ -500,7 +500,7 @@ export default function Dashboard() {
       statsArray.sort((a, b) => b.count - a.count);
       setTypeStats(statsArray);
     } catch (error) {
-      console.error("Erreur lors du chargement des stats par type:", error);
+      // Silencieux - données optionnelles
     }
   };
 

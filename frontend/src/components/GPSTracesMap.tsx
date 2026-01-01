@@ -99,11 +99,8 @@ export default function GPSTracesMap() {
     try {
       setLoading(true);
       const limitParam = limit === -1 ? 3000 : limit;
-      console.log(`🚀 Fetching traces with limit: ${limitParam}`);
       const response = await api.get(`/api/activities?limit=${limitParam}`);
       const activities = response.data.data.data || [];
-
-      console.log(`📊 Total activités reçues: ${activities.length}`);
 
       // Extraire tous les types disponibles
       const types = Array.from(
@@ -147,29 +144,17 @@ export default function GPSTracesMap() {
               if (Array.isArray(gpsData) && gpsData.length > 0) {
                 points = gpsData.map((point: any) => ({
                   lat: point.lat,
-                  lng: point.lng || point.lon, // Supporter les deux formats: lng (standard) et lon (GPX)
+                  lng: point.lng || point.lon,
                 }));
-                // hasRealGPS = true;
-                console.log(
-                  `✅ Activité ${activity.id} (${activity.type}): ${points.length} points GPS réels`
-                );
               }
-            } catch (e) {
-              console.warn(
-                `⚠️ Erreur parsing GPS pour activité ${activity.id}:`,
-                e
-              );
+            } catch {
+              // GPS parsing silencieux
             }
           }
 
           // Fallback: simuler si pas de données GPS réelles
           if (points.length === 0) {
             points = generateSimulatedTrace(activity);
-            if (points.length > 0) {
-              console.log(
-                `🔵 Activité ${activity.id} (${activity.type}): ${points.length} points GPS simulés`
-              );
-            }
           }
 
           return {
@@ -184,10 +169,9 @@ export default function GPSTracesMap() {
         })
         .filter((t: ActivityTrace) => t.points.length > 0);
 
-      console.log(`🗺️ Traces affichées: ${tracesData.length}`);
       setTraces(tracesData);
-    } catch (error) {
-      console.error("Erreur lors du chargement des traces:", error);
+    } catch {
+      // Silencieux
     } finally {
       setLoading(false);
     }

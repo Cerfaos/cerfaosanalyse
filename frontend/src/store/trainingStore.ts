@@ -449,7 +449,7 @@ export const useTrainingStore = create<TrainingState>()(
         } catch (error) {
           // Si erreur (ex: non authentifié), ne pas bloquer
           set({ loading: false })
-          console.warn('Impossible de charger le profil:', error)
+          // Silencieux
         }
       },
 
@@ -504,7 +504,7 @@ export const useTrainingStore = create<TrainingState>()(
             },
           })
         } catch (error) {
-          console.error('Erreur lors de la mise à jour FTP:', error)
+          // Silencieux
           // En cas d'erreur, on recharge le profil depuis l'API
           try {
             const profileData = await profileApi.get()

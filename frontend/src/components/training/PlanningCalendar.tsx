@@ -378,7 +378,7 @@ export function PlanningCalendar() {
           templates: templatesData,
         })
       } catch (error) {
-        console.error('Erreur chargement planning:', error)
+        // Silencieux
       } finally {
         setIsLoading(false)
       }

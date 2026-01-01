@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
+import toast from 'react-hot-toast'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 
 interface Equipment {
   id: number
@@ -47,6 +49,10 @@ export default function Equipment() {
     purchaseDate: '',
     notes: '',
   })
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: number | null }>({
+    isOpen: false,
+    id: null,
+  })
 
   useEffect(() => {
     fetchEquipment()
@@ -57,8 +63,8 @@ export default function Equipment() {
       setLoading(true)
       const response = await api.get('/api/equipment')
       setEquipment(response.data.data)
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'équipement:', error)
+    } catch {
+      // Silencieux
     } finally {
       setLoading(false)
     }
@@ -84,9 +90,8 @@ export default function Equipment() {
       setEditingId(null)
       resetForm()
       fetchEquipment()
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error)
-      alert('Erreur lors de la sauvegarde de l\'équipement')
+    } catch {
+      toast.error('Erreur lors de la sauvegarde')
     }
   }
 
@@ -105,15 +110,20 @@ export default function Equipment() {
     setShowForm(true)
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?')) return
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirm({ isOpen: true, id })
+  }
 
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.id) return
     try {
-      await api.delete(`/api/equipment/${id}`)
+      await api.delete(`/api/equipment/${deleteConfirm.id}`)
       fetchEquipment()
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
-      alert('Erreur lors de la suppression')
+      toast.success('Equipement supprimé')
+    } catch {
+      toast.error('Erreur lors de la suppression')
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null })
     }
   }
 
@@ -125,7 +135,7 @@ export default function Equipment() {
       })
       fetchEquipment()
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error)
+      // Erreur gérée par toast
     }
   }
 
@@ -460,7 +470,7 @@ export default function Equipment() {
                     {item.isActive ? 'Retirer' : 'Réactiver'}
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDeleteClick(item.id)}
                     className="px-3 py-2 rounded-xl text-sm font-medium border-2 border-danger/30 bg-danger/10 text-danger hover:bg-danger/20 transition-all"
                   >
                     Supprimer
@@ -483,6 +493,16 @@ export default function Equipment() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer l'équipement"
+        message="Êtes-vous sûr de vouloir supprimer cet équipement ? Cette action est irréversible."
+        confirmLabel="Supprimer"
+        variant="danger"
+      />
     </AppLayout>
   )
 }

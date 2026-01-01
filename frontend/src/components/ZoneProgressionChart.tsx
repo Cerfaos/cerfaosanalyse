@@ -46,14 +46,13 @@ export default function ZoneProgressionChart() {
 
       // Debug: vérifier la structure des données
       if (activities.length > 0) {
-        console.log('📊 Première activité pour zones:', activities[0])
       }
 
       // Grouper par période
       const grouped = groupByPeriod(activities, viewMode)
       setData(grouped)
     } catch (error) {
-      console.error('Erreur lors du chargement des zones:', error)
+      // Silencieux
     } finally {
       setLoading(false)
     }

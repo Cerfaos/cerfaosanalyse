@@ -39,7 +39,7 @@ export default function SimilarActivities({
         );
         setActivities(response.data.data);
       } catch (error) {
-        console.error("Erreur chargement activités similaires:", error);
+        // Silencieux
       } finally {
         setLoading(false);
       }

@@ -198,7 +198,7 @@ export default function CyclingStats() {
           setStats(response.data.data)
         }
       } catch (err) {
-        console.error('Erreur chargement stats cardio:', err)
+        // Silencieux - données optionnelles
         if (mounted) {
           let message = 'Impossible de charger les statistiques cardio'
           if (err && typeof err === 'object' && 'response' in err) {

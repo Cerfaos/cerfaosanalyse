@@ -94,7 +94,7 @@ export function Icon({
   }
 
   // 3. Icône non trouvée - afficher un placeholder
-  console.warn(`Icon "${name}" not found in custom icons or Lucide`);
+  // Icon non trouvé - silencieux
   return (
     <svg
       width={size}
