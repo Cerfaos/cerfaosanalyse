@@ -225,7 +225,7 @@ export default function TrainingPlanner() {
           eyebrow="Entraînement"
           title="Planification"
           description="Créez des séances structurées, gérez vos modèles et planifiez votre semaine d'entraînement."
-          icon="🚴"
+          icon="trainingPlanner"
           gradient="from-[#8BC34A] to-[#5CE1E6]"
         />
 

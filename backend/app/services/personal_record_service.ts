@@ -197,7 +197,7 @@ export default class PersonalRecordService {
     const records = await PersonalRecord.query()
       .where('userId', userId)
       .where('isCurrent', true)
-      .where('achievedAt', '>=', cutoffDate.toISO())
+      .where('achievedAt', '>=', cutoffDate.toSQL())
       .preload('activity')
       .orderBy('achievedAt', 'desc')
 

@@ -30,6 +30,7 @@ const navigation = [
   { label: "Profil", to: "/profile", icon: ProfileIcon },
   { label: "Export", to: "/export", icon: ExportIcon },
   { label: "Rapports", to: "/reports", icon: ReportsIcon },
+  { label: "Icônes (Dev)", to: "/icons", icon: IconsDevIcon },
 ];
 
 export default function AppLayout({
@@ -460,6 +461,29 @@ function ReportsIcon() {
       <path d="M7 8h10" strokeLinecap="round" />
       <path d="M7 12h10" strokeLinecap="round" />
       <path d="M7 16h6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconsDevIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v4" strokeLinecap="round" />
+      <path d="M12 18v4" strokeLinecap="round" />
+      <path d="M4.93 4.93l2.83 2.83" strokeLinecap="round" />
+      <path d="M16.24 16.24l2.83 2.83" strokeLinecap="round" />
+      <path d="M2 12h4" strokeLinecap="round" />
+      <path d="M18 12h4" strokeLinecap="round" />
+      <path d="M4.93 19.07l2.83-2.83" strokeLinecap="round" />
+      <path d="M16.24 7.76l2.83-2.83" strokeLinecap="round" />
     </svg>
   );
 }

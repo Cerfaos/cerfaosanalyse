@@ -199,6 +199,7 @@ export default class ActivitiesController {
       'movingTime',
       'rpe',
       'feelingNotes',
+      'youtubeUrl',
     ])
 
     // Vérifier s'il y a un fichier GPX pour les données GPS
@@ -283,6 +284,7 @@ export default class ActivitiesController {
       weather: weatherData ? JSON.stringify(weatherData) : null,
       rpe: data.rpe ? Number(data.rpe) : null,
       feelingNotes: data.feelingNotes || null,
+      youtubeUrl: data.youtubeUrl || null,
     })
 
     // Vérifier les records personnels
@@ -1035,7 +1037,7 @@ export default class ActivitiesController {
         ? now.minus({ days: numericPeriod }).startOf('day').toSQLDate()
         : null)
     // Utiliser endOf('day') pour inclure toutes les activités de la journée
-    const computedEnd = endDateInput || now.endOf('day').toISO()
+    const computedEnd = endDateInput || now.endOf('day').toSQL()
 
     // Sous-sports considérés comme indoor
     const indoorSubSports = ['Home Trainer', 'Virtuel', 'Tapis de course', 'Rameur intérieur', 'Piscine']

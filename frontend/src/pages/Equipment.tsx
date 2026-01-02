@@ -215,7 +215,7 @@ export default function Equipment() {
           eyebrow="Matériel"
           title="Mon Équipement"
           description="Suivez l'usure de votre matériel et planifiez vos remplacements."
-          icon="🚲"
+          icon="equipment"
           gradient="from-[#8BC34A] to-[#5CE1E6]"
           accentColor="#8BC34A"
         />

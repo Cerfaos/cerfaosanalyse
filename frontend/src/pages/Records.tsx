@@ -179,7 +179,7 @@ export default function Records() {
           eyebrow="Records"
           title="Records Personnels"
           description="Suivez vos meilleures performances et battez vos propres records."
-          icon="🏆"
+          icon="records"
           gradient="from-[#FFAB40] to-[#FF5252]"
           accentColor="#FFAB40"
           actions={

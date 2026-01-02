@@ -58,6 +58,7 @@ interface Activity {
   trimp: number | null;
   rpe: number | null;
   feelingNotes: string | null;
+  youtubeUrl: string | null;
   fileName: string | null;
   gpsData: string | null;
   weather: string | null;
@@ -1429,24 +1430,26 @@ export default function ActivityDetail() {
       >
         {/* Statistiques principales */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {/* Distance */}
-          <GlassCard
-            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-            style={{ animationDelay: '0ms' }}
-          >
-            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-primary)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
-            <div className="relative z-10">
-              <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--accent-primary)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                🛣️
+          {/* Distance - masqué pour Mobilité/Yoga */}
+          {!["Mobilité", "Yoga"].includes(activity.type) && (
+            <GlassCard
+              className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+              style={{ animationDelay: '0ms' }}
+            >
+              <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-primary)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--accent-primary)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  🛣️
+                </div>
+                <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                  Distance
+                </p>
+                <p className="text-2xl font-display font-bold text-[var(--accent-primary)]">
+                  {formatDistance(activity.distance)}
+                </p>
               </div>
-              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
-                Distance
-              </p>
-              <p className="text-2xl font-display font-bold text-[var(--accent-primary)]">
-                {formatDistance(activity.distance)}
-              </p>
-            </div>
-          </GlassCard>
+            </GlassCard>
+          )}
 
           {/* Durée */}
           <GlassCard
@@ -1467,27 +1470,29 @@ export default function ActivityDetail() {
             </div>
           </GlassCard>
 
-          {/* Vitesse */}
-          <GlassCard
-            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-            style={{ animationDelay: '100ms' }}
-          >
-            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-info)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
-            <div className="relative z-10">
-              <div className="w-12 h-12 rounded-xl bg-[var(--status-info)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-info)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                🚀
+          {/* Vitesse - masqué pour Mobilité/Yoga */}
+          {!["Mobilité", "Yoga"].includes(activity.type) && (
+            <GlassCard
+              className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+              style={{ animationDelay: '100ms' }}
+            >
+              <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-info)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-[var(--status-info)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-info)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  🚀
+                </div>
+                <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                  Vitesse moy
+                </p>
+                <p className="text-2xl font-display font-bold text-[var(--text-primary)]">
+                  {formatSpeed(activity.avgSpeed)}
+                </p>
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                  {formatPace(activity.avgSpeed)}
+                </p>
               </div>
-              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
-                Vitesse moy
-              </p>
-              <p className="text-2xl font-display font-bold text-[var(--text-primary)]">
-                {formatSpeed(activity.avgSpeed)}
-              </p>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1">
-                {formatPace(activity.avgSpeed)}
-              </p>
-            </div>
-          </GlassCard>
+            </GlassCard>
+          )}
 
           {/* FC moyenne */}
           <GlassCard
@@ -1512,29 +1517,31 @@ export default function ActivityDetail() {
             </div>
           </GlassCard>
 
-          {/* Dénivelé */}
-          <GlassCard
-            className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-            style={{ animationDelay: '200ms' }}
-          >
-            <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-success)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
-            <div className="relative z-10">
-              <div className="w-12 h-12 rounded-xl bg-[var(--status-success)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-success)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                ⛰️
-              </div>
-              <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
-                Dénivelé +
-              </p>
-              <p className="text-2xl font-display font-bold text-[var(--status-success)]">
-                {formatElevation(activity.elevationGain)}
-              </p>
-              {activity.elevationLoss && (
-                <p className="text-xs text-[var(--text-tertiary)] mt-1">
-                  Descente: {formatElevation(activity.elevationLoss)}
+          {/* Dénivelé - masqué pour Mobilité/Yoga */}
+          {!["Mobilité", "Yoga"].includes(activity.type) && (
+            <GlassCard
+              className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
+              style={{ animationDelay: '200ms' }}
+            >
+              <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--status-success)]/10 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-[var(--status-success)]/10 flex items-center justify-center text-xl mb-3 border border-[var(--status-success)]/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  ⛰️
+                </div>
+                <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)] font-semibold mb-1">
+                  Dénivelé +
                 </p>
-              )}
-            </div>
-          </GlassCard>
+                <p className="text-2xl font-display font-bold text-[var(--status-success)]">
+                  {formatElevation(activity.elevationGain)}
+                </p>
+                {activity.elevationLoss && (
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    Descente: {formatElevation(activity.elevationLoss)}
+                  </p>
+                )}
+              </div>
+            </GlassCard>
+          )}
 
           {/* TRIMP */}
           <GlassCard
@@ -1609,6 +1616,74 @@ export default function ActivityDetail() {
           )}
 
         </div>
+
+        {/* Lecteur vidéo YouTube intégré (Mobilité/Yoga) */}
+        {activity.youtubeUrl && (() => {
+          // Extraire l'ID de la vidéo YouTube
+          const getYoutubeVideoId = (url: string): string | null => {
+            const patterns = [
+              /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+              /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/
+            ];
+            for (const pattern of patterns) {
+              const match = url.match(pattern);
+              if (match) return match[1];
+            }
+            return null;
+          };
+
+          const videoId = getYoutubeVideoId(activity.youtubeUrl);
+
+          if (!videoId) return null;
+
+          return (
+            <GlassCard className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '400ms' }}>
+              <div className="relative overflow-hidden">
+                {/* Gradient décoratif */}
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-red-500/5" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center flex-shrink-0 border border-red-500/20">
+                      <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
+                      Vidéo de la séance
+                    </h3>
+                  </div>
+
+                  {/* Lecteur YouTube intégré */}
+                  <div className="relative w-full rounded-xl overflow-hidden bg-black/20" style={{ paddingBottom: '56.25%' }}>
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      title="Vidéo de la séance"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+
+                  {/* Lien externe */}
+                  <div className="mt-3 flex justify-end">
+                    <a
+                      href={activity.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      Ouvrir sur YouTube
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          );
+        })()}
 
         {/* Notes de sensations */}
         {activity.feelingNotes && (

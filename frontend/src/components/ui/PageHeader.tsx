@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { getPageIcon } from '../../config/pageIcons'
 
 interface PageHeaderProps {
   eyebrow: string
   title: string
   description: string
+  /** Clé de l'icône (ex: 'dashboard', 'activities') ou emoji direct */
   icon: string
   gradient?: string
   accentColor?: string
@@ -19,6 +21,13 @@ export function PageHeader({
   accentColor = '#8BC34A',
   actions,
 }: PageHeaderProps) {
+  const [imageError, setImageError] = useState(false)
+
+  // Vérifie si c'est une clé d'icône ou un emoji direct
+  const iconConfig = getPageIcon(icon)
+  const isEmoji = icon.length <= 2 || !iconConfig.image
+  const showImage = !isEmoji && iconConfig.image && !imageError
+
   return (
     <div className="glass-panel p-6 relative overflow-hidden">
       {/* Background gradients */}
@@ -38,9 +47,22 @@ export function PageHeader({
         <div className="flex items-start gap-4">
           {/* Icon box */}
           <div
-            className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-2xl shadow-lg flex-shrink-0`}
+            className={`w-32 h-32 rounded-3xl flex items-center justify-center text-6xl flex-shrink-0 ${
+              showImage
+                ? ''
+                : `bg-gradient-to-br ${gradient} shadow-2xl shadow-black/30 ring-2 ring-white/10`
+            }`}
           >
-            {icon}
+            {showImage ? (
+              <img
+                src={iconConfig.image}
+                alt=""
+                className="w-32 h-32 object-contain"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              isEmoji ? icon : iconConfig.fallback
+            )}
           </div>
 
           {/* Text content */}

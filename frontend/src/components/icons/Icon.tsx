@@ -4,45 +4,48 @@
  * =============================================================================
  *
  * Ce composant permet d'utiliser :
- * 1. Des icônes Lucide (par défaut)
- * 2. Des icônes SVG personnalisées (prioritaires si elles existent)
+ * 1. Des icônes PNG personnalisées (priorité maximale)
+ * 2. Des icônes SVG personnalisées (priorité haute)
+ * 3. Des icônes Lucide (fallback par défaut)
  *
  * Usage :
- * <Icon name="bike" size={24} />           // Utilise lucide OU custom
- * <Icon name="custom-power" size={24} />   // Icône custom uniquement
+ * <Icon name="bike" size={24} />           // Utilise PNG > SVG > Lucide
+ * <Icon name="mountain-bike" size={24} />  // Icône custom PNG
  *
- * Pour ajouter une icône custom :
- * 1. Créer le SVG dans /src/components/icons/custom/
- * 2. L'exporter dans /src/components/icons/custom/index.ts
- * 3. L'icône sera automatiquement disponible via <Icon name="..." />
+ * Pour ajouter une icône :
+ * - PNG : Ajouter dans /public/icons/[category]/ et enregistrer dans pngRegistry.ts
+ * - SVG : Créer dans /src/components/icons/custom/[category].tsx
  */
 
 import React from "react";
 import * as LucideIcons from "lucide-react";
 import { customIcons } from "./custom";
+import { hasPngIcon, getPngIconPath } from "./custom/pngRegistry";
 
 // Types pour les icônes Lucide
 type LucideIconName = keyof typeof LucideIcons;
 
 // Props du composant Icon
 export interface IconProps {
-  /** Nom de l'icône (lucide ou custom) */
+  /** Nom de l'icône (png, svg custom ou lucide) */
   name: string;
   /** Taille en pixels (défaut: 24) */
   size?: number;
-  /** Couleur (défaut: currentColor) */
+  /** Couleur (défaut: currentColor) - non applicable aux PNG */
   color?: string;
   /** Classes CSS additionnelles */
   className?: string;
-  /** Épaisseur du trait (défaut: 2) */
+  /** Épaisseur du trait (défaut: 2) - pour Lucide/SVG uniquement */
   strokeWidth?: number;
   /** Accessibilité - label */
   "aria-label"?: string;
+  /** Forcer un type spécifique (utile pour debug/dashboard) */
+  forceType?: 'png' | 'svg' | 'lucide';
 }
 
 /**
  * Composant Icon unifié
- * Cherche d'abord dans les icônes custom, puis dans Lucide
+ * Ordre de priorité : PNG > SVG Custom > Lucide
  */
 export function Icon({
   name,
@@ -51,50 +54,71 @@ export function Icon({
   className = "",
   strokeWidth = 2,
   "aria-label": ariaLabel,
+  forceType,
 }: IconProps) {
-  // 1. Chercher d'abord dans les icônes personnalisées
-  const CustomIcon = customIcons[name];
-  if (CustomIcon) {
-    return (
-      <CustomIcon
-        width={size}
-        height={size}
-        color={color}
-        className={className}
-        aria-label={ariaLabel}
-      />
-    );
+  // 1. Chercher d'abord dans les icônes PNG (priorité maximale)
+  if (forceType !== 'svg' && forceType !== 'lucide' && hasPngIcon(name)) {
+    const pngPath = getPngIconPath(name);
+    if (pngPath) {
+      return (
+        <img
+          src={pngPath}
+          alt={ariaLabel || name}
+          width={size}
+          height={size}
+          className={`inline-block ${className}`}
+          style={{ objectFit: 'contain' }}
+        />
+      );
+    }
   }
 
-  // 2. Sinon, chercher dans Lucide
-  // Convertir le nom en PascalCase pour Lucide (bike → Bike, heart-pulse → HeartPulse)
-  const pascalName = name
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join("") as LucideIconName;
-
-  const LucideIcon = LucideIcons[pascalName] as React.ComponentType<{
-    size?: number;
-    color?: string;
-    className?: string;
-    strokeWidth?: number;
-    "aria-label"?: string;
-  }>;
-
-  if (LucideIcon) {
-    return (
-      <LucideIcon
-        size={size}
-        color={color}
-        className={className}
-        strokeWidth={strokeWidth}
-        aria-label={ariaLabel}
-      />
-    );
+  // 2. Chercher dans les icônes SVG personnalisées
+  if (forceType !== 'png' && forceType !== 'lucide') {
+    const CustomIcon = customIcons[name];
+    if (CustomIcon) {
+      return (
+        <CustomIcon
+          width={size}
+          height={size}
+          color={color}
+          className={className}
+          aria-label={ariaLabel}
+        />
+      );
+    }
   }
 
-  // 3. Icône non trouvée - afficher un placeholder
-  // Icon non trouvé - silencieux
+  // 3. Sinon, chercher dans Lucide
+  if (forceType !== 'png' && forceType !== 'svg') {
+    // Convertir le nom en PascalCase pour Lucide (bike → Bike, heart-pulse → HeartPulse)
+    const pascalName = name
+      .split("-")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join("") as LucideIconName;
+
+    const LucideIcon = LucideIcons[pascalName] as React.ComponentType<{
+      size?: number;
+      color?: string;
+      className?: string;
+      strokeWidth?: number;
+      "aria-label"?: string;
+    }>;
+
+    if (LucideIcon) {
+      return (
+        <LucideIcon
+          size={size}
+          color={color}
+          className={className}
+          strokeWidth={strokeWidth}
+          aria-label={ariaLabel}
+        />
+      );
+    }
+  }
+
+  // 4. Icône non trouvée - afficher un placeholder
   return (
     <svg
       width={size}
@@ -122,24 +146,39 @@ export function Icon({
 }
 
 /**
- * Hook pour vérifier si une icône existe
+ * Hook pour vérifier si une icône existe et son type
  */
-export function useIconExists(name: string): boolean {
-  if (customIcons[name]) return true;
+export function useIconExists(name: string): { exists: boolean; type: 'png' | 'svg' | 'lucide' | null } {
+  // Vérifier PNG
+  if (hasPngIcon(name)) {
+    return { exists: true, type: 'png' };
+  }
 
+  // Vérifier SVG custom
+  if (customIcons[name]) {
+    return { exists: true, type: 'svg' };
+  }
+
+  // Vérifier Lucide
   const pascalName = name
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join("");
 
-  return pascalName in LucideIcons;
+  if (pascalName in LucideIcons) {
+    return { exists: true, type: 'lucide' };
+  }
+
+  return { exists: false, type: null };
 }
 
 /**
  * Liste toutes les icônes disponibles (pour debug/documentation)
  */
-export function getAllIconNames(): { custom: string[]; lucide: string[] } {
+export function getAllIconNames(): { png: string[]; custom: string[]; lucide: string[] } {
+  // Note: Pour obtenir les PNG, importer directement depuis pngRegistry
   return {
+    png: [], // Utiliser getPngIconStats() ou pngIcons directement depuis pngRegistry
     custom: Object.keys(customIcons),
     lucide: Object.keys(LucideIcons).filter(
       (key) => typeof (LucideIcons as Record<string, unknown>)[key] === "function"

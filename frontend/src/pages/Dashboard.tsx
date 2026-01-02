@@ -653,7 +653,7 @@ export default function Dashboard() {
           eyebrow="Tableau de bord"
           title="Synthèse d'entraînement"
           description="Analysez vos performances, suivez votre charge d'entraînement et visualisez vos progrès."
-          icon="📊"
+          icon="dashboard"
           gradient="from-[#8BC34A] to-[#5CE1E6]"
         />
 

@@ -165,7 +165,7 @@ export default function Export() {
           eyebrow="Données"
           title="Export de données"
           description="Exportez vos données pour les sauvegarder ou les analyser dans d'autres outils."
-          icon="📦"
+          icon="export"
           gradient="from-[#5CE1E6] to-[#8BC34A]"
           accentColor="#5CE1E6"
         />

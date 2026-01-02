@@ -32,13 +32,13 @@ const months = [
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
 ]
 
-const currentYear = new Date().getFullYear()
-const years = Array.from({ length: 6 }, (_, i) => currentYear + i)
+// Années de 2025 à 2030
+const years = [2025, 2026, 2027, 2028, 2029, 2030]
 
 export default function Reports() {
   const [reportType, setReportType] = useState<'monthly' | 'annual'>('monthly')
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
-  const [selectedYear, setSelectedYear] = useState(currentYear)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [report, setReport] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState<'pdf' | 'html' | null>(null)
@@ -136,7 +136,7 @@ export default function Reports() {
         eyebrow="Analyse"
         title="Rapports d'Activités"
         description="Consultez vos statistiques mensuelles ou annuelles et exportez-les"
-        icon="📊"
+        icon="reports"
         gradient="from-emerald-500 to-teal-600"
       />
 

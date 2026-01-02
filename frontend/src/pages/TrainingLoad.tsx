@@ -121,7 +121,7 @@ export default function TrainingLoad() {
           eyebrow="Performance"
           title="Charge d'entraînement"
           description="Le modèle PMC (Performance Management Chart) analyse l'équilibre entre votre forme physique et votre fatigue pour optimiser votre entraînement."
-          icon="📈"
+          icon="trainingLoad"
           gradient="from-[#8BC34A] to-[#FF5252]"
           accentColor="#8BC34A"
         />

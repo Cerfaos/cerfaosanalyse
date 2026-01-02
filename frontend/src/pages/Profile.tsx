@@ -190,7 +190,7 @@ export default function Profile() {
           eyebrow="Profil"
           title="Mon Profil"
           description="Configurez vos paramètres physiologiques pour des analyses précises."
-          icon="👤"
+          icon="profile"
           gradient="from-[#8BC34A] to-[#5CE1E6]"
           accentColor="#8BC34A"
         />

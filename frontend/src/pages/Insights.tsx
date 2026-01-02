@@ -110,7 +110,7 @@ export default function Insights() {
           eyebrow="Intelligence"
           title="Prédictions"
           description="Analyses personnalisées basées sur vos données d'entraînement pour optimiser vos performances."
-          icon="🧠"
+          icon="insights"
           gradient="from-[#5CE1E6] to-[#8BC34A]"
           accentColor="#5CE1E6"
         />

@@ -40,6 +40,8 @@ services:
     container_name: cycliste-frontend
     ports:
       - "8080:80"
+    volumes:
+      - ./frontend/public/icons:/usr/share/nginx/html/icons:Z
     restart: unless-stopped
     depends_on:
       - backend

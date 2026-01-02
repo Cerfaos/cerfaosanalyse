@@ -234,7 +234,7 @@ export default class AnalyticsService {
 
     const recentActivities = await Activity.query()
       .where('userId', userId)
-      .where('date', '>=', thirtyDaysAgo.toISO())
+      .where('date', '>=', thirtyDaysAgo.toSQL())
       .orderBy('date', 'desc')
 
     const indicators: string[] = []

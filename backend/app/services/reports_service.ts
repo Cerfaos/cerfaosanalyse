@@ -191,8 +191,8 @@ export default class ReportsService {
 
     const activities = await Activity.query()
       .where('userId', userId)
-      .where('date', '>=', startDate.toISO()!)
-      .where('date', '<=', endDate.toISO()!)
+      .where('date', '>=', startDate.toSQL()!)
+      .where('date', '<=', endDate.toSQL()!)
       .orderBy('date', 'asc')
 
     const period: ReportPeriod = {
@@ -341,8 +341,8 @@ export default class ReportsService {
 
     const activities = await Activity.query()
       .where('userId', userId)
-      .where('date', '>=', extendedStartDate.toISO()!)
-      .where('date', '<=', endDate.toISO()!)
+      .where('date', '>=', extendedStartDate.toSQL()!)
+      .where('date', '<=', endDate.toSQL()!)
       .orderBy('date', 'asc')
 
     const totalDays = Math.ceil(endDate.diff(extendedStartDate, 'days').days) + 1
@@ -423,8 +423,8 @@ export default class ReportsService {
 
     const records = await PersonalRecord.query()
       .where('userId', userId)
-      .where('achievedAt', '>=', startDate.toISO()!)
-      .where('achievedAt', '<=', endDate.toISO()!)
+      .where('achievedAt', '>=', startDate.toSQL()!)
+      .where('achievedAt', '<=', endDate.toSQL()!)
       .whereIn('recordType', relevantRecordTypes)
       .orderBy('achievedAt', 'desc')
 

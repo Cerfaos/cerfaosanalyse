@@ -179,6 +179,7 @@ export default function Activities() {
     normalizedPower: "",
     rpe: "",
     feelingNotes: "",
+    youtubeUrl: "",
   });
 
   const inputClass =
@@ -311,8 +312,9 @@ export default function Activities() {
         (Number(manualFormData.minutes) || 0) * 60 +
         (Number(manualFormData.seconds) || 0);
 
-      // Convertir la distance en mètres
-      const distance = Number(manualFormData.distance) * 1000;
+      // Convertir la distance en mètres (0 pour activités statiques)
+      const isStaticActivity = ["Musculation", "Yoga", "Mobilité"].includes(manualFormData.type);
+      const distance = isStaticActivity ? 0 : Number(manualFormData.distance) * 1000;
 
       // Le format datetime-local donne "2024-11-21T22:00" sans fuseau horaire
       // On l'envoie tel quel au backend qui le traitera comme heure locale
@@ -352,6 +354,8 @@ export default function Activities() {
       if (manualFormData.rpe) formData.append("rpe", manualFormData.rpe);
       if (manualFormData.feelingNotes)
         formData.append("feelingNotes", manualFormData.feelingNotes);
+      if (manualFormData.youtubeUrl)
+        formData.append("youtubeUrl", manualFormData.youtubeUrl);
 
       // Ajouter le fichier GPX s'il est présent
       if (manualGpxFile) {
@@ -383,6 +387,7 @@ export default function Activities() {
         normalizedPower: "",
         rpe: "",
         feelingNotes: "",
+        youtubeUrl: "",
       });
       setManualGpxFile(null);
 
@@ -616,6 +621,12 @@ export default function Activities() {
           text: "text-white",
           badge: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
         };
+      case "Mobilité":
+        return {
+          bg: "bg-gradient-to-br from-purple-500 to-pink-600",
+          text: "text-white",
+          badge: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+        };
       default:
         return {
           bg: "bg-gradient-to-br from-gray-500 to-slate-600",
@@ -672,7 +683,7 @@ export default function Activities() {
           eyebrow="Activités"
           title="Suivi des sorties"
           description="Importez vos fichiers ou ajoutez vos entraînements manuellement."
-          icon="🚴"
+          icon="activities"
           gradient="from-[#FFAB40] to-[#FF5252]"
           accentColor="#FFAB40"
         />
@@ -995,6 +1006,7 @@ export default function Activities() {
                           <SelectItem value="Course">🏃 Course</SelectItem>
                           <SelectItem value="Cyclisme">🚴 Cyclisme</SelectItem>
                           <SelectItem value="Marche">🚶 Marche</SelectItem>
+                          <SelectItem value="Mobilité">🤸 Mobilité</SelectItem>
                           <SelectItem value="Musculation">
                             🏋️ Musculation
                           </SelectItem>
@@ -1007,6 +1019,28 @@ export default function Activities() {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    {/* Champ YouTube pour Mobilité et Yoga */}
+                    {["Mobilité", "Yoga"].includes(manualFormData.type) && (
+                      <div className="col-span-2">
+                        <label htmlFor="manual-youtube" className={labelClass}>
+                          Lien vidéo YouTube
+                        </label>
+                        <input
+                          type="url"
+                          id="manual-youtube"
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          value={manualFormData.youtubeUrl}
+                          onChange={(e) =>
+                            setManualFormData({
+                              ...manualFormData,
+                              youtubeUrl: e.target.value,
+                            })
+                          }
+                          className={inputClass}
+                        />
+                      </div>
+                    )}
 
                     <div className="col-span-2">
                       <label className={labelClass}>Durée *</label>
@@ -1070,7 +1104,7 @@ export default function Activities() {
                       </div>
                     </div>
 
-                    {manualFormData.type !== "Musculation" && (
+                    {!["Musculation", "Yoga", "Mobilité"].includes(manualFormData.type) && (
                       <div className="col-span-2">
                         <label htmlFor="manual-distance" className={labelClass}>
                           Distance (km) *
@@ -1088,7 +1122,7 @@ export default function Activities() {
                               distance: e.target.value,
                             })
                           }
-                          required={manualFormData.type !== "Musculation"}
+                          required={!["Musculation", "Yoga", "Mobilité"].includes(manualFormData.type)}
                           className={inputClass}
                         />
                       </div>
@@ -1484,6 +1518,7 @@ export default function Activities() {
                     <option value="Course" className="hover:bg-[#8BC34A]">Course</option>
                     <option value="Rameur" className="hover:bg-[#8BC34A]">Rameur</option>
                     <option value="Marche" className="hover:bg-[#8BC34A]">Marche</option>
+                    <option value="Mobilité" className="hover:bg-[#8BC34A]">Mobilité</option>
                   </select>
                 </div>
               </div>

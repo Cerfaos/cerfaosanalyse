@@ -24,6 +24,7 @@ const Records = lazy(() => import("./pages/Records"));
 const Insights = lazy(() => import("./pages/Insights"));
 const TrainingPlanner = lazy(() => import("./pages/TrainingPlanner"));
 const Reports = lazy(() => import("./pages/Reports"));
+const IconDashboard = lazy(() => import("./pages/IconDashboard"));
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -188,6 +189,15 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Reports />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Dev-only: Icon Dashboard */}
+              <Route
+                path="/icons"
+                element={
+                  <ProtectedRoute>
+                    <IconDashboard />
                   </ProtectedRoute>
                 }
               />

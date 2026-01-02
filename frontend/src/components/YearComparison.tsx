@@ -37,19 +37,13 @@ export default function YearComparison() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Années sélectionnables (à partir de 2025, année de création de l'app)
+  // Années sélectionnables (2025 à 2030)
   const thisYear = new Date().getFullYear();
-  const startYear = 2025;
-  // Par défaut, afficher la dernière année complète (ou 2025 si on est en 2025)
-  const defaultYear = thisYear > startYear ? thisYear - 1 : startYear;
-  const [selectedYear, setSelectedYear] = useState(defaultYear);
-  const [comparedYear, setComparedYear] = useState(defaultYear);
+  const [selectedYear, setSelectedYear] = useState(thisYear);
+  const [comparedYear, setComparedYear] = useState(thisYear - 1);
 
-  // Générer la liste des années disponibles (de 2025 à année courante + 1 pour anticiper)
-  const availableYears = Array.from(
-    { length: thisYear - startYear + 2 },
-    (_, i) => startYear + i
-  );
+  // Liste des années disponibles (2025 à 2030)
+  const availableYears = [2025, 2026, 2027, 2028, 2029, 2030];
 
   useEffect(() => {
     fetchComparison();
@@ -59,13 +53,14 @@ export default function YearComparison() {
     try {
       setLoading(true);
 
+      // Utiliser startDate et endDate pour filtrer par année
       const [currentRes, previousRes] = await Promise.all([
-        api.get(`/api/activities?year=${selectedYear}&limit=1000`),
-        api.get(`/api/activities?year=${comparedYear}&limit=1000`),
+        api.get(`/api/activities?startDate=${selectedYear}-01-01&endDate=${selectedYear}-12-31&limit=1000`),
+        api.get(`/api/activities?startDate=${comparedYear}-01-01&endDate=${comparedYear}-12-31&limit=1000`),
       ]);
 
-      const currentActivities = currentRes.data.data.activities || currentRes.data.data.data || [];
-      const previousActivities = previousRes.data.data.activities || previousRes.data.data.data || [];
+      const currentActivities = currentRes.data.data.data || currentRes.data.data.activities || [];
+      const previousActivities = previousRes.data.data.data || previousRes.data.data.activities || [];
 
       // Grouper par mois
       const monthNames = [

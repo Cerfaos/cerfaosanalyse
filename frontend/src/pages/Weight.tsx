@@ -168,7 +168,7 @@ export default function Weight() {
           eyebrow="Suivi"
           title="Suivi du poids"
           description="Enregistrez vos pesées et suivez vos tendances corporelles."
-          icon="⚖️"
+          icon="weight"
           gradient="from-[#5CE1E6] to-[#8BC34A]"
           accentColor="#5CE1E6"
         />

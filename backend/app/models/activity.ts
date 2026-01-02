@@ -88,6 +88,10 @@ export default class Activity extends BaseModel {
   @column()
   declare feelingNotes: string | null
 
+  // Lien vidéo YouTube (pour Mobilité)
+  @column()
+  declare youtubeUrl: string | null
+
   // Données GPS (JSON)
   @column()
   declare gpsData: string | null

@@ -254,7 +254,7 @@ export default function CyclingStats() {
           eyebrow="Analyse cardio"
           title="Cartographie FC"
           description="Zones d'intensité, polarisation et répartition de toutes vos activités (cyclisme, rameur, course, etc.)"
-          icon="❤️"
+          icon="cyclingStats"
           gradient="from-[#FF5252] to-[#5CE1E6]"
           accentColor="#FF5252"
         />
