@@ -453,6 +453,8 @@ export function PlanningCalendar() {
           blocks: template.blocks || undefined,
           exercises: template.exercises || undefined,
           templateId: template.id,
+          week: template.week || undefined,
+          day: template.day || undefined,
         })
         // Ajouter la nouvelle séance au planning
         await addToPlanning(newSession.id, selectedDate)

@@ -60,6 +60,12 @@ export default class TrainingSession extends BaseModel {
   })
   declare exercises: PpgExercise[] | null
 
+  @column()
+  declare week: number | null
+
+  @column()
+  declare day: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -42,6 +42,8 @@ export const createSessionValidator = vine.compile(
     blocks: vine.array(cyclingBlockSchema).optional(),
     exercises: vine.array(ppgExerciseSchema).optional(),
     templateId: vine.number().optional(),
+    week: vine.number().min(1).optional(),
+    day: vine.number().min(1).max(7).optional(),
   })
 )
 
@@ -60,5 +62,7 @@ export const updateSessionValidator = vine.compile(
     description: vine.string().maxLength(2000).optional().nullable(),
     blocks: vine.array(cyclingBlockSchema).optional().nullable(),
     exercises: vine.array(ppgExerciseSchema).optional().nullable(),
+    week: vine.number().min(1).optional().nullable(),
+    day: vine.number().min(1).max(7).optional().nullable(),
   })
 )

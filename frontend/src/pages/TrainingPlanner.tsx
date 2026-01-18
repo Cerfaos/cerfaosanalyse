@@ -1,10 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Bike, Dumbbell, Plus, Zap, Calendar, FolderOpen, TrendingUp, TrendingDown, Loader2, AlertCircle, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 import AppLayout from '../components/layout/AppLayout'
 import { PageHeader } from '../components/ui/PageHeader'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Button } from '../components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select'
 import {
   Dialog,
   DialogContent,
@@ -96,6 +103,7 @@ export default function TrainingPlanner() {
     isOpen: false,
     id: null,
   })
+  const [filterSessionWeek, setFilterSessionWeek] = useState<string>('all')
 
   // Charger les données au montage
   useEffect(() => {
@@ -166,9 +174,22 @@ export default function TrainingPlanner() {
       : { label: 'À améliorer', color: 'text-red-500', icon: TrendingDown }
     : null
 
-  // Filtrer les séances par catégorie
-  const cyclingSessions = sessions.filter((s) => s.category === 'cycling')
-  const ppgSessions = sessions.filter((s) => s.category === 'ppg')
+  // Obtenir les semaines uniques des séances
+  const sessionWeeks = useMemo(() => {
+    const uniqueWeeks = [...new Set(sessions.map((s) => s.week).filter(Boolean) as number[])]
+    return uniqueWeeks.sort((a, b) => a - b)
+  }, [sessions])
+
+  // Filtrer les séances par catégorie et semaine
+  const filteredSessions = useMemo(() => {
+    return sessions.filter((s) => {
+      if (filterSessionWeek !== 'all' && s.week !== parseInt(filterSessionWeek)) return false
+      return true
+    })
+  }, [sessions, filterSessionWeek])
+
+  const cyclingSessions = filteredSessions.filter((s) => s.category === 'cycling')
+  const ppgSessions = filteredSessions.filter((s) => s.category === 'ppg')
 
   // Handler pour recharger les données
   const handleRetry = () => {
@@ -316,6 +337,31 @@ export default function TrainingPlanner() {
                   </div>
                 ) : (
                   <>
+                    {/* Filtre par semaine */}
+                    {sessionWeeks.length > 0 && (
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-sm text-text-secondary">Filtrer par semaine :</span>
+                        <Select value={filterSessionWeek} onValueChange={setFilterSessionWeek}>
+                          <SelectTrigger className="w-40">
+                            <SelectValue placeholder="Toutes semaines" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Toutes semaines</SelectItem>
+                            {sessionWeeks.map((w) => (
+                              <SelectItem key={w} value={w.toString()}>
+                                Semaine {w}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {filterSessionWeek !== 'all' && (
+                          <span className="text-sm text-text-secondary">
+                            ({filteredSessions.length} séance{filteredSessions.length > 1 ? 's' : ''})
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     {/* Séances Cyclisme */}
                     {cyclingSessions.length > 0 && (
                       <div>

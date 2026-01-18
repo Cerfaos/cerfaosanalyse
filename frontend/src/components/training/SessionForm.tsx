@@ -60,6 +60,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
     blocks: CyclingBlock[]
     exercises: PpgExercise[]
     templateId?: number
+    week?: number
+    day?: number
   }>({
     name: '',
     category: 'cycling',
@@ -71,6 +73,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
     description: '',
     blocks: [],
     exercises: [],
+    week: undefined,
+    day: undefined,
   })
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
@@ -90,6 +94,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
         blocks: session.blocks ? [...session.blocks] : [],
         exercises: session.exercises ? [...session.exercises] : [],
         templateId: session.templateId || undefined,
+        week: session.week || undefined,
+        day: session.day || undefined,
       })
     } else if (templateToUse) {
       setFormData({
@@ -106,6 +112,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
           ? JSON.parse(JSON.stringify(templateToUse.exercises))
           : [],
         templateId: templateToUse.id,
+        week: templateToUse.week || undefined,
+        day: templateToUse.day || undefined,
       })
     }
   }, [session, templateToUse])
@@ -133,6 +141,8 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
         blocks: template.blocks ? JSON.parse(JSON.stringify(template.blocks)) : [],
         exercises: template.exercises ? JSON.parse(JSON.stringify(template.exercises)) : [],
         templateId: template.id,
+        week: template.week || undefined,
+        day: template.day || undefined,
       })
     }
     setSelectedTemplateId(templateId)
@@ -251,6 +261,38 @@ export function SessionForm({ session, templateToUse, onSave, onCancel }: Sessio
               ))}
             </SelectContent>
           </Select>
+        </div>
+      </div>
+
+      {/* Semaine et Jour */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div>
+          <label className="block text-sm font-medium text-text-secondary mb-1">Semaine</label>
+          <Input
+            type="number"
+            min="1"
+            max="52"
+            placeholder="S"
+            value={formData.week || ''}
+            onChange={(e) =>
+              setFormData({ ...formData, week: e.target.value ? parseInt(e.target.value) : undefined })
+            }
+            className="h-10"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text-secondary mb-1">Jour</label>
+          <Input
+            type="number"
+            min="1"
+            max="7"
+            placeholder="J"
+            value={formData.day || ''}
+            onChange={(e) =>
+              setFormData({ ...formData, day: e.target.value ? parseInt(e.target.value) : undefined })
+            }
+            className="h-10"
+          />
         </div>
       </div>
 

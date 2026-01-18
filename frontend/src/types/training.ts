@@ -117,6 +117,8 @@ export interface TrainingSession {
   description: string | null
   blocks: CyclingBlock[] | null
   exercises: PpgExercise[] | null
+  week: number | null
+  day: number | null
   createdAt: string
   updatedAt: string
 }
@@ -134,6 +136,8 @@ export interface CreateSessionData {
   blocks?: CyclingBlock[]
   exercises?: PpgExercise[]
   templateId?: number
+  week?: number
+  day?: number
 }
 
 /** Données pour modifier une séance */

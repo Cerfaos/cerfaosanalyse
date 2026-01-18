@@ -49,14 +49,18 @@ export function SessionCard({
 
   // Version compacte pour le calendrier
   if (compact) {
+    const weekDayInfo = (session.week || session.day)
+      ? ` (${session.week ? `S${session.week}` : ''}${session.day ? `J${session.day}` : ''})`
+      : ''
     return (
       <div
         className="px-2 py-1 rounded text-xs font-medium truncate cursor-pointer hover:opacity-80 transition-opacity"
         style={{ backgroundColor: `${categoryColor}20`, color: categoryColor }}
-        title={session.name}
+        title={`${session.name}${weekDayInfo}`}
       >
         <CategoryIcon className="inline h-3 w-3 mr-1" />
         {session.name}
+        {weekDayInfo && <span className="opacity-70">{weekDayInfo}</span>}
       </div>
     )
   }
@@ -84,6 +88,13 @@ export function SessionCard({
             <p className="text-sm text-text-secondary mt-0.5">
               {formatDuration(session.duration)}
               {session.tss && session.tss > 0 && ` • TSS ~${session.tss}`}
+              {(session.week || session.day) && (
+                <span className="ml-1">
+                  •
+                  {session.week && ` S${String(session.week).padStart(2, '0')}`}
+                  {session.day && ` J${String(session.day).padStart(2, '0')}`}
+                </span>
+              )}
             </p>
           </div>
         </div>
