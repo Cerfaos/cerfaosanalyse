@@ -1020,8 +1020,8 @@ export default function Activities() {
                       </Select>
                     </div>
 
-                    {/* Champ YouTube pour Mobilité et Yoga */}
-                    {["Mobilité", "Yoga"].includes(manualFormData.type) && (
+                    {/* Champ YouTube pour activités statiques */}
+                    {["Mobilité", "Yoga", "Musculation"].includes(manualFormData.type) && (
                       <div className="col-span-2">
                         <label htmlFor="manual-youtube" className={labelClass}>
                           Lien vidéo YouTube

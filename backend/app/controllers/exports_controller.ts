@@ -2,8 +2,15 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Activity from '#models/activity'
 import WeightHistory from '#models/weight_history'
 import Equipment from '#models/equipment'
+import TrainingSession from '#models/training_session'
+import TrainingTemplate from '#models/training_template'
+import TrainingProgram from '#models/training_program'
+import PpgExercise from '#models/ppg_exercise'
 import { DateTime } from 'luxon'
 import type { ParsedGpsPoint } from '#types/training'
+import { readdir, stat } from 'node:fs/promises'
+import { join } from 'node:path'
+import app from '@adonisjs/core/services/app'
 
 export default class ExportsController {
   /**
@@ -474,5 +481,156 @@ ${trackPoints}
         error: error.message,
       })
     }
+  }
+
+  /**
+   * Obtenir le statut des sauvegardes serveur
+   */
+  async backupStatus({ response }: HttpContext) {
+    try {
+      const backupDir = join(app.makePath('..'), 'backups')
+
+      let backups: {
+        full: Array<{ name: string; date: string; size: string }>
+        db: Array<{ name: string; date: string; size: string }>
+        uploads: Array<{ name: string; date: string; size: string }>
+      } = { full: [], db: [], uploads: [] }
+
+      let totalSize = 0
+      let lastBackupDate: string | null = null
+
+      try {
+        const files = await readdir(backupDir)
+
+        for (const file of files) {
+          const filePath = join(backupDir, file)
+          const fileStat = await stat(filePath)
+
+          if (!fileStat.isFile()) continue
+
+          const sizeBytes = fileStat.size
+          totalSize += sizeBytes
+          const size = this.formatFileSize(sizeBytes)
+          const date = fileStat.mtime.toISOString()
+
+          if (!lastBackupDate || new Date(date) > new Date(lastBackupDate)) {
+            lastBackupDate = date
+          }
+
+          const backupInfo = { name: file, date, size }
+
+          if (file.startsWith('full_backup_')) {
+            backups.full.push(backupInfo)
+          } else if (file.startsWith('db_')) {
+            backups.db.push(backupInfo)
+          } else if (file.startsWith('uploads_')) {
+            backups.uploads.push(backupInfo)
+          }
+        }
+
+        // Trier par date décroissante
+        const sortByDate = (a: { date: string }, b: { date: string }) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+
+        backups.full.sort(sortByDate)
+        backups.db.sort(sortByDate)
+        backups.uploads.sort(sortByDate)
+
+      } catch {
+        // Répertoire n'existe pas encore
+      }
+
+      return response.ok({
+        message: 'Statut des sauvegardes',
+        data: {
+          backups,
+          summary: {
+            totalFull: backups.full.length,
+            totalDb: backups.db.length,
+            totalUploads: backups.uploads.length,
+            totalSize: this.formatFileSize(totalSize),
+            lastBackupDate,
+          },
+          serverBackupEnabled: true,
+          backupSchedule: 'Quotidien à 2h00',
+        },
+      })
+    } catch (error) {
+      console.error('Erreur lors de la récupération du statut des sauvegardes:', error)
+      return response.internalServerError({
+        message: 'Erreur lors de la récupération du statut',
+      })
+    }
+  }
+
+  /**
+   * Obtenir les statistiques étendues pour l'export
+   */
+  async extendedStats({ auth, response }: HttpContext) {
+    const user = auth.user!
+
+    const [
+      activitiesCount,
+      weightCount,
+      equipmentCount,
+      sessionsCount,
+      templatesCount,
+      programsCount,
+      ppgCount,
+      firstActivity,
+      lastActivity,
+    ] = await Promise.all([
+      Activity.query().where('user_id', user.id).count('* as total'),
+      WeightHistory.query().where('user_id', user.id).count('* as total'),
+      Equipment.query().where('user_id', user.id).count('* as total'),
+      TrainingSession.query().where('user_id', user.id).count('* as total'),
+      TrainingTemplate.query().where('user_id', user.id).count('* as total'),
+      TrainingProgram.query().where('user_id', user.id).count('* as total'),
+      PpgExercise.query().where('user_id', user.id).count('* as total'),
+      Activity.query().where('user_id', user.id).orderBy('date', 'asc').first(),
+      Activity.query().where('user_id', user.id).orderBy('date', 'desc').first(),
+    ])
+
+    // Calculer la taille approximative des données
+    const activities = await Activity.query().where('user_id', user.id)
+    let totalGpsDataSize = 0
+    for (const activity of activities) {
+      if (activity.gpsData) {
+        totalGpsDataSize += activity.gpsData.length
+      }
+    }
+
+    const stats = {
+      totalActivities: Number(activitiesCount[0].$extras.total),
+      totalWeightEntries: Number(weightCount[0].$extras.total),
+      totalEquipment: Number(equipmentCount[0].$extras.total),
+      totalTrainingSessions: Number(sessionsCount[0].$extras.total),
+      totalTrainingTemplates: Number(templatesCount[0].$extras.total),
+      totalTrainingPrograms: Number(programsCount[0].$extras.total),
+      totalPpgExercises: Number(ppgCount[0].$extras.total),
+      firstActivityDate: firstActivity?.date.toISODate() || null,
+      lastActivityDate: lastActivity?.date.toISODate() || null,
+      memberSince: user.createdAt.toISODate(),
+      estimatedDataSize: this.formatFileSize(totalGpsDataSize +
+        (Number(activitiesCount[0].$extras.total) * 500) +
+        (Number(weightCount[0].$extras.total) * 100) +
+        (Number(equipmentCount[0].$extras.total) * 200)),
+    }
+
+    return response.ok({
+      message: 'Statistiques étendues récupérées',
+      data: stats,
+    })
+  }
+
+  /**
+   * Formater la taille d'un fichier
+   */
+  private formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'Ko', 'Mo', 'Go']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
   }
 }

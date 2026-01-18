@@ -28,7 +28,34 @@ const IconDashboard = lazy(() => import("./pages/IconDashboard"));
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading, authError } = useAuthStore();
+
+  // Afficher le loader pendant la vérification du token
+  if (isLoading) {
+    return <LoadingFallback />;
+  }
+
+  // Afficher l'erreur si problème de connexion serveur
+  if (authError && isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0c1017]">
+        <div className="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 max-w-md">
+          <div className="text-red-400 text-center">
+            <p className="font-medium mb-2">Erreur de connexion</p>
+            <p className="text-sm text-gray-400">{authError}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="btn-primary mt-4"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 

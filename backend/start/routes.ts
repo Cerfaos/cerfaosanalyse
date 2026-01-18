@@ -131,6 +131,8 @@ router
 router
   .group(() => {
     router.get('/stats', [ExportsController, 'stats'])
+    router.get('/extended-stats', [ExportsController, 'extendedStats'])
+    router.get('/backup-status', [ExportsController, 'backupStatus'])
     router.get('/all', [ExportsController, 'exportAll'])
     router.get('/backup', [ExportsController, 'exportBackup'])
     router.post('/restore', [ExportsController, 'importBackup'])

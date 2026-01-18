@@ -1,0 +1,14 @@
+[Unit]
+Description=Centre d'Analyse Cycliste - Sauvegarde automatique
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=gaibeul
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStart=/home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse/scripts/backup.sh full
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

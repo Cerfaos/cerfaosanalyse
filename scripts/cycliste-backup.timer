@@ -1,0 +1,13 @@
+[Unit]
+Description=Centre d'Analyse Cycliste - Timer de sauvegarde quotidienne
+
+[Timer]
+# Sauvegarde tous les jours à 2h du matin
+OnCalendar=*-*-* 02:00:00
+# Si le PC était éteint à l'heure prévue, exécuter au prochain démarrage
+Persistent=true
+# Randomiser légèrement l'heure pour éviter les pics
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

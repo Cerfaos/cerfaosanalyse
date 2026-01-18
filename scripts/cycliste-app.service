@@ -1,0 +1,23 @@
+[Unit]
+Description=Centre d'Analyse Cycliste - Application Web
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=gaibeul
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+
+# Démarrage des conteneurs
+ExecStart=/home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse/scripts/start.sh --no-browser
+
+# Arrêt des conteneurs
+ExecStop=/home/gaibeul/Documents/Projet-Cursor/cerfaosanalyse/scripts/stop.sh
+
+# Redémarrage en cas d'échec
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
