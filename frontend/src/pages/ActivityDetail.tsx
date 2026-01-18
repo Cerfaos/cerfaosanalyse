@@ -247,8 +247,8 @@ export default function ActivityDetail() {
       const seconds = Number(editForm.durationSeconds) || 0;
       const totalSeconds = hours * 3600 + minutes * 60 + seconds;
 
-      // Convertir km en mètres
-      const distanceInMeters = Math.round(Number(editForm.distanceKm) * 1000);
+      // Convertir km en mètres (sans arrondi pour conserver la précision)
+      const distanceInMeters = Number(editForm.distanceKm) * 1000;
 
       // Combiner date et heure
       const dateTimeStr = editForm.time
@@ -1077,6 +1077,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.avgHeartRate}
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgHeartRate: e.target.value })
@@ -1093,6 +1094,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.maxHeartRate}
                     onChange={(e) =>
                       setEditForm({ ...editForm, maxHeartRate: e.target.value })
@@ -1157,6 +1159,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.avgPower}
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgPower: e.target.value })
@@ -1172,6 +1175,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.normalizedPower}
                     onChange={(e) =>
                       setEditForm({
@@ -1198,6 +1202,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.avgCadence}
                     onChange={(e) =>
                       setEditForm({ ...editForm, avgCadence: e.target.value })
@@ -1213,6 +1218,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.elevationGain}
                     onChange={(e) =>
                       setEditForm({
@@ -1231,6 +1237,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.calories}
                     onChange={(e) =>
                       setEditForm({ ...editForm, calories: e.target.value })
@@ -1284,6 +1291,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.weatherTemperature}
                     onChange={(e) =>
                       setEditForm({
@@ -1304,6 +1312,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.weatherWindSpeed}
                     onChange={(e) =>
                       setEditForm({
@@ -1324,6 +1333,7 @@ export default function ActivityDetail() {
                   </label>
                   <input
                     type="number"
+                    step="any"
                     value={editForm.weatherWindDirection}
                     onChange={(e) =>
                       setEditForm({
@@ -1431,7 +1441,7 @@ export default function ActivityDetail() {
         {/* Statistiques principales */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {/* Distance - masqué pour Mobilité/Yoga */}
-          {!["Mobilité", "Yoga"].includes(activity.type) && (
+          {!["Mobilité", "Yoga", "Musculation"].includes(activity.type) && (
             <GlassCard
               className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
               style={{ animationDelay: '0ms' }}
@@ -1471,7 +1481,7 @@ export default function ActivityDetail() {
           </GlassCard>
 
           {/* Vitesse - masqué pour Mobilité/Yoga */}
-          {!["Mobilité", "Yoga"].includes(activity.type) && (
+          {!["Mobilité", "Yoga", "Musculation"].includes(activity.type) && (
             <GlassCard
               className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
               style={{ animationDelay: '100ms' }}
@@ -1518,7 +1528,7 @@ export default function ActivityDetail() {
           </GlassCard>
 
           {/* Dénivelé - masqué pour Mobilité/Yoga */}
-          {!["Mobilité", "Yoga"].includes(activity.type) && (
+          {!["Mobilité", "Yoga", "Musculation"].includes(activity.type) && (
             <GlassCard
               className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
               style={{ animationDelay: '200ms' }}
