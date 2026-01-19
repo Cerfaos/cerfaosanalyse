@@ -84,10 +84,44 @@ export default class ExportsController {
   /**
    * Exporter les activités en CSV
    */
-  async exportActivitiesCsv({ auth, response }: HttpContext) {
+  async exportActivitiesCsv({ auth, request, response }: HttpContext) {
     const user = auth.user!
 
-    const activities = await Activity.query().where('user_id', user.id).orderBy('date', 'desc')
+    const type = request.input('type')
+    const search = request.input('search')
+    const startDate = request.input('startDate')
+    const endDate = request.input('endDate')
+
+    let query = Activity.query().where('user_id', user.id).orderBy('date', 'desc')
+
+    // Appliquer les filtres
+    if (type) {
+      query = query.where('type', type)
+    }
+
+    if (search) {
+      const searchTerm = `%${search.toLowerCase()}%`
+      query = query.where((builder) => {
+        builder
+          .whereRaw('LOWER(notes) LIKE ?', [searchTerm])
+          .orWhereRaw('LOWER(feeling_notes) LIKE ?', [searchTerm])
+          .orWhereRaw('LOWER(type) LIKE ?', [searchTerm])
+          .orWhereRaw('LOWER(file_name) LIKE ?', [searchTerm])
+      })
+    }
+
+    if (startDate) {
+      query = query.where('date', '>=', startDate)
+    }
+
+    if (endDate) {
+      const endDatePlusOne = new Date(endDate)
+      endDatePlusOne.setDate(endDatePlusOne.getDate() + 1)
+      const endDateStr = endDatePlusOne.toISOString().split('T')[0]
+      query = query.where('date', '<', endDateStr)
+    }
+
+    const activities = await query
 
     // Créer le CSV
     const headers = [

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import { Card } from "../components/ui/Card";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
@@ -16,40 +15,15 @@ import {
 } from "../components/ui/select";
 import { Skeleton } from "../components/ui/skeleton";
 import api from "../services/api";
-
-interface WeatherData {
-  temperature: number;
-  feelsLike: number;
-  humidity: number;
-  pressure: number;
-  windSpeed: number;
-  windDirection: number;
-  description: string;
-  icon: string;
-  clouds: number;
-  visibility: number;
-}
-
-interface Activity {
-  id: number;
-  date: string;
-  type: string;
-  duration: number;
-  distance: number;
-  avgHeartRate: number | null;
-  maxHeartRate: number | null;
-  avgSpeed: number | null;
-  maxSpeed: number | null;
-  elevationGain: number | null;
-  calories: number | null;
-  avgCadence: number | null;
-  avgPower: number | null;
-  normalizedPower: number | null;
-  trimp: number | null;
-  fileName: string | null;
-  weather: string | null;
-  createdAt: string;
-}
+import {
+  ActivityFilters,
+  ActivityCard,
+  ActivityEditModal,
+  type Activity,
+  type EditFormData,
+  formatDistance,
+  formatDuration,
+} from "../components/activities";
 
 interface ActivityStats {
   count: number;
@@ -141,7 +115,6 @@ const showRecordNotifications = (newRecords: NewRecord[]) => {
 };
 
 export default function Activities() {
-  const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [stats, setStats] = useState<ActivityStats | null>(null);
@@ -154,12 +127,26 @@ export default function Activities() {
     isOpen: false,
     id: null,
   });
+  const [editModal, setEditModal] = useState<{ isOpen: boolean; activity: Activity | null }>({
+    isOpen: false,
+    activity: null,
+  });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedGpxFile, setSelectedGpxFile] = useState<File | null>(null);
   const [manualGpxFile, setManualGpxFile] = useState<File | null>(null);
   const [filterType, setFilterType] = useState("");
   const [period, setPeriod] = useState("30");
   const [activeTab, setActiveTab] = useState<"upload" | "manual">("upload");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<{
+    total: number;
+    perPage: number;
+    currentPage: number;
+    lastPage: number;
+  } | null>(null);
+  const ITEMS_PER_PAGE = 20;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const [manualFormData, setManualFormData] = useState({
     date: new Date(),
@@ -191,13 +178,30 @@ export default function Activities() {
 
   useEffect(() => {
     loadData();
-  }, [filterType, period]);
+  }, [filterType, period, currentPage, debouncedSearch]);
+
+  // Réinitialiser la page quand les filtres changent
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterType, period, debouncedSearch]);
+
+  // Debounce pour la recherche (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const params: any = {};
+      const params: Record<string, string | number> = {
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+      };
       if (filterType) params.type = filterType;
+      if (debouncedSearch) params.search = debouncedSearch;
 
       const [activitiesRes, statsRes] = await Promise.all([
         api.get("/api/activities", { params }),
@@ -206,7 +210,14 @@ export default function Activities() {
         }),
       ]);
 
-      setActivities(activitiesRes.data.data.data || []);
+      const paginatedData = activitiesRes.data.data;
+      setActivities(paginatedData.data || []);
+      setPagination({
+        total: paginatedData.meta?.total || 0,
+        perPage: paginatedData.meta?.perPage || ITEMS_PER_PAGE,
+        currentPage: paginatedData.meta?.currentPage || 1,
+        lastPage: paginatedData.meta?.lastPage || 1,
+      });
       setStats(statsRes.data.data);
     } catch (err) {
       // Erreur gérée par toast
@@ -296,6 +307,95 @@ export default function Activities() {
       setError(err.response?.data?.message || "Erreur lors de la suppression");
     } finally {
       setDeleteConfirm({ isOpen: false, id: null });
+    }
+  };
+
+  const handleEditClick = (activity: Activity) => {
+    setEditModal({ isOpen: true, activity });
+  };
+
+  const handleEditSubmit = async (formData: EditFormData) => {
+    if (!editModal.activity) return;
+
+    setError("");
+    setUploading(true);
+
+    try {
+      // Convertir le temps en secondes
+      const duration =
+        (Number(formData.hours) || 0) * 3600 +
+        (Number(formData.minutes) || 0) * 60 +
+        (Number(formData.seconds) || 0);
+
+      // Convertir la distance en mètres
+      const isStaticActivity = ["Musculation", "Yoga", "Mobilité"].includes(formData.type);
+      const distance = isStaticActivity ? 0 : Number(formData.distance) * 1000;
+
+      // Préparer la date au format ISO local
+      const localDate = new Date(
+        formData.date.getTime() - formData.date.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .slice(0, 16);
+
+      const updateData: Record<string, unknown> = {
+        date: localDate,
+        type: formData.type,
+        duration,
+        distance,
+      };
+
+      // Ajouter les champs optionnels
+      if (formData.avgHeartRate) updateData.avgHeartRate = Number(formData.avgHeartRate);
+      if (formData.maxHeartRate) updateData.maxHeartRate = Number(formData.maxHeartRate);
+      if (formData.avgSpeed) updateData.avgSpeed = Number(formData.avgSpeed);
+      if (formData.maxSpeed) updateData.maxSpeed = Number(formData.maxSpeed);
+      if (formData.elevationGain) updateData.elevationGain = Number(formData.elevationGain);
+      if (formData.calories) updateData.calories = Number(formData.calories);
+      if (formData.avgCadence) updateData.avgCadence = Number(formData.avgCadence);
+      if (formData.avgPower) updateData.avgPower = Number(formData.avgPower);
+      if (formData.normalizedPower) updateData.normalizedPower = Number(formData.normalizedPower);
+      if (formData.rpe) updateData.rpe = Number(formData.rpe);
+      if (formData.feelingNotes) updateData.feelingNotes = formData.feelingNotes;
+
+      await api.patch(`/api/activities/${editModal.activity.id}`, updateData);
+      setSuccess("Activité mise à jour");
+      setEditModal({ isOpen: false, activity: null });
+      loadData();
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Erreur lors de la mise à jour");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleExportCsv = async () => {
+    try {
+      const params: Record<string, string> = {};
+      if (filterType) params.type = filterType;
+      if (debouncedSearch) params.search = debouncedSearch;
+
+      const response = await api.get("/api/exports/activities/csv", {
+        params,
+        responseType: "blob",
+      });
+
+      // Créer un lien de téléchargement
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `activites-${new Date().toISOString().split("T")[0]}.csv`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Export CSV téléchargé");
+    } catch (err) {
+      toast.error("Erreur lors de l'export");
     }
   };
 
@@ -417,35 +517,6 @@ export default function Activities() {
     }
   };
 
-  const formatDuration = (seconds: number) => {
-    const totalSeconds = Math.round(seconds);
-    let hours = Math.floor(totalSeconds / 3600);
-    let minutes = Math.floor((totalSeconds % 3600) / 60);
-    let secs = totalSeconds % 60;
-
-    if (secs === 60) {
-      secs = 0;
-      minutes += 1;
-    }
-
-    if (minutes === 60) {
-      minutes = 0;
-      hours += 1;
-    }
-
-    if (hours > 0) {
-      return `${hours}h ${minutes.toString().padStart(2, "0")}min ${secs
-        .toString()
-        .padStart(2, "0")}s`;
-    }
-    return `${minutes}min ${secs.toString().padStart(2, "0")}s`;
-  };
-
-  const formatDistance = (meters: number) => {
-    const km = meters / 1000;
-    return `${km.toFixed(2)} km`;
-  };
-
   const periodLabel = () => {
     switch (period) {
       case "7":
@@ -459,198 +530,6 @@ export default function Activities() {
       default:
         return "";
     }
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case "Cyclisme":
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
-        );
-      case "Course":
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        );
-      case "Marche":
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 21h18M12 3v18m0-18l-3 3m3-3l3 3"
-            />
-          </svg>
-        );
-      case "Rameur":
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        );
-      case "Randonnée":
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 3l7 18m0 0l7-18M12 21V3"
-            />
-          </svg>
-        );
-      case "Natation":
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5"
-            />
-          </svg>
-        );
-      default:
-        return (
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            />
-          </svg>
-        );
-    }
-  };
-
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case "Cyclisme":
-        return {
-          bg: "bg-gradient-to-br from-orange-500 to-amber-600",
-          text: "text-white",
-          badge:
-            "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
-        };
-      case "Course":
-        return {
-          bg: "bg-gradient-to-br from-blue-500 to-indigo-600",
-          text: "text-white",
-          badge:
-            "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-        };
-      case "Marche":
-        return {
-          bg: "bg-gradient-to-br from-green-500 to-emerald-600",
-          text: "text-white",
-          badge:
-            "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-        };
-      case "Rameur":
-        return {
-          bg: "bg-gradient-to-br from-cyan-500 to-teal-600",
-          text: "text-white",
-          badge:
-            "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
-        };
-      case "Randonnée":
-        return {
-          bg: "bg-gradient-to-br from-yellow-500 to-lime-600",
-          text: "text-white",
-          badge:
-            "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
-        };
-      case "Natation":
-        return {
-          bg: "bg-gradient-to-br from-sky-500 to-blue-600",
-          text: "text-white",
-          badge: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
-        };
-      case "Mobilité":
-        return {
-          bg: "bg-gradient-to-br from-purple-500 to-pink-600",
-          text: "text-white",
-          badge: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
-        };
-      default:
-        return {
-          bg: "bg-gradient-to-br from-gray-500 to-slate-600",
-          text: "text-white",
-          badge:
-            "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300",
-        };
-    }
-  };
-
-  const getTrimpColor = (trimp: number | null) => {
-    if (!trimp) return "text-gray-400";
-    if (trimp < 50) return "text-[#8BC34A]";
-    if (trimp < 100) return "text-[#5CE1E6]";
-    if (trimp < 200) return "text-[#FFAB40]";
-    return "text-[#FF5252]";
-  };
-
-  const getTrimpLevel = (trimp: number | null) => {
-    if (!trimp) return null;
-    if (trimp < 50) return "Léger";
-    if (trimp < 100) return "Modéré";
-    if (trimp < 200) return "Intense";
-    return "Très intense";
   };
 
   const scrollToForm = () => {
@@ -1478,57 +1357,34 @@ export default function Activities() {
           {/* Liste et filtres */}
           <div className="lg:col-span-2 space-y-6">
             {/* Filtres */}
-            <div className="glass-panel p-4">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex-1 min-w-[200px]">
-                  <label
-                    htmlFor="period"
-                    className="block text-sm font-medium text-text-body mb-2"
-                  >
-                    Période
-                  </label>
-                  <select
-                    id="period"
-                    value={period}
-                    onChange={(e) => setPeriod(e.target.value)}
-                    className="w-full px-4 py-2 border border-border-base rounded-xl bg-[#0A191A] text-white hover:border-[#8BC34A] hover:bg-[#8BC34A]/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta [&>option]:bg-[#0A191A] [&>option]:text-white [&>option:hover]:bg-[#8BC34A] [&>option:checked]:bg-[#8BC34A]/30"
-                  >
-                    <option value="7" className="hover:bg-[#8BC34A]">7 derniers jours</option>
-                    <option value="30" className="hover:bg-[#8BC34A]">30 derniers jours</option>
-                    <option value="90" className="hover:bg-[#8BC34A]">90 derniers jours</option>
-                    <option value="365" className="hover:bg-[#8BC34A]">1 an</option>
-                  </select>
-                </div>
-
-                <div className="flex-1 min-w-[200px]">
-                  <label
-                    htmlFor="type"
-                    className="block text-sm font-medium text-text-body mb-2"
-                  >
-                    Type d'activité
-                  </label>
-                  <select
-                    id="type"
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="w-full px-4 py-2 border border-border-base rounded-xl bg-[#0A191A] text-white hover:border-[#8BC34A] hover:bg-[#8BC34A]/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta/30 focus:border-cta [&>option]:bg-[#0A191A] [&>option]:text-white [&>option:hover]:bg-[#8BC34A] [&>option:checked]:bg-[#8BC34A]/30"
-                  >
-                    <option value="" className="hover:bg-[#8BC34A]">Tous les types</option>
-                    <option value="Cyclisme" className="hover:bg-[#8BC34A]">Cyclisme</option>
-                    <option value="Course" className="hover:bg-[#8BC34A]">Course</option>
-                    <option value="Rameur" className="hover:bg-[#8BC34A]">Rameur</option>
-                    <option value="Marche" className="hover:bg-[#8BC34A]">Marche</option>
-                    <option value="Mobilité" className="hover:bg-[#8BC34A]">Mobilité</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            <ActivityFilters
+              period={period}
+              setPeriod={setPeriod}
+              filterType={filterType}
+              setFilterType={setFilterType}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
 
             {/* Liste */}
             <div className="glass-panel p-6">
-              <h2 className="text-xl font-semibold text-white mb-6">
-                Historique
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white">
+                  Historique
+                </h2>
+                <button
+                  type="button"
+                  onClick={handleExportCsv}
+                  disabled={activities.length === 0}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-brand/30 text-brand hover:bg-brand/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Exporter en CSV"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span className="text-sm font-medium">Export CSV</span>
+                </button>
+              </div>
 
               {loading ? (
                 <div className="space-y-4">
@@ -1582,212 +1438,95 @@ export default function Activities() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {activities.map((activity) => {
-                    const colors = getActivityColor(activity.type);
-                    return (
-                      <div
-                        key={activity.id}
-                        className="group relative bg-[#0A191A]/60 rounded-2xl border border-[#8BC34A]/20 hover:border-[#8BC34A]/40 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm"
-                        onClick={() => navigate(`/activities/${activity.id}`)}
-                      >
-                        {/* Bande de couleur à gauche */}
-                        <div
-                          className={`absolute left-0 top-0 bottom-0 w-1.5 ${colors.bg} opacity-80 group-hover:opacity-100 transition-opacity`}
-                        />
+                  {activities.map((activity) => (
+                    <ActivityCard
+                      key={activity.id}
+                      activity={activity}
+                      onEdit={handleEditClick}
+                      onDelete={handleDeleteClick}
+                    />
+                  ))}
+                </div>
+              )}
 
-                        <div className="p-5 pl-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                              {/* Icône avec fond gradient */}
-                              <div
-                                className={`w-14 h-14 rounded-xl ${colors.bg} ${colors.text} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}
-                              >
-                                {getActivityIcon(activity.type)}
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                  <h3 className="text-lg font-bold text-white">
-                                    {activity.type}
-                                  </h3>
-                                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#8BC34A]/20 text-[#8BC34A] shadow-sm">
-                                    {new Date(activity.date).toLocaleDateString(
-                                      "fr-FR",
-                                      {
-                                        day: "2-digit",
-                                        month: "short",
-                                      }
-                                    )}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
-                                  <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                  </svg>
-                                  {new Date(activity.date).toLocaleTimeString(
-                                    "fr-FR",
-                                    {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    }
-                                  )}
-                                  <span className="text-gray-500">•</span>
-                                  <span className="text-gray-400">
-                                    {new Date(activity.date).toLocaleDateString(
-                                      "fr-FR",
-                                      {
-                                        weekday: "long",
-                                      }
-                                    )}
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
+              {/* Pagination */}
+              {pagination && pagination.lastPage > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+                  <div className="text-sm text-gray-400">
+                    {pagination.total} activité{pagination.total > 1 ? "s" : ""} • Page{" "}
+                    {pagination.currentPage} sur {pagination.lastPage}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Première page"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Précédent
+                    </button>
 
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteClick(activity.id);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all duration-200"
-                              title="Supprimer"
-                            >
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-
-                          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
-                              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
-                                Distance
-                              </p>
-                              <p className="text-lg font-bold text-white">
-                                {formatDistance(activity.distance)}
-                              </p>
-                            </div>
-                            <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
-                              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
-                                Durée
-                              </p>
-                              <p className="text-lg font-bold text-white">
-                                {formatDuration(activity.duration)}
-                              </p>
-                            </div>
-                            <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
-                              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
-                                FC moy
-                              </p>
-                              <p className="text-lg font-bold text-[#FF5252]">
-                                {activity.avgHeartRate
-                                  ? `${activity.avgHeartRate}`
-                                  : "-"}
-                                {activity.avgHeartRate && (
-                                  <span className="text-xs font-normal ml-1">
-                                    bpm
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-                            <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10 shadow-sm">
-                              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
-                                TRIMP
-                              </p>
-                              <p
-                                className={`text-lg font-bold ${getTrimpColor(
-                                  activity.trimp
-                                )}`}
-                              >
-                                {activity.trimp || "-"}
-                              </p>
-                              {activity.trimp && (
-                                <p className="text-xs text-gray-400 mt-0.5">
-                                  {getTrimpLevel(activity.trimp)}
-                                </p>
-                              )}
-                            </div>
-                            <div className="bg-white/5 rounded-xl p-3 border border-white/10 shadow-sm">
-                              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1 text-center">
-                                Météo
-                              </p>
-                              {(activity.weather &&
-                                (() => {
-                                  try {
-                                    const weather: WeatherData = JSON.parse(
-                                      activity.weather
-                                    );
-                                    return (
-                                      <div className="flex flex-col items-center">
-                                        <div className="flex items-center gap-1">
-                                          <img
-                                            src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
-                                            alt={weather.description}
-                                            className="w-8 h-8"
-                                          />
-                                          <p className="text-lg font-bold text-white">
-                                            {Math.round(weather.temperature)}°
-                                          </p>
-                                        </div>
-                                        <p className="text-xs text-gray-400 truncate max-w-full">
-                                          💨 {weather.windSpeed} km/h
-                                        </p>
-                                      </div>
-                                    );
-                                  } catch {
-                                    return (
-                                      <p className="text-lg font-bold text-white text-center">
-                                        -
-                                      </p>
-                                    );
-                                  }
-                                })()) || (
-                                <p className="text-lg font-bold text-white text-center">
-                                  -
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Indicateur de navigation */}
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg
-                            className="w-6 h-6 text-[#8BC34A]"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                    {/* Numéros de page */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, pagination.lastPage) }, (_, i) => {
+                        let pageNum: number;
+                        if (pagination.lastPage <= 5) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 3) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= pagination.lastPage - 2) {
+                          pageNum = pagination.lastPage - 4 + i;
+                        } else {
+                          pageNum = currentPage - 2 + i;
+                        }
+                        return (
+                          <button
+                            key={pageNum}
+                            type="button"
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                              currentPage === pageNum
+                                ? "bg-brand text-black"
+                                : "border border-white/10 text-gray-400 hover:text-white hover:bg-white/5"
+                            }`}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    );
-                  })}
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((p) => Math.min(pagination.lastPage, p + 1))}
+                      disabled={currentPage === pagination.lastPage}
+                      className="px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Suivant
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage(pagination.lastPage)}
+                      disabled={currentPage === pagination.lastPage}
+                      className="p-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Dernière page"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1803,6 +1542,15 @@ export default function Activities() {
         message="Voulez-vous vraiment supprimer cette activité ? Cette action est irréversible."
         confirmLabel="Supprimer"
         variant="danger"
+      />
+
+      {/* Modale d'édition */}
+      <ActivityEditModal
+        activity={editModal.activity}
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ isOpen: false, activity: null })}
+        onSubmit={handleEditSubmit}
+        isLoading={uploading}
       />
     </AppLayout>
   );

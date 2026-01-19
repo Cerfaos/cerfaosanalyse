@@ -2,6 +2,12 @@
 # Script pour démarrer l'application (conteneurs existants)
 set -euo pipefail
 
+# Chemin explicite vers podman (évite les problèmes de PATH après redémarrage)
+PODMAN="${PODMAN:-/usr/bin/podman}"
+if [[ ! -x "$PODMAN" ]]; then
+    PODMAN=$(command -v podman 2>/dev/null || echo "/usr/bin/podman")
+fi
+
 # Couleurs pour les logs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -26,12 +32,12 @@ detect_local_ip() {
 
 # Vérifier si un conteneur existe
 container_exists() {
-    podman container exists "$1" 2>/dev/null
+    $PODMAN container exists "$1" 2>/dev/null
 }
 
 # Vérifier si un conteneur est en cours d'exécution
 container_running() {
-    [[ "$(podman inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" == "true" ]]
+    [[ "$($PODMAN inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" == "true" ]]
 }
 
 # Démarrer le backend
@@ -49,7 +55,7 @@ start_backend() {
         return 0
     fi
 
-    if podman start cycliste-backend >/dev/null 2>&1; then
+    if $PODMAN start cycliste-backend >/dev/null 2>&1; then
         log_success "Backend démarré"
         return 0
     else
@@ -95,7 +101,7 @@ start_frontend() {
         return 0
     fi
 
-    if podman start cycliste-frontend >/dev/null 2>&1; then
+    if $PODMAN start cycliste-frontend >/dev/null 2>&1; then
         log_success "Frontend démarré"
         return 0
     else

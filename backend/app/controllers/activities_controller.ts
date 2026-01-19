@@ -114,10 +114,23 @@ export default class ActivitiesController {
     const type = request.input('type')
     const startDate = request.input('startDate')
     const endDate = request.input('endDate')
+    const search = request.input('search')
 
     const fields = request.input('fields')
 
     let query = Activity.query().where('user_id', user.id).orderBy('date', 'desc')
+
+    // Recherche textuelle dans les notes et le type
+    if (search) {
+      const searchTerm = `%${search.toLowerCase()}%`
+      query = query.where((builder) => {
+        builder
+          .whereRaw('LOWER(notes) LIKE ?', [searchTerm])
+          .orWhereRaw('LOWER(feeling_notes) LIKE ?', [searchTerm])
+          .orWhereRaw('LOWER(type) LIKE ?', [searchTerm])
+          .orWhereRaw('LOWER(file_name) LIKE ?', [searchTerm])
+      })
+    }
 
     if (fields) {
       const fieldsArray = fields.split(',').map((f: string) => {
