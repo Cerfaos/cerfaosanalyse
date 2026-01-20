@@ -1,5 +1,10 @@
 export { default as ActivityFilters } from "./ActivityFilters";
 export { default as ActivityCard } from "./ActivityCard";
 export { default as ActivityEditModal } from "./ActivityEditModal";
+export { default as ActivityStatsCards } from "./ActivityStatsCards";
+export { default as ActivityList } from "./ActivityList";
+export { default as UploadForm } from "./UploadForm";
+export { default as ManualActivityForm } from "./ManualActivityForm";
 export type { EditFormData } from "./ActivityEditModal";
 export * from "./activityUtils";
+export * from "./activitiesConfig.tsx";
