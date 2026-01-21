@@ -144,3 +144,17 @@ export const monthNames = [
   "Novembre",
   "Décembre",
 ];
+
+// Fonctions utilitaires de formatage
+export const formatDuration = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) {
+    return `${hours}h ${minutes}min`;
+  }
+  return `${minutes}min`;
+};
+
+export const formatDistance = (meters: number): string => {
+  return `${(meters / 1000).toFixed(2)} km`;
+};

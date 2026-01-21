@@ -6,3 +6,5 @@ export { default as WeightSummaryCard } from "./WeightSummaryCard";
 export { default as PeriodCard } from "./PeriodCard";
 export { default as TypeChip } from "./TypeChip";
 export { default as EmptyState } from "./EmptyState";
+export { FiltersSection } from "./FiltersSection";
+export { OverviewSection } from "./OverviewSection";
