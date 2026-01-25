@@ -176,6 +176,7 @@ export default function ActivityEditModal({
               <div>
                 <input
                   type="number"
+                  step="any"
                   placeholder="Heures"
                   value={formData.hours}
                   onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
@@ -187,6 +188,7 @@ export default function ActivityEditModal({
               <div>
                 <input
                   type="number"
+                  step="any"
                   placeholder="Minutes"
                   value={formData.minutes}
                   onChange={(e) => setFormData({ ...formData, minutes: e.target.value })}
@@ -199,6 +201,7 @@ export default function ActivityEditModal({
               <div>
                 <input
                   type="number"
+                  step="any"
                   placeholder="Secondes"
                   value={formData.seconds}
                   onChange={(e) => setFormData({ ...formData, seconds: e.target.value })}
@@ -217,7 +220,7 @@ export default function ActivityEditModal({
               <Label className={labelClass}>Distance (km)</Label>
               <input
                 type="number"
-                step="0.01"
+                step="any"
                 placeholder="Distance en km"
                 value={formData.distance}
                 onChange={(e) => setFormData({ ...formData, distance: e.target.value })}
@@ -232,6 +235,7 @@ export default function ActivityEditModal({
               <Label className={labelClass}>FC moyenne (bpm)</Label>
               <input
                 type="number"
+                step="any"
                 placeholder="FC moyenne"
                 value={formData.avgHeartRate}
                 onChange={(e) => setFormData({ ...formData, avgHeartRate: e.target.value })}
@@ -242,6 +246,7 @@ export default function ActivityEditModal({
               <Label className={labelClass}>FC max (bpm)</Label>
               <input
                 type="number"
+                step="any"
                 placeholder="FC max"
                 value={formData.maxHeartRate}
                 onChange={(e) => setFormData({ ...formData, maxHeartRate: e.target.value })}
@@ -258,7 +263,7 @@ export default function ActivityEditModal({
                   <Label className={labelClass}>Vitesse moy. (km/h)</Label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="any"
                     placeholder="Vitesse moyenne"
                     value={formData.avgSpeed}
                     onChange={(e) => setFormData({ ...formData, avgSpeed: e.target.value })}
@@ -269,7 +274,7 @@ export default function ActivityEditModal({
                   <Label className={labelClass}>Vitesse max (km/h)</Label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="any"
                     placeholder="Vitesse max"
                     value={formData.maxSpeed}
                     onChange={(e) => setFormData({ ...formData, maxSpeed: e.target.value })}
@@ -281,6 +286,7 @@ export default function ActivityEditModal({
                 <Label className={labelClass}>Dénivelé positif (m)</Label>
                 <input
                   type="number"
+                  step="any"
                   placeholder="Dénivelé en mètres"
                   value={formData.elevationGain}
                   onChange={(e) => setFormData({ ...formData, elevationGain: e.target.value })}
@@ -295,6 +301,7 @@ export default function ActivityEditModal({
             <Label className={labelClass}>Calories</Label>
             <input
               type="number"
+              step="any"
               placeholder="Calories brûlées"
               value={formData.calories}
               onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
@@ -309,6 +316,7 @@ export default function ActivityEditModal({
                 <Label className={labelClass}>Cadence moy.</Label>
                 <input
                   type="number"
+                  step="any"
                   placeholder="rpm"
                   value={formData.avgCadence}
                   onChange={(e) => setFormData({ ...formData, avgCadence: e.target.value })}
@@ -319,6 +327,7 @@ export default function ActivityEditModal({
                 <Label className={labelClass}>Puissance moy.</Label>
                 <input
                   type="number"
+                  step="any"
                   placeholder="watts"
                   value={formData.avgPower}
                   onChange={(e) => setFormData({ ...formData, avgPower: e.target.value })}
@@ -329,6 +338,7 @@ export default function ActivityEditModal({
                 <Label className={labelClass}>Puissance norm.</Label>
                 <input
                   type="number"
+                  step="any"
                   placeholder="NP"
                   value={formData.normalizedPower}
                   onChange={(e) => setFormData({ ...formData, normalizedPower: e.target.value })}

@@ -105,7 +105,7 @@ function GeneralInfoSection({ editForm, setEditForm, formatDuration }: SectionPr
           <FormInput
             label="Distance (km) *"
             type="number"
-            step="0.01"
+            step="any"
             value={editForm.distanceKm}
             onChange={(value) => setEditForm({ ...editForm, distanceKm: value })}
             required
@@ -163,6 +163,7 @@ function CardioSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="FC Moyenne (bpm)"
           type="number"
+          step="any"
           value={editForm.avgHeartRate}
           onChange={(value) => setEditForm({ ...editForm, avgHeartRate: value })}
           min="0"
@@ -171,6 +172,7 @@ function CardioSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="FC Maximale (bpm)"
           type="number"
+          step="any"
           value={editForm.maxHeartRate}
           onChange={(value) => setEditForm({ ...editForm, maxHeartRate: value })}
           min="0"
@@ -189,7 +191,7 @@ function SpeedSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Vitesse Moyenne (km/h)"
           type="number"
-          step="0.1"
+          step="any"
           value={editForm.avgSpeed}
           onChange={(value) => setEditForm({ ...editForm, avgSpeed: value })}
           min="0"
@@ -197,7 +199,7 @@ function SpeedSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Vitesse Maximale (km/h)"
           type="number"
-          step="0.1"
+          step="any"
           value={editForm.maxSpeed}
           onChange={(value) => setEditForm({ ...editForm, maxSpeed: value })}
           min="0"
@@ -215,6 +217,7 @@ function PowerSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Puissance Moyenne (W)"
           type="number"
+          step="any"
           value={editForm.avgPower}
           onChange={(value) => setEditForm({ ...editForm, avgPower: value })}
           min="0"
@@ -222,6 +225,7 @@ function PowerSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Puissance Normalisée (W)"
           type="number"
+          step="any"
           value={editForm.normalizedPower}
           onChange={(value) => setEditForm({ ...editForm, normalizedPower: value })}
           min="0"
@@ -239,6 +243,7 @@ function OtherDataSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Cadence Moyenne (rpm)"
           type="number"
+          step="any"
           value={editForm.avgCadence}
           onChange={(value) => setEditForm({ ...editForm, avgCadence: value })}
           min="0"
@@ -246,6 +251,7 @@ function OtherDataSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Dénivelé (m)"
           type="number"
+          step="any"
           value={editForm.elevationGain}
           onChange={(value) => setEditForm({ ...editForm, elevationGain: value })}
           min="0"
@@ -253,6 +259,7 @@ function OtherDataSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Calories"
           type="number"
+          step="any"
           value={editForm.calories}
           onChange={(value) => setEditForm({ ...editForm, calories: value })}
           min="0"
@@ -288,6 +295,7 @@ function WeatherEditSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Température (°C)"
           type="number"
+          step="any"
           value={editForm.weatherTemperature}
           onChange={(value) => setEditForm({ ...editForm, weatherTemperature: value })}
           placeholder="ex: 18"
@@ -297,6 +305,7 @@ function WeatherEditSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Vitesse du vent (km/h)"
           type="number"
+          step="any"
           value={editForm.weatherWindSpeed}
           onChange={(value) => setEditForm({ ...editForm, weatherWindSpeed: value })}
           placeholder="ex: 15"
@@ -306,6 +315,7 @@ function WeatherEditSection({ editForm, setEditForm }: SectionProps) {
         <FormInput
           label="Direction du vent (°)"
           type="number"
+          step="any"
           value={editForm.weatherWindDirection}
           onChange={(value) => setEditForm({ ...editForm, weatherWindDirection: value })}
           placeholder="ex: 180 (Nord=0, Est=90, Sud=180, Ouest=270)"
@@ -440,6 +450,7 @@ function DurationInput({ value, onChange, label, max, required }: DurationInputP
     <div>
       <input
         type="number"
+        step="any"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full px-3 py-2 border border-[var(--border-default)] bg-[var(--surface-input)] text-white rounded-lg focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--accent-primary)]"
