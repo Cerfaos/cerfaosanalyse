@@ -29,9 +29,11 @@ export const useActivityDetail = (id: string | undefined): UseActivityDetailResu
       // Parser les données GPS si disponibles
       if (activityData.gpsData) {
         try {
-          const parsed = JSON.parse(activityData.gpsData);
+          const parsed = typeof activityData.gpsData === "string"
+            ? JSON.parse(activityData.gpsData)
+            : activityData.gpsData;
           // Filtrer les points GPS invalides
-          const validPoints = parsed.filter(
+          const validPoints = (Array.isArray(parsed) ? parsed : []).filter(
             (point: GpsPoint) =>
               point.lat &&
               point.lon &&

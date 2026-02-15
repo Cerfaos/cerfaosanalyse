@@ -3,9 +3,11 @@ declare module 'fit-file-parser' {
     position_lat?: number
     position_long?: number
     altitude?: number
+    enhanced_altitude?: number
     timestamp?: Date
     heart_rate?: number
     speed?: number
+    enhanced_speed?: number
   }
 
   interface FitSession {
@@ -19,6 +21,8 @@ declare module 'fit-file-parser' {
     max_heart_rate?: number
     avg_speed?: number
     max_speed?: number
+    enhanced_avg_speed?: number
+    enhanced_max_speed?: number
     total_ascent?: number
     total_descent?: number
     total_calories?: number
@@ -43,6 +47,7 @@ declare module 'fit-file-parser' {
 
   interface FitData {
     activity?: FitActivity
+    records?: FitRecord[]
   }
 
   interface FitParserOptions {

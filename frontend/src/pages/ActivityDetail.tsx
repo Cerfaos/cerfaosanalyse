@@ -5,7 +5,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SimilarActivities from "../components/SimilarActivities";
-import { GlassCard } from "../components/ui/GlassCard";
+import AppLayout from "../components/layout/AppLayout";
 import {
   MainStats,
   GpsMapSection,
@@ -128,305 +128,368 @@ export default function ActivityDetail() {
     }
   };
 
+  // Loading state
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <p className="text-center text-text-secondary py-8">Chargement...</p>
-      </div>
+      <AppLayout title="Chargement..." description="Récupération des données">
+        <div className="flex items-center justify-center py-20">
+          <div className="w-6 h-6 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin" />
+        </div>
+      </AppLayout>
     );
   }
 
+  // Error state
   if (error || !activity) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-          {error || "Activité non trouvée"}
+      <AppLayout title="Erreur" description="Activité introuvable">
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red-500/10 border border-red-500/25">
+          <div className="w-2 h-2 rounded-full bg-red-400" />
+          <p className="text-sm font-semibold text-red-400">
+            {error || "Activité non trouvée"}
+          </p>
         </div>
         <button
           onClick={() => navigate("/activities")}
-          className="mt-4 px-4 py-2 text-accent-500 hover:text-accent-600"
+          className="mt-4 flex items-center gap-2 text-sm font-bold text-[var(--accent-primary)] hover:text-white transition-colors"
         >
-          ← Retour aux activités
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Retour aux activités
         </button>
-      </div>
+      </AppLayout>
     );
   }
 
   const showMovementStats = !isStaticActivity(activity.type);
 
-  return (
-    <div className="relative min-h-screen">
-      {/* Background Ambience */}
-      <div className="pointer-events-none absolute top-0 -left-64 h-[800px] w-[800px] rounded-full bg-[var(--accent-primary)]/5 blur-[120px]" />
-      <div className="pointer-events-none absolute bottom-0 -right-64 h-[600px] w-[600px] rounded-full bg-[var(--accent-secondary)]/5 blur-[120px]" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-slate-900/30 blur-[100px]" />
+  // Date formatée pour le titre
+  const formattedDate = new Date(activity.date).toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        {/* Bouton retour */}
+  // Header actions
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => navigate("/activities")}
+        className="flex items-center gap-1.5 text-sm font-bold text-[#475569] hover:text-white px-3 py-2 rounded-lg hover:bg-[#1e293b] transition-all duration-200"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour
+      </button>
+      <div className="w-px h-5 bg-[#1e293b]" />
+      {activity.gpsData !== null && (
         <button
-          onClick={() => navigate("/activities")}
-          className="group flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] mb-6 transition-colors duration-200"
+          onClick={handleExportGpx}
+          disabled={downloadingGpx}
+          className="flex items-center gap-1.5 text-sm font-bold text-[#475569] hover:text-white px-3 py-2 rounded-lg hover:bg-[#1e293b] transition-all duration-200 disabled:opacity-50"
         >
-          <svg
-            className="w-5 h-5 transition-transform group-hover:-translate-x-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          Retour aux activités
+          {downloadingGpx ? "..." : "GPX"}
         </button>
-
-        {/* Messages de succès/erreur */}
-        {(success || fileReplacement.success) && (
-          <div className="glass-panel border border-[var(--status-success)]/40 text-[var(--status-success)] px-4 py-3 mb-6 animate-in fade-in duration-300">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-[var(--status-success)] rounded-full animate-pulse" />
-              {success || fileReplacement.success}
-            </div>
-          </div>
-        )}
-
-        {fileReplacement.error && (
-          <div className="glass-panel border border-[var(--status-error)]/40 text-[var(--status-error)] px-4 py-3 mb-6 animate-in fade-in duration-300">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-[var(--status-error)] rounded-full" />
-              {fileReplacement.error}
-            </div>
-          </div>
-        )}
-
-        {/* En-tête de l'activité */}
-        <ActivityHeader
-          activity={activity}
-          activityConfig={activityConfig}
-          downloadingGpx={downloadingGpx}
-          exportingImage={exportingImage}
-          onExportGpx={handleExportGpx}
-          onExportImage={handleExportImage}
-          onReplace={() => fileReplacement.setIsOpen(true)}
-          onEdit={startEditing}
-        />
-
-        {/* Modal de remplacement */}
-        <FileReplacementModal
-          isOpen={fileReplacement.isOpen}
-          onClose={() => {
-            fileReplacement.setIsOpen(false);
-            fileReplacement.setReplacementFile(null);
-          }}
-          replacementFile={fileReplacement.replacementFile}
-          onFileChange={fileReplacement.handleFileChange}
-          onSubmit={fileReplacement.handleReplaceFile}
-          uploading={fileReplacement.uploadingFile}
-        />
-
-        {/* Formulaire d'édition */}
-        {isEditing && (
-          <EditForm
-            editForm={editForm}
-            setEditForm={setEditForm}
-            handleSubmitEdit={handleSubmitEdit}
-            cancelEditing={cancelEditing}
-            formatDuration={formatDuration}
-          />
-        )}
-
-        {/* Contenu exportable */}
-        <div id="activity-content" className="space-y-6">
-          {/* Statistiques principales */}
-          <MainStats
-            activity={activity}
-            showMovementStats={showMovementStats}
-            formatDistance={formatDistance}
-            formatDuration={formatDuration}
-            formatSpeed={formatSpeed}
-            formatPace={formatPace}
-            formatElevation={formatElevation}
-            getTrimpColor={getTrimpColor}
-            getRpeColor={getRpeColor}
-          />
-
-          {/* Vidéo YouTube */}
-          {activity.youtubeUrl && <YoutubePlayer url={activity.youtubeUrl} />}
-
-          {/* Notes de sensations */}
-          {activity.feelingNotes && <FeelingNotes notes={activity.feelingNotes} />}
-
-          {/* Météo */}
-          {activity.weather && <WeatherCard weatherJson={activity.weather} />}
-
-          {/* Carte GPS */}
-          {gpsData.length > 0 && (
-            <GpsMapSection
-              gpsData={gpsData}
-              formatDistance={formatDistance}
-              activityDistance={activity.distance}
-            />
-          )}
-
-          {/* Graphique d'élévation */}
-          {elevationChartData.length > 0 && (
-            <ElevationChartSection
-              data={elevationChartData}
-              activity={activity}
-              formatElevation={formatElevation}
-            />
-          )}
-
-          {/* Zones FC */}
-          {hrZonesData && <HRZonesSection hrZonesData={hrZonesData} activity={activity} />}
-
-          {/* Données supplémentaires */}
-          <AdditionalDataSection
-            activity={activity}
-            formatSpeed={formatSpeed}
-            formatPace={formatPace}
-            getTrimpColor={getTrimpColor}
-          />
+      )}
+      {activity.fileName && (
+        <button
+          onClick={() => fileReplacement.setIsOpen(true)}
+          className="flex items-center gap-1.5 text-sm font-bold text-[#475569] hover:text-white px-3 py-2 rounded-lg hover:bg-[#1e293b] transition-all duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Remplacer
+        </button>
+      )}
+      <button
+        onClick={startEditing}
+        className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-lg text-white transition-all duration-200"
+        style={{
+          background: "linear-gradient(135deg, #f8712f 0%, #ea580c 100%)",
+          boxShadow: "0 4px 24px rgba(248,113,47,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
+        }}
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Modifier
+      </button>
+      <div className="relative group">
+        <button
+          disabled={exportingImage}
+          className="flex items-center gap-1.5 text-sm font-bold text-[#475569] hover:text-white px-3 py-2 rounded-lg hover:bg-[#1e293b] transition-all duration-200 disabled:opacity-50"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          {exportingImage ? "..." : "Image"}
+        </button>
+        <div className="absolute right-0 mt-1 w-40 rounded-xl border border-[#1e293b] bg-[#0f1520] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 overflow-hidden shadow-xl shadow-black/40">
+          <button
+            onClick={() => handleExportImage("png")}
+            disabled={exportingImage}
+            className="w-full text-left px-4 py-2.5 text-sm font-medium text-[#94a3b8] hover:bg-[#1e293b] hover:text-white transition-colors"
+          >
+            Exporter PNG
+          </button>
+          <button
+            onClick={() => handleExportImage("pdf")}
+            disabled={exportingImage}
+            className="w-full text-left px-4 py-2.5 text-sm font-medium text-[#94a3b8] hover:bg-[#1e293b] hover:text-white transition-colors"
+          >
+            Exporter PDF
+          </button>
         </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <AppLayout
+      title={activity.type}
+      description={formattedDate}
+      actions={headerActions}
+    >
+      {/* Messages de succès/erreur */}
+      {(success || fileReplacement.success) && (
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <p className="text-sm font-semibold text-emerald-400">
+            {success || fileReplacement.success}
+          </p>
+        </div>
+      )}
+
+      {fileReplacement.error && (
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red-500/10 border border-red-500/25">
+          <div className="w-2 h-2 rounded-full bg-red-400" />
+          <p className="text-sm font-semibold text-red-400">{fileReplacement.error}</p>
+        </div>
+      )}
+
+      {/* En-tête de l'activité — Hero */}
+      <ActivityHeader
+        activity={activity}
+        activityConfig={activityConfig}
+      />
+
+      {/* Modal de remplacement */}
+      <FileReplacementModal
+        isOpen={fileReplacement.isOpen}
+        onClose={() => {
+          fileReplacement.setIsOpen(false);
+          fileReplacement.setReplacementFile(null);
+        }}
+        replacementFile={fileReplacement.replacementFile}
+        onFileChange={fileReplacement.handleFileChange}
+        onSubmit={fileReplacement.handleReplaceFile}
+        uploading={fileReplacement.uploadingFile}
+      />
+
+      {/* Formulaire d'édition */}
+      {isEditing && (
+        <EditForm
+          editForm={editForm}
+          setEditForm={setEditForm}
+          handleSubmitEdit={handleSubmitEdit}
+          cancelEditing={cancelEditing}
+          formatDuration={formatDuration}
+        />
+      )}
+
+      {/* Contenu exportable */}
+      <div id="activity-content" className="space-y-5">
+        {/* Statistiques principales */}
+        <MainStats
+          activity={activity}
+          showMovementStats={showMovementStats}
+          formatDistance={formatDistance}
+          formatDuration={formatDuration}
+          formatSpeed={formatSpeed}
+          formatPace={formatPace}
+          formatElevation={formatElevation}
+          getTrimpColor={getTrimpColor}
+          getRpeColor={getRpeColor}
+        />
+
+        {/* Séparateur gradient entre stats et sections visuelles */}
+        <div className="h-px bg-gradient-to-r from-transparent via-[#1e293b] to-transparent" />
+
+        {/* Vidéo YouTube */}
+        {activity.youtubeUrl && <YoutubePlayer url={activity.youtubeUrl} />}
+
+        {/* Météo + Notes côte à côte (adaptatif) */}
+        {(activity.weather || activity.avgTemperature || activity.feelingNotes) && (
+          <WeatherNotesRow
+            weather={activity.weather}
+            avgTemperature={activity.avgTemperature}
+            maxTemperature={activity.maxTemperature}
+            feelingNotes={activity.feelingNotes}
+          />
+        )}
+
+        {/* Carte GPS */}
+        {gpsData.length > 0 && (
+          <GpsMapSection
+            gpsData={gpsData}
+            formatDistance={formatDistance}
+            activityDistance={activity.distance}
+          />
+        )}
+
+        {/* Élévation + Zones FC côte à côte sur grands écrans */}
+        {(elevationChartData.length > 0 || hrZonesData) && (
+          <div className={`grid gap-5 ${elevationChartData.length > 0 && hrZonesData ? "grid-cols-1 xl:grid-cols-2" : "grid-cols-1"}`}>
+            {elevationChartData.length > 0 && (
+              <ElevationChartSection
+                data={elevationChartData}
+                activity={activity}
+                formatElevation={formatElevation}
+              />
+            )}
+            {hrZonesData && <HRZonesSection hrZonesData={hrZonesData} activity={activity} />}
+          </div>
+        )}
+
+        {/* Données supplémentaires */}
+        <AdditionalDataSection
+          activity={activity}
+          formatSpeed={formatSpeed}
+          formatPace={formatPace}
+          getTrimpColor={getTrimpColor}
+        />
 
         {/* Activités similaires */}
         {activity && <SimilarActivities activityId={activity.id} />}
       </div>
-    </div>
+    </AppLayout>
   );
 }
 
-// Composant En-tête d'activité
+// Composant En-tête d'activité — Hero style
 interface ActivityHeaderProps {
   activity: {
     type: string;
     subSport: string | null;
     date: string;
     fileName: string | null;
-    gpsData: string | null;
   };
   activityConfig: { icon: string; gradient: string } | null;
-  downloadingGpx: boolean;
-  exportingImage: boolean;
-  onExportGpx: () => void;
-  onExportImage: (format: "png" | "pdf") => void;
-  onReplace: () => void;
-  onEdit: () => void;
 }
 
 function ActivityHeader({
   activity,
   activityConfig,
-  downloadingGpx,
-  exportingImage,
-  onExportGpx,
-  onExportImage,
-  onReplace,
-  onEdit,
 }: ActivityHeaderProps) {
   return (
-    <GlassCard className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        {/* Info */}
-        <div className="flex items-center gap-6">
-          {activityConfig && (
-            <div
-              className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${activityConfig.gradient} flex items-center justify-center text-4xl shadow-lg shadow-[var(--accent-primary)]/20 transition-all duration-300 hover:scale-110 hover:rotate-3 hover:shadow-xl`}
-            >
-              {activityConfig.icon}
-            </div>
-          )}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20">
-                <span className="text-sm font-medium text-[var(--accent-primary)]">
-                  {activity.type}
-                </span>
-              </div>
-              {activity.subSport && (
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-[var(--surface-hover)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-                  {activity.subSport}
-                </span>
-              )}
-            </div>
+    <div
+      className="relative rounded-xl border border-white/[0.06] p-5 overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(15,21,32,0.9) 0%, rgba(12,16,23,0.95) 60%, rgba(15,21,32,0.9) 100%)",
+      }}
+    >
+      {/* Orbe décoratif flou */}
+      <div
+        className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-[0.07] blur-3xl pointer-events-none"
+        style={{
+          background: activityConfig
+            ? "radial-gradient(circle, #f8712f 0%, transparent 70%)"
+            : "radial-gradient(circle, #3b82f6 0%, transparent 70%)",
+        }}
+      />
 
-            <h1 className="text-2xl md:text-3xl font-display font-bold text-[var(--text-primary)] mb-1">
-              {new Date(activity.date).toLocaleDateString("fr-FR", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </h1>
-            <p className="text-[var(--text-secondary)]">
+      <div className="relative z-10 flex items-center gap-4">
+        {activityConfig && (
+          <div
+            className={`w-14 h-14 rounded-xl bg-gradient-to-br ${activityConfig.gradient} flex items-center justify-center text-2xl flex-shrink-0`}
+            style={{
+              boxShadow: "0 6px 24px rgba(248,113,47,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+            }}
+          >
+            {activityConfig.icon}
+          </div>
+        )}
+        <div className="min-w-0">
+          <span className="text-2xl font-display font-extrabold text-white leading-tight">
+            {new Date(activity.date).toLocaleDateString("fr-FR", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="px-3 py-1 rounded-lg bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 text-sm font-bold text-[var(--accent-primary)]">
+              {activity.type}
+            </span>
+            {activity.subSport && (
+              <span className="px-3 py-1 rounded-lg bg-[#1e293b] text-xs font-bold text-[#64748b]">
+                {activity.subSport}
+              </span>
+            )}
+            <span className="text-sm font-mono text-[#475569]">
               {new Date(activity.date).toLocaleTimeString("fr-FR", {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
-            </p>
-
-            {activity.fileName && (
-              <p className="text-sm text-[var(--text-tertiary)] mt-2 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                {activity.fileName}
-              </p>
-            )}
+            </span>
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-3 flex-wrap">
-          {activity.gpsData !== null && (
-            <button onClick={onExportGpx} disabled={downloadingGpx} className="btn-secondary flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" strokeLinecap="round" strokeLinejoin="round" />
-                <polyline points="7 10 12 15 17 10" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="12" y1="15" x2="12" y2="3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {downloadingGpx ? "Export..." : "GPX"}
-            </button>
-          )}
           {activity.fileName && (
-            <button onClick={onReplace} className="btn-secondary">
-              Remplacer
-            </button>
-          )}
-          <button onClick={onEdit} className="btn-primary">
-            Modifier
-          </button>
-          <div className="relative group">
-            <button disabled={exportingImage} className="btn-secondary flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
+            <p className="text-xs text-[#475569] mt-2 flex items-center gap-1.5 font-medium">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
-              {exportingImage ? "..." : "Image"}
-            </button>
-            <div className="absolute right-0 mt-2 w-40 glass-panel opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-              <button
-                onClick={() => onExportImage("png")}
-                disabled={exportingImage}
-                className="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] rounded-t-lg transition-colors"
-              >
-                Exporter PNG
-              </button>
-              <button
-                onClick={() => onExportImage("pdf")}
-                disabled={exportingImage}
-                className="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] rounded-b-lg transition-colors"
-              >
-                Exporter PDF
-              </button>
-            </div>
-          </div>
+              {activity.fileName}
+            </p>
+          )}
         </div>
       </div>
-    </GlassCard>
+
+      {/* Ligne gradient décorative en bas */}
+      <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[var(--accent-primary)]/20 to-transparent" />
+    </div>
+  );
+}
+
+// Layout adaptatif Météo + Notes
+function WeatherNotesRow({
+  weather,
+  avgTemperature,
+  maxTemperature,
+  feelingNotes,
+}: {
+  weather: string | null;
+  avgTemperature?: number | null;
+  maxTemperature?: number | null;
+  feelingNotes?: string | null;
+}) {
+  const hasWeather = weather || avgTemperature;
+  const hasNotes = !!feelingNotes;
+  const bothPresent = hasWeather && hasNotes;
+
+  return (
+    <div className={`grid gap-5 ${bothPresent ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
+      {hasWeather && (
+        <WeatherCard
+          weatherJson={weather}
+          avgTemperature={avgTemperature}
+          maxTemperature={maxTemperature}
+        />
+      )}
+      {hasNotes && <FeelingNotes notes={feelingNotes} />}
+    </div>
   );
 }

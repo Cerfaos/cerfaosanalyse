@@ -9,9 +9,11 @@ export interface FitRecord {
   position_lat?: number
   position_long?: number
   altitude?: number
+  enhanced_altitude?: number
   timestamp?: Date
   heart_rate?: number
   speed?: number
+  enhanced_speed?: number
 }
 
 export interface FitData {
@@ -27,6 +29,8 @@ export interface FitData {
       max_heart_rate?: number
       avg_speed?: number
       max_speed?: number
+      enhanced_avg_speed?: number
+      enhanced_max_speed?: number
       total_ascent?: number
       total_descent?: number
       total_calories?: number
@@ -40,6 +44,8 @@ export interface FitData {
       }>
     }>
   }
+  // mode 'both' : liste plate des records en plus de la structure cascade
+  records?: FitRecord[]
 }
 
 export interface ParsedActivity {

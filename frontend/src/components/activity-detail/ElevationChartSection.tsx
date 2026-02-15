@@ -1,5 +1,5 @@
 /**
- * Section graphique d'élévation
+ * Section graphique d'élévation — Style A Glass
  */
 
 import {
@@ -11,7 +11,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { GlassCard } from "../ui/GlassCard";
 import type { Activity } from "../../types/activity";
 
 interface ElevationChartSectionProps {
@@ -26,87 +25,98 @@ export default function ElevationChartSection({
   formatElevation,
 }: ElevationChartSectionProps) {
   return (
-    <GlassCard
-      className="animate-in fade-in slide-in-from-bottom-4 duration-700"
-      style={{ animationDelay: "600ms" }}
+    <div
+      className="relative rounded-2xl border border-white/[0.08] overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(15,21,32,0.85) 0%, rgba(15,21,32,0.65) 100%)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03)",
+      }}
     >
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 rounded-2xl bg-[var(--status-success)]/10 flex items-center justify-center text-2xl border border-[var(--status-success)]/20">
-          ⛰️
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-4">
+        <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+          <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-[var(--status-success)] font-semibold">
-            Altitude
-          </p>
-          <h3 className="text-xl font-display font-bold text-[var(--text-primary)]">
-            Profil d'élévation
-          </h3>
-        </div>
+        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+          Profil d'élévation
+        </span>
       </div>
 
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
-            <defs>
-              <linearGradient id="elevationGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#10B981" stopOpacity={0.05} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" />
-            <XAxis dataKey="index" stroke="var(--text-tertiary)" hide />
-            <YAxis
-              stroke="var(--text-tertiary)"
-              style={{ fontSize: "11px" }}
-              tickFormatter={(value) => `${value}m`}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "rgba(15, 23, 42, 0.95)",
-                border: "1px solid rgba(148, 163, 184, 0.2)",
-                borderRadius: "12px",
-                backdropFilter: "blur(10px)",
-                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
-              }}
-              labelStyle={{ color: "var(--text-tertiary)", fontSize: "11px" }}
-              formatter={(value: number) => [
-                <span key="val" style={{ color: "#10B981", fontWeight: 600 }}>
-                  {value} m
-                </span>,
-                "Altitude",
-              ]}
-            />
-            <Area
-              type="monotone"
-              dataKey="elevation"
-              stroke="#10B981"
-              strokeWidth={2}
-              fill="url(#elevationGradient)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      <div className="px-5 pb-5">
+        <div className="h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id="elevationGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.4} />
+                  <stop offset="50%" stopColor="#10B981" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.06)" />
+              <XAxis dataKey="index" stroke="#475569" hide />
+              <YAxis
+                stroke="#475569"
+                style={{ fontSize: "11px", fontFamily: "var(--font-mono)" }}
+                tickFormatter={(value) => `${Math.round(value)}m`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15,21,32,0.95)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "12px",
+                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5)",
+                  backdropFilter: "blur(8px)",
+                }}
+                labelStyle={{ color: "#475569", fontSize: "11px" }}
+                formatter={(value: number) => [
+                  <span key="val" style={{ color: "#10B981", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+                    {parseFloat(value.toFixed(1))} m
+                  </span>,
+                  "Altitude",
+                ]}
+              />
+              <Area
+                type="monotone"
+                dataKey="elevation"
+                stroke="#10B981"
+                strokeWidth={2}
+                fill="url(#elevationGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
 
-      {activity.elevationGain && (
-        <div className="flex items-center gap-6 mt-4 pt-4 border-t border-[var(--border-subtle)]">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-[var(--status-success)] rounded-full" />
-            <span className="text-sm text-[var(--text-tertiary)]">Dénivelé +</span>
-            <span className="font-semibold text-[var(--status-success)]">
-              {formatElevation(activity.elevationGain)}
-            </span>
-          </div>
-          {activity.elevationLoss && (
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-[var(--status-error)] rounded-full" />
-              <span className="text-sm text-[var(--text-tertiary)]">Dénivelé -</span>
-              <span className="font-semibold text-[var(--status-error)]">
-                {formatElevation(activity.elevationLoss)}
+        {/* Footer avec pills colorées */}
+        {activity.elevationGain && (
+          <div className="relative flex items-center gap-3 mt-4 pt-3">
+            {/* Gradient line */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/15 to-transparent" />
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/15">
+              <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+              </svg>
+              <span className="text-xs font-bold font-mono text-emerald-400">
+                {formatElevation(activity.elevationGain)}
               </span>
             </div>
-          )}
-        </div>
-      )}
-    </GlassCard>
+            {activity.elevationLoss && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/15">
+                <svg className="w-3 h-3 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+                <span className="text-xs font-bold font-mono text-red-400">
+                  {formatElevation(activity.elevationLoss)}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

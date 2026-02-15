@@ -33,7 +33,7 @@ export const formatDistance = (meters: number): string => {
 
 export const formatElevation = (value: number | null | undefined): string => {
   if (value === null || value === undefined) return "-";
-  return `${value.toFixed(2)} m`;
+  return `${parseFloat(value.toFixed(3))} m`;
 };
 
 export const formatSpeed = (kmh: number | null): string => {

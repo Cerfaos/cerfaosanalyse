@@ -1,11 +1,11 @@
 /**
- * Section carte GPS avec tracé de l'activité
+ * Section carte GPS avec tracé de l'activité — Style A Glass
  */
 
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
 import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
-import { GlassCard } from "../ui/GlassCard";
 import type { GpsPoint } from "../../types/activity";
 
 interface GpsMapSectionProps {
@@ -36,30 +36,35 @@ export default function GpsMapSection({
   activityDistance,
 }: GpsMapSectionProps) {
   return (
-    <GlassCard
-      className="animate-in fade-in slide-in-from-bottom-4 duration-700"
-      style={{ animationDelay: "550ms" }}
+    <div
+      className="relative rounded-2xl border border-white/[0.08] overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(15,21,32,0.85) 0%, rgba(15,21,32,0.65) 100%)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03)",
+      }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-[var(--accent-primary)]/10 flex items-center justify-center text-2xl border border-[var(--accent-primary)]/20">
-            📍
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-lg bg-[var(--accent-primary)]/15 flex items-center justify-center">
+            <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent-primary)] font-semibold">
-              Parcours
-            </p>
-            <h3 className="text-xl font-display font-bold text-[var(--text-primary)]">
-              Tracé GPS
-            </h3>
-          </div>
+          <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+            Tracé GPS
+          </span>
         </div>
-        <span className="text-sm text-[var(--text-tertiary)] bg-[var(--surface-hover)] px-3 py-1 rounded-full">
+        <span className="text-xs font-bold text-[#475569] bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06]">
           {gpsData.length} points
         </span>
       </div>
 
-      <div className="h-96 rounded-xl overflow-hidden border-2 border-[var(--border-default)] hover:border-[var(--accent-primary)]/30 hover:shadow-[0_0_30px_rgba(248,113,47,0.15)] transition-all duration-300">
+      {/* Map sans bordure interne */}
+      <div className="h-80">
         <MapContainer
           center={[gpsData[0].lat, gpsData[0].lon]}
           zoom={13}
@@ -86,13 +91,18 @@ export default function GpsMapSection({
         </MapContainer>
       </div>
 
-      <div className="flex items-center gap-2 mt-4 text-sm text-[var(--text-tertiary)]">
-        <span className="w-2 h-2 bg-[var(--accent-primary)] rounded-full animate-pulse" />
-        Distance totale:{" "}
-        <span className="font-semibold text-[var(--text-secondary)]">
-          {formatDistance(activityDistance)}
-        </span>
+      {/* Footer */}
+      <div className="relative px-6 py-3">
+        {/* Gradient line top */}
+        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[var(--accent-primary)]/20 to-transparent" />
+        <div className="flex items-center gap-2 text-xs text-[#475569]">
+          <span className="w-2 h-2 bg-[var(--accent-primary)] rounded-full animate-pulse" />
+          Distance totale :{" "}
+          <span className="font-bold text-white font-mono">
+            {formatDistance(activityDistance)}
+          </span>
+        </div>
       </div>
-    </GlassCard>
+    </div>
   );
 }

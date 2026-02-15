@@ -1,7 +1,3 @@
-/**
- * Liste des activités avec pagination
- */
-
 import { Skeleton } from "../ui/skeleton";
 import type { Activity } from "./activityUtils";
 import ActivityCard from "./ActivityCard";
@@ -29,29 +25,40 @@ export default function ActivityList({
   onPageChange,
 }: ActivityListProps) {
   return (
-    <div className="glass-panel p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-white">Historique</h2>
+    <div>
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-[#64748b]">
+            Historique
+          </h2>
+          {pagination && (
+            <span className="px-2 py-0.5 rounded-md bg-[#1e293b] text-[11px] font-mono font-bold text-[#475569] tabular-nums">
+              {pagination.total}
+            </span>
+          )}
+        </div>
         <button
           type="button"
           onClick={onExportCsv}
           disabled={activities.length === 0}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-brand/30 text-brand hover:bg-brand/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          title="Exporter en CSV"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-[#475569] hover:text-white bg-[#0f1520] border border-[#1e293b] hover:border-[#334155] disabled:opacity-20 disabled:cursor-not-allowed transition-all"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          <span className="text-sm font-medium">Export CSV</span>
+          Exporter CSV
         </button>
       </div>
 
+      {/* Content */}
       {loading ? (
         <LoadingSkeleton />
       ) : activities.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {activities.map((activity) => (
             <ActivityCard
               key={activity.id}
@@ -63,12 +70,9 @@ export default function ActivityList({
         </div>
       )}
 
+      {/* Pagination */}
       {pagination && pagination.lastPage > 1 && (
-        <Pagination
-          pagination={pagination}
-          currentPage={currentPage}
-          onPageChange={onPageChange}
-        />
+        <Pagination pagination={pagination} currentPage={currentPage} onPageChange={onPageChange} />
       )}
     </div>
   );
@@ -76,23 +80,23 @@ export default function ActivityList({
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="glass-panel p-5 h-40 flex flex-col justify-between">
-          <div className="flex justify-between">
-            <div className="flex gap-4">
-              <Skeleton className="w-14 h-14 rounded-xl" />
-              <div className="space-y-2">
-                <Skeleton className="h-5 w-32" />
-                <Skeleton className="h-4 w-48" />
-              </div>
+        <div key={i} className="rounded-2xl bg-[#0f1520] border border-[#1e293b] p-5">
+          <div className="flex items-center gap-5">
+            <Skeleton className="w-12 h-12 rounded-2xl" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
             </div>
-            <Skeleton className="h-8 w-8 rounded-lg" />
-          </div>
-          <div className="grid grid-cols-5 gap-4 mt-4">
-            {[1, 2, 3, 4, 5].map((j) => (
-              <Skeleton key={j} className="h-12 rounded-xl" />
-            ))}
+            <div className="flex gap-6">
+              {[1, 2, 3, 4].map((j) => (
+                <div key={j}>
+                  <Skeleton className="h-2 w-12 mb-1" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ))}
@@ -102,27 +106,26 @@ function LoadingSkeleton() {
 
 function EmptyState() {
   return (
-    <div className="text-center py-16">
-      <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
-        <svg className="w-10 h-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#1e293b] py-24 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-[#0f1520] border border-[#1e293b] flex items-center justify-center mb-5">
+        <svg className="w-7 h-7 text-[#334155]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
       </div>
-      <p className="text-xl font-semibold text-gray-300 mb-2">Aucune activité enregistrée</p>
-      <p className="text-sm text-gray-400 max-w-sm mx-auto">
-        Importez votre première activité pour commencer à suivre vos performances
+      <p className="text-base font-extrabold text-[#64748b] mb-1">Aucune activité</p>
+      <p className="text-sm text-[#334155]">
+        Importez un fichier <span className="font-mono font-bold text-[var(--accent-primary)]">.FIT</span> ou{" "}
+        <span className="font-mono font-bold text-[var(--accent-secondary)]">.CSV</span> pour commencer
       </p>
     </div>
   );
 }
 
-interface PaginationProps {
+function Pagination({ pagination, currentPage, onPageChange }: {
   pagination: PaginationMeta;
   currentPage: number;
   onPageChange: (page: number) => void;
-}
-
-function Pagination({ pagination, currentPage, onPageChange }: PaginationProps) {
+}) {
   const pageNumbers = Array.from({ length: Math.min(5, pagination.lastPage) }, (_, i) => {
     if (pagination.lastPage <= 5) return i + 1;
     if (currentPage <= 3) return i + 1;
@@ -131,66 +134,43 @@ function Pagination({ pagination, currentPage, onPageChange }: PaginationProps) 
   });
 
   return (
-    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
-      <div className="text-sm text-gray-400">
-        {pagination.total} activité{pagination.total > 1 ? "s" : ""} • Page {pagination.currentPage}{" "}
-        sur {pagination.lastPage}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
-          className="p-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          title="Première page"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-          </svg>
-        </button>
+    <div className="flex items-center justify-between mt-6 pt-5 border-t border-[#1e293b]">
+      <span className="text-xs font-mono font-bold text-[#334155] tabular-nums">
+        {pagination.currentPage} / {pagination.lastPage}
+      </span>
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="h-9 px-3 rounded-xl text-[#475569] hover:text-white bg-[#0f1520] border border-[#1e293b] hover:border-[#334155] disabled:opacity-20 disabled:cursor-not-allowed transition-all"
         >
-          Précédent
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
-
-        <div className="flex items-center gap-1">
-          {pageNumbers.map((pageNum) => (
-            <button
-              key={pageNum}
-              type="button"
-              onClick={() => onPageChange(pageNum)}
-              className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                currentPage === pageNum
-                  ? "bg-brand text-black"
-                  : "border border-white/10 text-gray-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
-        </div>
-
+        {pageNumbers.map((pageNum) => (
+          <button
+            key={pageNum}
+            type="button"
+            onClick={() => onPageChange(pageNum)}
+            className={`w-9 h-9 rounded-xl text-xs font-bold font-mono transition-all ${
+              currentPage === pageNum
+                ? "bg-[var(--accent-primary)] text-white shadow-[0_2px_12px_rgba(248,113,47,0.35)]"
+                : "text-[#475569] hover:text-white bg-[#0f1520] border border-[#1e293b] hover:border-[#334155]"
+            }`}
+          >
+            {pageNum}
+          </button>
+        ))}
         <button
           type="button"
           onClick={() => onPageChange(Math.min(pagination.lastPage, currentPage + 1))}
           disabled={currentPage === pagination.lastPage}
-          className="px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="h-9 px-3 rounded-xl text-[#475569] hover:text-white bg-[#0f1520] border border-[#1e293b] hover:border-[#334155] disabled:opacity-20 disabled:cursor-not-allowed transition-all"
         >
-          Suivant
-        </button>
-        <button
-          type="button"
-          onClick={() => onPageChange(pagination.lastPage)}
-          disabled={currentPage === pagination.lastPage}
-          className="p-2 rounded-lg border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          title="Dernière page"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>

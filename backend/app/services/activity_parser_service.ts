@@ -59,10 +59,10 @@ export default class ActivityParserService {
     const fitParser = new FitParser({
       force: true,
       speedUnit: 'km/h',
-      lengthUnit: 'km',
+      lengthUnit: 'm',
       temperatureUnit: 'celsius',
       elapsedRecordField: true,
-      mode: 'cascade',
+      mode: 'both',
     })
 
     const fileBuffer = await fs.readFile(filePath)
@@ -76,19 +76,28 @@ export default class ActivityParserService {
 
         try {
           const session = data.activity?.sessions?.[0] || {}
-          const records = data.activity?.sessions?.[0]?.laps?.[0]?.records || []
+
+          // Récupérer les records : cascade (laps → records) puis fallback sur la liste plate
+          let records = data.activity?.sessions?.[0]?.laps?.flatMap(lap => lap.records ?? []) ?? []
+          if (records.length === 0 && data.records) {
+            records = data.records
+          }
 
           // Extraire les données GPS
           const gpsData = records
             .filter((r: FitRecord) => r.position_lat && r.position_long)
-            .map((r: FitRecord) => ({
-              lat: r.position_lat!,
-              lon: r.position_long!,
-              ele: r.altitude,
-              time: r.timestamp,
-              hr: typeof r.heart_rate === 'number' ? r.heart_rate : (r.heart_rate ?? null),
-              speed: typeof r.speed === 'number' ? r.speed : (r.speed ?? null),
-            }))
+            .map((r: FitRecord) => {
+              const altitude = r.enhanced_altitude ?? r.altitude
+              const speed = r.enhanced_speed ?? r.speed
+              return {
+                lat: r.position_lat!,
+                lon: r.position_long!,
+                ele: altitude != null ? Math.round(altitude * 1000) / 1000 : undefined,
+                time: r.timestamp,
+                hr: typeof r.heart_rate === 'number' ? r.heart_rate : (r.heart_rate ?? null),
+                speed: typeof speed === 'number' ? speed : (speed ?? null),
+              }
+            })
 
           // Déterminer le type d'activité
           const type = session.sport ? sportMap[session.sport] || 'Cyclisme' : 'Cyclisme'
@@ -99,18 +108,38 @@ export default class ActivityParserService {
             subSport = subSportMap[session.sub_sport] || session.sub_sport
           }
 
+          // Distance en mètres (lengthUnit: 'm' → déjà en mètres)
+          const distanceM = session.total_distance || 0
+          const duration = session.total_elapsed_time || 0
+
+          // Vitesse moyenne : session d'abord, enhanced ensuite, calcul en dernier recours
+          let avgSpeed = session.avg_speed || session.enhanced_avg_speed || null
+          if (!avgSpeed && distanceM > 0 && duration > 0) {
+            avgSpeed = Math.round(((distanceM / 1000) / (duration / 3600)) * 100) / 100
+          }
+
+          const maxSpeed = session.max_speed || session.enhanced_max_speed || null
+
+          // Dénivelés (déjà en mètres), arrondir à 3 décimales
+          const elevationGain = session.total_ascent != null
+            ? Math.round(session.total_ascent * 1000) / 1000
+            : null
+          const elevationLoss = session.total_descent != null
+            ? Math.round(session.total_descent * 1000) / 1000
+            : null
+
           resolve({
             date: DateTime.fromJSDate(session.start_time || new Date()),
             type,
-            duration: session.total_elapsed_time || 0,
+            duration,
             movingTime: session.total_timer_time || null,
-            distance: (session.total_distance || 0) * 1000, // km -> m
+            distance: distanceM,
             avgHeartRate: session.avg_heart_rate || null,
             maxHeartRate: session.max_heart_rate || null,
-            avgSpeed: session.avg_speed || null,
-            maxSpeed: session.max_speed || null,
-            elevationGain: session.total_ascent || null,
-            elevationLoss: session.total_descent || null,
+            avgSpeed,
+            maxSpeed,
+            elevationGain,
+            elevationLoss,
             calories: session.total_calories || null,
             avgCadence: session.avg_cadence || null,
             avgPower: session.avg_power || null,
@@ -146,7 +175,7 @@ export default class ActivityParserService {
     const gpsData = track.points.map((p) => ({
       lat: p.lat,
       lon: p.lon,
-      ele: p.ele,
+      ele: p.ele != null ? Math.round(p.ele * 1000) / 1000 : undefined,
       time: p.time,
     }))
 
@@ -177,8 +206,8 @@ export default class ActivityParserService {
       maxHeartRate: null,
       avgSpeed: distanceInMeters / 1000 / (duration / 3600), // km/h
       maxSpeed: null,
-      elevationGain: track.elevation.pos || null,
-      elevationLoss: track.elevation.neg || null,
+      elevationGain: track.elevation.pos != null ? Math.round(track.elevation.pos * 1000) / 1000 : null,
+      elevationLoss: track.elevation.neg != null ? Math.round(track.elevation.neg * 1000) / 1000 : null,
       calories: null,
       avgCadence: null,
       avgPower: null,

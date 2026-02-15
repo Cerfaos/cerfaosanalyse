@@ -29,7 +29,7 @@
   /* -- Font Configuration -- */
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-display: "Bricolage Grotesque", "Space Grotesk", var(--font-sans);
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-mono: "Geist Mono", "JetBrains Mono", "Fira Code", monospace;
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -232,6 +232,9 @@
  * ============================================================================= */
 
 @theme inline {
+  --font-family-mono: "Geist Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-family-display: "Bricolage Grotesque", "Space Grotesk", system-ui, sans-serif;
+
   --color-background: var(--surface-base);
   --color-foreground: var(--text-primary);
   --color-card: var(--surface-card);

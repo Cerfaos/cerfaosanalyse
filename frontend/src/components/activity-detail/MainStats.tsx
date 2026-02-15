@@ -1,5 +1,5 @@
 /**
- * Grille des statistiques principales d'une activité
+ * Grille uniforme des statistiques principales
  */
 
 import MetricInfo from "../ui/MetricInfo";
@@ -30,76 +30,72 @@ export default function MainStats({
   getRpeColor,
 }: MainStatsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
       {/* Distance */}
       {showMovementStats && (
         <StatCard
-          icon="🛣️"
           label="Distance"
           value={formatDistance(activity.distance)}
-          bgColorClass="bg-[var(--accent-primary)]/10"
           colorClass="text-[var(--accent-primary)]"
+          dotColor="#f8712f"
           delay={0}
         />
       )}
 
       {/* Durée */}
       <StatCard
-        icon="⏱️"
         label="Durée"
         value={formatDuration(activity.duration)}
-        bgColorClass="bg-[var(--accent-secondary)]/10"
+        colorClass="text-[var(--accent-secondary)]"
+        dotColor="#f59e0b"
         delay={50}
       />
 
       {/* Vitesse */}
       {showMovementStats && (
         <StatCard
-          icon="🚀"
           label="Vitesse moy"
           value={formatSpeed(activity.avgSpeed)}
           secondary={formatPace(activity.avgSpeed)}
-          bgColorClass="bg-[var(--status-info)]/10"
+          colorClass="text-[var(--status-info)]"
+          dotColor="#3b82f6"
           delay={100}
         />
       )}
 
       {/* FC moyenne */}
       <StatCard
-        icon="❤️"
         label="FC moyenne"
         value={activity.avgHeartRate ? `${activity.avgHeartRate}` : "-"}
         unit="bpm"
         secondary={activity.maxHeartRate ? `Max: ${activity.maxHeartRate} bpm` : undefined}
-        bgColorClass="bg-[var(--status-error)]/10"
         colorClass="text-[var(--status-error)]"
+        dotColor="#ef4444"
         delay={150}
       />
 
       {/* Dénivelé */}
       {showMovementStats && (
         <StatCard
-          icon="⛰️"
           label="Dénivelé +"
           value={formatElevation(activity.elevationGain)}
           secondary={
             activity.elevationLoss
-              ? `Descente: ${formatElevation(activity.elevationLoss)}`
+              ? `D- ${formatElevation(activity.elevationLoss)}`
               : undefined
           }
-          bgColorClass="bg-[var(--status-success)]/10"
           colorClass="text-[var(--status-success)]"
+          dotColor="#10b981"
           delay={200}
         />
       )}
 
       {/* TRIMP */}
       <StatCard
-        icon="💪"
         label="TRIMP"
         value={activity.trimp || "-"}
-        bgColorClass="bg-purple-500/10"
         colorClass={getTrimpColor(activity.trimp)}
+        dotColor="#a855f7"
         infoComponent={<MetricInfo metric="trimp" />}
         delay={250}
       />
@@ -107,7 +103,6 @@ export default function MainStats({
       {/* RPE */}
       {activity.rpe && (
         <StatCard
-          icon="🎯"
           label="RPE"
           value={`${activity.rpe}`}
           unit="/10"
@@ -120,23 +115,9 @@ export default function MainStats({
               ? "Difficile"
               : "Extrême"
           }
-          bgColorClass="bg-amber-500/10"
           colorClass={getRpeColor(activity.rpe)}
+          dotColor="#f59e0b"
           delay={300}
-        />
-      )}
-
-      {/* Température */}
-      {activity.avgTemperature && (
-        <StatCard
-          icon="🌡️"
-          label="Température"
-          value={`${activity.avgTemperature}°C`}
-          secondary={
-            activity.maxTemperature ? `Max: ${activity.maxTemperature}°C` : undefined
-          }
-          bgColorClass="bg-cyan-500/10"
-          delay={350}
         />
       )}
     </div>

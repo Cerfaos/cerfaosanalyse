@@ -116,6 +116,11 @@ export function useActivities(): UseActivitiesReturn {
       };
       if (filterType) params.type = filterType;
       if (debouncedSearch) params.search = debouncedSearch;
+      if (period) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - Number(period));
+        params.startDate = startDate.toISOString().split("T")[0];
+      }
 
       const [activitiesRes, statsRes] = await Promise.all([
         api.get("/api/activities", { params }),

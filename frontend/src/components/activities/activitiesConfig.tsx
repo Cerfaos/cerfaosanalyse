@@ -35,11 +35,11 @@ export const CARDIO_ACTIVITIES = ["Cyclisme", "Course"];
 
 export const INPUT_CLASSES = {
   default:
-    "w-full px-4 py-3 rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none transition",
+    "w-full px-4 py-2.5 rounded-lg border border-[var(--border-default)] bg-[var(--surface-input)] text-[var(--text-primary)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 outline-none transition-colors text-sm",
   compact:
-    "w-full px-3 py-2 rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/60 text-white placeholder-gray-500 focus:border-[#8BC34A] focus:ring-2 focus:ring-[#8BC34A]/20 outline-none text-center transition",
-  label: "block text-sm font-medium text-gray-300 mb-2",
-  primaryButton: "btn-primary w-full font-display",
+    "w-full px-3 py-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-input)] text-[var(--text-primary)] placeholder-[var(--text-disabled)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]/20 outline-none text-center transition-colors text-sm",
+  label: "block text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5",
+  primaryButton: "btn-primary w-full",
 };
 
 export const formatRecordValue = (value: number, unit: string): string => {

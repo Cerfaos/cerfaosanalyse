@@ -61,13 +61,14 @@ export default function SimilarActivities({
   };
 
   const formatDiff = (value: number, unit: string, inverse = false) => {
-    if (value === 0) return <span className="text-gray-500">=</span>;
+    if (value === 0) return <span className="text-[#475569]">=</span>;
     const isPositive = value > 0;
     const isGood = inverse ? !isPositive : isPositive;
-    const color = isGood ? "text-emerald-500" : "text-red-500";
+    const color = isGood ? "text-emerald-400" : "text-red-400";
+    const bgColor = isGood ? "bg-emerald-500/10 border-emerald-500/15" : "bg-red-500/10 border-red-500/15";
     const sign = isPositive ? "+" : "";
     return (
-      <span className={`text-xs font-medium ${color}`}>
+      <span className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded-full border ${bgColor} ${color}`}>
         {sign}
         {value} {unit}
       </span>
@@ -75,44 +76,64 @@ export default function SimilarActivities({
   };
 
   return (
-    <div className="glass-panel p-6 mt-8">
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-          Sessions similaires <span className="text-2xl">👯</span>
-        </h3>
-        <p className="text-sm text-gray-400">
-          Basé sur la distance, durée et intensité
-        </p>
+    <div
+      className="relative rounded-2xl overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(99,102,241,0.04) 0%, rgba(15,21,32,0.6) 100%)",
+        border: "1px solid rgba(99,102,241,0.08)",
+      }}
+    >
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-4">
+        <div className="w-7 h-7 rounded-lg bg-indigo-500/15 flex items-center justify-center">
+          <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+        </div>
+        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+          Sessions similaires
+        </span>
+        <span className="ml-auto text-xs font-bold text-indigo-400/70 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/15">
+          {activities.length}
+        </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="px-4 pb-4 space-y-2.5">
         {activities.map((activity) => (
           <div
             key={activity.id}
             onClick={() => navigate(`/activities/${activity.id}`)}
-            className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-primary/30"
+            className="group rounded-xl p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] hover:border-indigo-500/15 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="text-sm font-medium text-primary">
+                <span className="text-sm font-bold text-white font-mono">
                   {new Date(activity.date).toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "short",
                     year: "numeric",
                   })}
-                </div>
-                <div className="px-2 py-0.5 rounded-full bg-white/10 text-xs text-gray-300">
-                  {activity.similarityScore}% similaire
-                </div>
+                </span>
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                    activity.similarityScore >= 80
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                      : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
+                  }`}
+                >
+                  {activity.similarityScore}%
+                </span>
               </div>
-              <div className="text-gray-400 text-sm">➜</div>
+              <svg className="w-4 h-4 text-[#475569] group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-xs text-gray-500 mb-1">Distance</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">Distance</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-medium">
+                  <span className="text-white font-bold font-mono text-sm">
                     {(activity.distance / 1000).toFixed(2)} km
                   </span>
                   {formatDiff(
@@ -124,9 +145,9 @@ export default function SimilarActivities({
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Durée</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">Durée</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-medium">
+                  <span className="text-white font-bold font-mono text-sm">
                     {formatDuration(activity.duration)}
                   </span>
                   {formatDiff(
@@ -136,9 +157,9 @@ export default function SimilarActivities({
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Vitesse</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">Vitesse</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-medium">
+                  <span className="text-white font-bold font-mono text-sm">
                     {activity.avgSpeed?.toFixed(1)} km/h
                   </span>
                   {formatDiff(
@@ -148,9 +169,9 @@ export default function SimilarActivities({
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">FC Moy.</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">FC Moy.</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-medium">
+                  <span className="text-white font-bold font-mono text-sm">
                     {activity.avgHeartRate} bpm
                   </span>
                   {formatDiff(activity.comparison.hrDiff, "bpm", true)}

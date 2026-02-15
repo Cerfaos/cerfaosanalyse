@@ -1,8 +1,7 @@
 /**
- * Section données supplémentaires (cardio, vitesse, puissance, autres)
+ * Section données supplémentaires — Style B Raised, compact
  */
 
-import { GlassCard } from "../ui/GlassCard";
 import type { Activity } from "../../types/activity";
 
 interface AdditionalDataSectionProps {
@@ -18,161 +17,90 @@ export default function AdditionalDataSection({
   formatPace,
   getTrimpColor,
 }: AdditionalDataSectionProps) {
+  // Collecter les cards qui ont des données
+  const cards: { accentColor: string; title: string; rows: { label: string; value: string | number; unit?: string; colorClass?: string }[] }[] = [];
+
+  if (activity.avgHeartRate || activity.maxHeartRate) {
+    const rows: typeof cards[0]["rows"] = [];
+    if (activity.avgHeartRate) rows.push({ label: "FC moy.", value: activity.avgHeartRate, unit: "bpm" });
+    if (activity.maxHeartRate) rows.push({ label: "FC max.", value: activity.maxHeartRate, unit: "bpm" });
+    if (activity.trimp) rows.push({ label: "TRIMP", value: activity.trimp, colorClass: getTrimpColor(activity.trimp) });
+    cards.push({ accentColor: "#ef4444", title: "Cardio", rows });
+  }
+
+  if (activity.avgSpeed || activity.maxSpeed) {
+    const rows: typeof cards[0]["rows"] = [];
+    if (activity.avgSpeed) rows.push({ label: "Vit. moy.", value: formatSpeed(activity.avgSpeed) });
+    if (activity.maxSpeed) rows.push({ label: "Vit. max.", value: formatSpeed(activity.maxSpeed) });
+    if (activity.avgSpeed) rows.push({ label: "Allure", value: formatPace(activity.avgSpeed), colorClass: "text-[var(--accent-primary)]" });
+    cards.push({ accentColor: "#3b82f6", title: "Vitesse", rows });
+  }
+
+  if (activity.avgPower || activity.normalizedPower) {
+    const rows: typeof cards[0]["rows"] = [];
+    if (activity.avgPower) rows.push({ label: "Puiss. moy.", value: activity.avgPower, unit: "W" });
+    if (activity.normalizedPower) rows.push({ label: "Puiss. norm.", value: activity.normalizedPower, unit: "W", colorClass: "text-amber-400" });
+    cards.push({ accentColor: "#f59e0b", title: "Puissance", rows });
+  }
+
+  if (activity.avgCadence || activity.calories) {
+    const rows: typeof cards[0]["rows"] = [];
+    if (activity.avgCadence) rows.push({ label: "Cadence", value: activity.avgCadence, unit: "rpm" });
+    if (activity.calories) rows.push({ label: "Calories", value: activity.calories, unit: "kcal", colorClass: "text-[var(--accent-primary)]" });
+    cards.push({ accentColor: "#a855f7", title: "Autres", rows });
+  }
+
+  if (cards.length === 0) return null;
+
+  // Grille adaptative : 2 cols si 2 cards, 3 cols si 3+, 4 cols si 4
+  const gridClass = cards.length === 1
+    ? "grid-cols-1 max-w-md"
+    : cards.length === 2
+    ? "grid-cols-1 sm:grid-cols-2"
+    : cards.length === 3
+    ? "grid-cols-1 sm:grid-cols-3"
+    : "grid-cols-2 lg:grid-cols-4";
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Cardio */}
-      {(activity.avgHeartRate || activity.maxHeartRate) && (
-        <GlassCard
-          className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-          style={{ animationDelay: "700ms" }}
+    <div className={`grid gap-3 ${gridClass}`}>
+      {cards.map((card) => (
+        <div
+          key={card.title}
+          className="relative rounded-xl border border-[#1e293b]/60 overflow-hidden"
+          style={{ background: "linear-gradient(180deg, #0f1520 0%, #0c1017 100%)" }}
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--status-error)]/10 flex items-center justify-center text-lg border border-[var(--status-error)]/20 group-hover:scale-110 transition-transform duration-300">
-              ❤️
-            </div>
-            <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">Cardio</h3>
-          </div>
-          <div className="space-y-3">
-            {activity.avgHeartRate && (
-              <DataRow label="FC moyenne" value={activity.avgHeartRate} unit="bpm" />
-            )}
-            {activity.maxHeartRate && (
-              <DataRow label="FC maximale" value={activity.maxHeartRate} unit="bpm" />
-            )}
-            {activity.trimp && (
-              <DataRow
-                label="TRIMP"
-                value={activity.trimp}
-                colorClass={getTrimpColor(activity.trimp)}
-                noBorder
-              />
-            )}
-          </div>
-        </GlassCard>
-      )}
+          {/* Accent bar gauche */}
+          <div
+            className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r-full"
+            style={{ backgroundColor: card.accentColor, opacity: 0.5 }}
+          />
 
-      {/* Vitesse */}
-      {(activity.avgSpeed || activity.maxSpeed) && (
-        <GlassCard
-          className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-          style={{ animationDelay: "750ms" }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--status-info)]/10 flex items-center justify-center text-lg border border-[var(--status-info)]/20 group-hover:scale-110 transition-transform duration-300">
-              🚀
-            </div>
-            <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">Vitesse</h3>
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#1e293b]/40">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: card.accentColor }}
+            />
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+              {card.title}
+            </span>
           </div>
-          <div className="space-y-3">
-            {activity.avgSpeed && (
-              <DataRow label="Vitesse moyenne" value={formatSpeed(activity.avgSpeed)} />
-            )}
-            {activity.maxSpeed && (
-              <DataRow label="Vitesse maximale" value={formatSpeed(activity.maxSpeed)} />
-            )}
-            {activity.avgSpeed && (
-              <DataRow
-                label="Allure moyenne"
-                value={formatPace(activity.avgSpeed)}
-                colorClass="text-[var(--accent-primary)]"
-                noBorder
-              />
-            )}
-          </div>
-        </GlassCard>
-      )}
 
-      {/* Puissance */}
-      {(activity.avgPower || activity.normalizedPower) && (
-        <GlassCard
-          className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-          style={{ animationDelay: "800ms" }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--accent-secondary)]/10 flex items-center justify-center text-lg border border-[var(--accent-secondary)]/20 group-hover:scale-110 transition-transform duration-300">
-              ⚡
-            </div>
-            <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
-              Puissance
-            </h3>
+          <div className="px-4 py-3">
+            {card.rows.map((row) => (
+              <div
+                key={row.label}
+                className="flex justify-between items-center py-1.5 hover:bg-white/[0.02] -mx-1.5 px-1.5 rounded transition-colors duration-150"
+              >
+                <span className="text-xs text-[#475569]">{row.label}</span>
+                <span className={`text-sm font-bold font-mono ${row.colorClass || "text-white"}`}>
+                  {row.value}
+                  {row.unit && <span className="text-[10px] text-[#475569] ml-0.5">{row.unit}</span>}
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="space-y-3">
-            {activity.avgPower && (
-              <DataRow label="Puissance moyenne" value={activity.avgPower} unit="W" />
-            )}
-            {activity.normalizedPower && (
-              <DataRow
-                label="Puissance normalisée"
-                value={activity.normalizedPower}
-                unit="W"
-                colorClass="text-[var(--accent-secondary)]"
-                noBorder
-              />
-            )}
-          </div>
-        </GlassCard>
-      )}
-
-      {/* Autres */}
-      {(activity.avgCadence || activity.calories) && (
-        <GlassCard
-          className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-          style={{ animationDelay: "850ms" }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg border border-purple-500/20 group-hover:scale-110 transition-transform duration-300">
-              📊
-            </div>
-            <h3 className="text-lg font-display font-bold text-[var(--text-primary)]">
-              Autres données
-            </h3>
-          </div>
-          <div className="space-y-3">
-            {activity.avgCadence && (
-              <DataRow label="Cadence moyenne" value={activity.avgCadence} unit="rpm" />
-            )}
-            {activity.calories && (
-              <DataRow
-                label="Calories"
-                value={activity.calories}
-                unit="kcal"
-                colorClass="text-[var(--accent-primary)]"
-                noBorder
-              />
-            )}
-          </div>
-        </GlassCard>
-      )}
-    </div>
-  );
-}
-
-interface DataRowProps {
-  label: string;
-  value: string | number;
-  unit?: string;
-  colorClass?: string;
-  noBorder?: boolean;
-}
-
-function DataRow({
-  label,
-  value,
-  unit,
-  colorClass = "text-[var(--text-primary)]",
-  noBorder = false,
-}: DataRowProps) {
-  return (
-    <div
-      className={`flex justify-between items-center py-2 ${
-        noBorder ? "" : "border-b border-[var(--border-subtle)]"
-      }`}
-    >
-      <span className="text-sm text-[var(--text-tertiary)]">{label}</span>
-      <span className={`font-semibold ${colorClass}`}>
-        {value}
-        {unit && <span className="text-xs text-[var(--text-tertiary)] ml-1">{unit}</span>}
-      </span>
+        </div>
+      ))}
     </div>
   );
 }
