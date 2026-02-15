@@ -136,13 +136,24 @@ export default class MrcParserService {
     const dataPoints: MrcDataPoint[] = []
 
     for (const line of lines) {
-      // Format: MINUTES\tPERCENTAGE\t"TEXT"
-      const match = line.match(/^\s*([\d.]+)\s+([\d.]+)\s+"([^"]*)"/)
-      if (match) {
+      // Format 1: MINUTES PERCENTAGE "TEXT" (avec texte)
+      const matchWithText = line.match(/^\s*([\d.]+)\s+([\d.]+)\s+"([^"]*)"/)
+      if (matchWithText) {
         dataPoints.push({
-          minutes: parseFloat(match[1]),
-          percentage: parseFloat(match[2]),
-          text: match[3],
+          minutes: parseFloat(matchWithText[1]),
+          percentage: parseFloat(matchWithText[2]),
+          text: matchWithText[3],
+        })
+        continue
+      }
+
+      // Format 2: MINUTES PERCENTAGE (sans texte - format Zwift/TrainerRoad simple)
+      const matchSimple = line.match(/^\s*([\d.]+)\s+([\d.]+)\s*$/)
+      if (matchSimple) {
+        dataPoints.push({
+          minutes: parseFloat(matchSimple[1]),
+          percentage: parseFloat(matchSimple[2]),
+          text: '',
         })
       }
     }

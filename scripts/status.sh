@@ -2,6 +2,12 @@
 # Script pour afficher l'état complet des services
 set -euo pipefail
 
+# Chemin explicite vers podman (évite les problèmes de PATH après redémarrage)
+PODMAN="${PODMAN:-/usr/bin/podman}"
+if [[ ! -x "$PODMAN" ]]; then
+    PODMAN=$(command -v podman 2>/dev/null || echo "/usr/bin/podman")
+fi
+
 # Couleurs pour les logs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -22,19 +28,19 @@ detect_local_ip() {
 
 # Vérifier si un conteneur existe
 container_exists() {
-    podman container exists "$1" 2>/dev/null
+    $PODMAN container exists "$1" 2>/dev/null
 }
 
 # Vérifier si un conteneur est en cours d'exécution
 container_running() {
-    [[ "$(podman inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" == "true" ]]
+    [[ "$($PODMAN inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" == "true" ]]
 }
 
 # Obtenir des infos sur un conteneur
 get_container_info() {
     local container="$1"
     if container_exists "$container"; then
-        podman inspect -f '{{.State.Status}} | Démarré: {{.State.StartedAt}}' "$container" 2>/dev/null | cut -c1-50
+        $PODMAN inspect -f '{{.State.Status}} | Démarré: {{.State.StartedAt}}' "$container" 2>/dev/null | cut -c1-50
     else
         echo "n'existe pas"
     fi
@@ -75,7 +81,7 @@ show_service_status() {
     # Infos mémoire/CPU si en cours
     if container_running "$container"; then
         local stats
-        stats=$(podman stats --no-stream --format "{{.MemUsage}} | CPU: {{.CPUPerc}}" "$container" 2>/dev/null | head -1)
+        stats=$($PODMAN stats --no-stream --format "{{.MemUsage}} | CPU: {{.CPUPerc}}" "$container" 2>/dev/null | head -1)
         if [[ -n "$stats" ]]; then
             echo "│    Ressources: $stats"
         fi

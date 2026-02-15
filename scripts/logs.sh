@@ -2,6 +2,12 @@
 # Script pour afficher les logs des conteneurs
 set -euo pipefail
 
+# Chemin explicite vers podman (évite les problèmes de PATH après redémarrage)
+PODMAN="${PODMAN:-/usr/bin/podman}"
+if [[ ! -x "$PODMAN" ]]; then
+    PODMAN=$(command -v podman 2>/dev/null || echo "/usr/bin/podman")
+fi
+
 # Couleurs pour les logs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -80,7 +86,7 @@ show_logs() {
     local name="$2"
     local color="$3"
 
-    if ! podman container exists "$container" 2>/dev/null; then
+    if ! $PODMAN container exists "$container" 2>/dev/null; then
         echo -e "${RED}Le conteneur $container n'existe pas${NC}"
         return 1
     fi
@@ -92,9 +98,9 @@ show_logs() {
     echo ""
 
     if $ERRORS_ONLY; then
-        podman logs --tail "$LINES" $SINCE $FOLLOW "$container" 2>&1 | grep -iE "(error|exception|fatal|failed|crash)" || echo "Aucune erreur trouvée"
+        $PODMAN logs --tail "$LINES" $SINCE $FOLLOW "$container" 2>&1 | grep -iE "(error|exception|fatal|failed|crash)" || echo "Aucune erreur trouvée"
     else
-        podman logs --tail "$LINES" $SINCE $FOLLOW "$container" 2>&1
+        $PODMAN logs --tail "$LINES" $SINCE $FOLLOW "$container" 2>&1
     fi
 }
 

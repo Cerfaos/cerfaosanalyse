@@ -2,6 +2,12 @@
 # Script pour arrêter l'application
 set -euo pipefail
 
+# Chemin explicite vers podman (évite les problèmes de PATH après redémarrage)
+PODMAN="${PODMAN:-/usr/bin/podman}"
+if [[ ! -x "$PODMAN" ]]; then
+    PODMAN=$(command -v podman 2>/dev/null || echo "/usr/bin/podman")
+fi
+
 # Couleurs pour les logs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -15,7 +21,7 @@ log_warn() { printf "${YELLOW}[%s] ⚠${NC} %s\n" "$(date '+%H:%M:%S')" "$*"; }
 
 # Vérifier si un conteneur est en cours d'exécution
 container_running() {
-    [[ "$(podman inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" == "true" ]]
+    [[ "$($PODMAN inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" == "true" ]]
 }
 
 # Arrêter un conteneur
@@ -25,7 +31,7 @@ stop_container() {
 
     if container_running "$name"; then
         log "Arrêt de ${display_name}..."
-        if podman stop "$name" >/dev/null 2>&1; then
+        if $PODMAN stop "$name" >/dev/null 2>&1; then
             log_success "${display_name} arrêté"
         else
             log_warn "Impossible d'arrêter ${display_name}"
