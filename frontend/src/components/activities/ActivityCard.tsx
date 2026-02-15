@@ -28,7 +28,7 @@ export default function ActivityCard({ activity, onEdit, onDelete }: ActivityCar
 
   return (
     <div
-      className="group relative rounded-2xl border border-[#1e293b] bg-[#0f1520] hover:border-[#334155] hover:bg-[#111827] transition-all duration-200 cursor-pointer"
+      className="group relative rounded-2xl border border-[var(--border-default)] bg-[var(--surface-raised)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-input)] transition-all duration-200 cursor-pointer"
       onClick={() => navigate(`/activities/${activity.id}`)}
     >
       {/* Left accent bar - thick and visible */}
@@ -50,11 +50,11 @@ export default function ActivityCard({ activity, onEdit, onDelete }: ActivityCar
               </span>
             )}
           </div>
-          <p className="text-[12px] text-[#475569] mt-1 font-mono tabular-nums">
-            <span className="text-[#64748b] capitalize">{dayStr}</span>
-            <span className="mx-1.5 text-[#1e293b]">|</span>
+          <p className="text-[12px] text-[var(--text-disabled)] mt-1 font-mono tabular-nums">
+            <span className="text-[var(--text-tertiary)] capitalize">{dayStr}</span>
+            <span className="mx-1.5 text-[var(--border-default)]">|</span>
             {dateStr}
-            <span className="mx-1.5 text-[#1e293b]">|</span>
+            <span className="mx-1.5 text-[var(--border-default)]">|</span>
             {timeStr}
           </p>
         </div>
@@ -73,7 +73,7 @@ export default function ActivityCard({ activity, onEdit, onDelete }: ActivityCar
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onEdit(activity); }}
-            className="p-2 rounded-lg text-[#475569] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/10 transition-colors"
+            className="p-2 rounded-lg text-[var(--text-disabled)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/10 transition-colors"
             title="Modifier"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -83,14 +83,14 @@ export default function ActivityCard({ activity, onEdit, onDelete }: ActivityCar
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onDelete(activity.id); }}
-            className="p-2 rounded-lg text-[#475569] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            className="p-2 rounded-lg text-[var(--text-disabled)] hover:text-red-400 hover:bg-red-500/10 transition-colors"
             title="Supprimer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
-          <svg className="w-4 h-4 text-[#334155] ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-4 h-4 text-[var(--border-strong)] ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </div>
@@ -104,7 +104,7 @@ function StaticMetrics({ activity }: { activity: Activity }) {
     <div className="flex items-center gap-6">
       <Metric label="Durée" value={formatDuration(activity.duration)} />
       <Metric label="Calories" value={activity.calories ? `${activity.calories}` : "–"} unit={activity.calories ? "kcal" : undefined} />
-      <Metric label="FC moy" value={activity.avgHeartRate ? `${activity.avgHeartRate}` : "–"} unit={activity.avgHeartRate ? "bpm" : undefined} color="#ef4444" />
+      <Metric label="FC moy" value={activity.avgHeartRate ? `${activity.avgHeartRate}` : "–"} unit={activity.avgHeartRate ? "bpm" : undefined} color="var(--status-error)" />
       <TrimpMetric trimp={activity.trimp} />
     </div>
   );
@@ -120,7 +120,7 @@ function DynamicMetrics({ activity }: { activity: Activity }) {
         value={activity.avgSpeed ? `${activity.avgSpeed.toFixed(1)}` : activity.elevationGain ? `${activity.elevationGain}` : "–"}
         unit={activity.avgSpeed ? "km/h" : activity.elevationGain ? "m" : undefined}
       />
-      <Metric label="FC moy" value={activity.avgHeartRate ? `${activity.avgHeartRate}` : "–"} unit={activity.avgHeartRate ? "bpm" : undefined} color="#ef4444" />
+      <Metric label="FC moy" value={activity.avgHeartRate ? `${activity.avgHeartRate}` : "–"} unit={activity.avgHeartRate ? "bpm" : undefined} color="var(--status-error)" />
       <TrimpMetric trimp={activity.trimp} />
       <WeatherInline weather={activity.weather} />
     </div>
@@ -130,10 +130,10 @@ function DynamicMetrics({ activity }: { activity: Activity }) {
 function Metric({ label, value, unit, color }: { label: string; value: string; unit?: string; color?: string }) {
   return (
     <div className="min-w-[70px]">
-      <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#334155] mb-0.5">{label}</p>
-      <p className="text-sm font-extrabold font-mono tabular-nums leading-tight" style={{ color: color || "#e2e8f0" }}>
+      <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--text-disabled)] mb-0.5">{label}</p>
+      <p className="text-sm font-extrabold font-mono tabular-nums leading-tight" style={{ color: color || "var(--text-secondary)" }}>
         {value}
-        {unit && <span className="text-[10px] font-semibold text-[#475569] ml-0.5">{unit}</span>}
+        {unit && <span className="text-[10px] font-semibold text-[var(--text-disabled)] ml-0.5">{unit}</span>}
       </p>
     </div>
   );
@@ -143,11 +143,11 @@ function TrimpMetric({ trimp }: { trimp: number | null }) {
   const level = getTrimpLevel(trimp);
   return (
     <div className="min-w-[55px]">
-      <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#334155] mb-0.5">TRIMP</p>
+      <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--text-disabled)] mb-0.5">TRIMP</p>
       <p className={`text-sm font-extrabold font-mono tabular-nums leading-tight ${getTrimpColor(trimp)}`}>
         {trimp || "–"}
       </p>
-      {level && <p className="text-[8px] font-bold text-[#334155] mt-0.5">{level}</p>}
+      {level && <p className="text-[8px] font-bold text-[var(--text-disabled)] mt-0.5">{level}</p>}
     </div>
   );
 }
@@ -158,10 +158,10 @@ function WeatherInline({ weather }: { weather: string | null }) {
     const data: WeatherData = JSON.parse(weather);
     return (
       <div className="min-w-[55px]">
-        <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#334155] mb-0.5">Météo</p>
+        <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--text-disabled)] mb-0.5">Météo</p>
         <div className="flex items-center gap-1">
           <img src={`https://openweathermap.org/img/wn/${data.icon}.png`} alt={data.description} className="w-5 h-5 -ml-0.5" />
-          <span className="text-sm font-extrabold font-mono text-[#e2e8f0]">{Math.round(data.temperature)}°</span>
+          <span className="text-sm font-extrabold font-mono text-[var(--text-secondary)]">{Math.round(data.temperature)}°</span>
         </div>
       </div>
     );

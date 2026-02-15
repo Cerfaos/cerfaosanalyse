@@ -25,7 +25,7 @@ export default function ActivityFilters({
   return (
     <div className="flex items-center gap-4 flex-wrap">
       {/* Period selector */}
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0f1520] border border-[#1e293b]">
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-raised)] border border-[var(--border-default)]">
         {PERIODS.map((p) => (
           <button
             key={p.value}
@@ -34,7 +34,7 @@ export default function ActivityFilters({
             className={`px-4 py-2 rounded-lg text-xs font-bold tracking-wide transition-all duration-200 ${
               period === p.value
                 ? "bg-[var(--accent-primary)] text-white shadow-[0_2px_12px_rgba(248,113,47,0.4)]"
-                : "text-[#475569] hover:text-[#94a3b8] hover:bg-[#1e293b]/50"
+                : "text-[var(--text-disabled)] hover:text-[var(--text-tertiary)] hover:bg-[var(--surface-input)]/50"
             }`}
           >
             {p.label}
@@ -46,7 +46,7 @@ export default function ActivityFilters({
       <select
         value={filterType}
         onChange={(e) => setFilterType(e.target.value)}
-        className="h-10 px-4 pr-8 rounded-xl border border-[#1e293b] bg-[#0f1520] text-xs font-bold text-[#94a3b8] cursor-pointer hover:border-[#334155] focus:border-[var(--accent-primary)] outline-none transition-all appearance-none"
+        className="h-10 px-4 pr-8 rounded-xl border border-[var(--border-default)] bg-[var(--surface-raised)] text-xs font-bold text-[var(--text-tertiary)] cursor-pointer hover:border-[var(--border-strong)] focus:border-[var(--accent-primary)] outline-none transition-all appearance-none"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
           backgroundRepeat: "no-repeat",
@@ -85,7 +85,7 @@ export default function ActivityFilters({
       {/* Search */}
       <div className="relative w-64">
         <svg
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#334155]"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-disabled)]"
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -95,13 +95,13 @@ export default function ActivityFilters({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Rechercher une activité..."
-          className="w-full h-10 pl-10 pr-10 rounded-xl border border-[#1e293b] bg-[#0f1520] text-sm text-white placeholder-[#334155] focus:border-[var(--accent-primary)] outline-none transition-colors"
+          className="w-full h-10 pl-10 pr-10 rounded-xl border border-[var(--border-default)] bg-[var(--surface-raised)] text-sm text-white placeholder-[var(--text-disabled)] focus:border-[var(--accent-primary)] outline-none transition-colors"
         />
         {searchTerm && (
           <button
             type="button"
             onClick={() => setSearchTerm("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#475569] hover:text-white transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-disabled)] hover:text-white transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

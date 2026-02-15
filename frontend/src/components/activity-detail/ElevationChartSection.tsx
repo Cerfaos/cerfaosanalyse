@@ -28,10 +28,10 @@ export default function ElevationChartSection({
     <div
       className="relative rounded-2xl border border-white/[0.08] overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, rgba(15,21,32,0.85) 0%, rgba(15,21,32,0.65) 100%)",
+        background: `linear-gradient(135deg, var(--surface-raised) 0%, rgba(15,21,32,0.65) 100%)`,
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        boxShadow: "0 8px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03)",
+        boxShadow: "var(--shadow-md), 0 0 0 1px rgba(255,255,255,0.03)",
       }}
     >
       {/* Header */}
@@ -41,7 +41,7 @@ export default function ElevationChartSection({
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
         </div>
-        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--text-tertiary)]">
           Profil d'élévation
         </span>
       </div>
@@ -52,29 +52,29 @@ export default function ElevationChartSection({
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="elevationGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.4} />
-                  <stop offset="50%" stopColor="#10B981" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="var(--status-success)" stopOpacity={0.4} />
+                  <stop offset="50%" stopColor="var(--status-success)" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="var(--status-success)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.06)" />
-              <XAxis dataKey="index" stroke="#475569" hide />
+              <XAxis dataKey="index" stroke="var(--text-disabled)" hide />
               <YAxis
-                stroke="#475569"
+                stroke="var(--text-disabled)"
                 style={{ fontSize: "11px", fontFamily: "var(--font-mono)" }}
                 tickFormatter={(value) => `${Math.round(value)}m`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "rgba(15,21,32,0.95)",
+                  backgroundColor: "var(--surface-overlay)",
                   border: "1px solid rgba(255,255,255,0.08)",
                   borderRadius: "12px",
-                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5)",
+                  boxShadow: "var(--shadow-lg)",
                   backdropFilter: "blur(8px)",
                 }}
-                labelStyle={{ color: "#475569", fontSize: "11px" }}
+                labelStyle={{ color: "var(--text-disabled)", fontSize: "11px" }}
                 formatter={(value: number) => [
-                  <span key="val" style={{ color: "#10B981", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+                  <span key="val" style={{ color: "var(--status-success)", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                     {parseFloat(value.toFixed(1))} m
                   </span>,
                   "Altitude",
@@ -83,7 +83,7 @@ export default function ElevationChartSection({
               <Area
                 type="monotone"
                 dataKey="elevation"
-                stroke="#10B981"
+                stroke="var(--status-success)"
                 strokeWidth={2}
                 fill="url(#elevationGradient)"
               />

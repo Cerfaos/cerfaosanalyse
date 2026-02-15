@@ -55,13 +55,13 @@ export default function WeatherCard({ weatherJson, avgTemperature, maxTemperatur
               <ThermometerIcon />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569]">Température capteur</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)]">Température capteur</p>
               <p className="text-2xl font-black font-mono tabular-nums text-cyan-400 leading-none mt-0.5">
                 {avgTemperature}°C
               </p>
             </div>
-            {maxTemperature && (
-              <span className="ml-auto text-xs font-mono font-bold text-[#475569] bg-white/[0.04] px-2.5 py-1 rounded-lg">
+            {maxTemperature != null && maxTemperature !== undefined && (
+              <span className="ml-auto text-xs font-mono font-bold text-[var(--text-disabled)] bg-white/[0.04] px-2.5 py-1 rounded-lg">
                 Max {maxTemperature}°C
               </span>
             )}
@@ -87,11 +87,11 @@ export default function WeatherCard({ weatherJson, avgTemperature, maxTemperatur
             <span className="text-3xl font-black font-mono tabular-nums text-white leading-none">
               {Math.round(weather.temperature)}°
             </span>
-            <span className="text-sm font-mono text-[#475569]">
+            <span className="text-sm font-mono text-[var(--text-disabled)]">
               ressenti {Math.round(weather.feelsLike)}°
             </span>
           </div>
-          <p className="text-xs text-[#64748b] capitalize mt-1 truncate">
+          <p className="text-xs text-[var(--text-tertiary)] capitalize mt-1 truncate">
             {weather.description}
           </p>
         </div>
@@ -132,7 +132,7 @@ export default function WeatherCard({ weatherJson, avgTemperature, maxTemperatur
           />
 
           {/* Capteur ou espace vide */}
-          {avgTemperature ? (
+          {avgTemperature != null ? (
             <MetricCell
               icon={<ThermometerIcon />}
               iconColor="text-cyan-400"
@@ -174,14 +174,14 @@ function MetricCell({
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] leading-none">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] leading-none">
           {label}
         </p>
         <p className={`text-sm font-bold font-mono leading-tight mt-0.5 ${valueColor}`}>
           {value}
         </p>
         {sub && (
-          <p className="text-[10px] text-[#475569] leading-none mt-0.5">{sub}</p>
+          <p className="text-[10px] text-[var(--text-disabled)] leading-none mt-0.5">{sub}</p>
         )}
       </div>
     </div>

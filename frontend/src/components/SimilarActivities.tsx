@@ -61,7 +61,7 @@ export default function SimilarActivities({
   };
 
   const formatDiff = (value: number, unit: string, inverse = false) => {
-    if (value === 0) return <span className="text-[#475569]">=</span>;
+    if (value === 0) return <span className="text-[var(--text-disabled)]">=</span>;
     const isPositive = value > 0;
     const isGood = inverse ? !isPositive : isPositive;
     const color = isGood ? "text-emerald-400" : "text-red-400";
@@ -90,7 +90,7 @@ export default function SimilarActivities({
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
         </div>
-        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--text-tertiary)]">
           Sessions similaires
         </span>
         <span className="ml-auto text-xs font-bold text-indigo-400/70 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/15">
@@ -124,14 +124,14 @@ export default function SimilarActivities({
                   {activity.similarityScore}%
                 </span>
               </div>
-              <svg className="w-4 h-4 text-[#475569] group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4 text-[var(--text-disabled)] group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">Distance</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">Distance</p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-white font-bold font-mono text-sm">
                     {(activity.distance / 1000).toFixed(2)} km
@@ -145,7 +145,7 @@ export default function SimilarActivities({
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">Durée</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">Durée</p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-white font-bold font-mono text-sm">
                     {formatDuration(activity.duration)}
@@ -157,10 +157,10 @@ export default function SimilarActivities({
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">Vitesse</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">Vitesse</p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-white font-bold font-mono text-sm">
-                    {activity.avgSpeed?.toFixed(1)} km/h
+                    {activity.avgSpeed != null ? `${activity.avgSpeed.toFixed(1)} km/h` : "-"}
                   </span>
                   {formatDiff(
                     Number(activity.comparison.speedDiff.toFixed(1)),
@@ -169,10 +169,10 @@ export default function SimilarActivities({
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#475569] mb-1">FC Moy.</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">FC Moy.</p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-white font-bold font-mono text-sm">
-                    {activity.avgHeartRate} bpm
+                    {activity.avgHeartRate != null ? `${activity.avgHeartRate} bpm` : "-"}
                   </span>
                   {formatDiff(activity.comparison.hrDiff, "bpm", true)}
                 </div>
