@@ -16,7 +16,7 @@ export default function StatCard({
   unit,
   secondary,
   colorClass = "text-white",
-  dotColor = "#f8712f",
+  dotColor = "var(--accent-primary)",
   delay = 0,
   infoComponent,
   variant = "standard",
@@ -31,18 +31,18 @@ export default function StatCard({
           className="w-[7px] h-[7px] rounded-full flex-shrink-0 shadow-[0_0_6px_var(--glow)]"
           style={{ backgroundColor: dotColor, "--glow": `${dotColor}60` } as React.CSSProperties}
         />
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#475569]">
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--text-disabled)]">
           {label}
         </p>
         {infoComponent}
         <p className={`font-bold font-mono tabular-nums text-base ml-auto ${colorClass}`}>
           {value}
           {unit && (
-            <span className="text-xs font-semibold text-[#475569] ml-1">{unit}</span>
+            <span className="text-xs font-semibold text-[var(--text-disabled)] ml-1">{unit}</span>
           )}
         </p>
         {secondary && (
-          <span className="text-xs text-[#475569] font-medium">{secondary}</span>
+          <span className="text-xs text-[var(--text-disabled)] font-medium">{secondary}</span>
         )}
       </div>
     );
@@ -56,7 +56,7 @@ export default function StatCard({
       className="group relative rounded-xl border border-white/[0.06] p-4 overflow-hidden hover:border-white/[0.12] transition-all duration-200 animate-in fade-in slide-in-from-bottom-4 duration-700"
       style={{
         animationDelay: `${delay}ms`,
-        background: "linear-gradient(135deg, rgba(15,21,32,0.8) 0%, rgba(12,16,23,0.9) 100%)",
+        background: `linear-gradient(135deg, var(--surface-raised) 0%, var(--surface-base) 100%)`,
       }}
     >
       {/* Accent bar gauche */}
@@ -79,7 +79,7 @@ export default function StatCard({
             className="w-1.5 h-1.5 rounded-full flex-shrink-0"
             style={{ backgroundColor: dotColor }}
           />
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#475569] truncate">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--text-disabled)] truncate">
             {label}
           </p>
           {infoComponent}
@@ -87,13 +87,13 @@ export default function StatCard({
         <p className={`text-2xl font-black font-mono tabular-nums leading-tight ${colorClass}`}>
           {value}
           {unit && (
-            <span className="text-xs font-semibold text-[#475569] ml-1">
+            <span className="text-xs font-semibold text-[var(--text-disabled)] ml-1">
               {unit}
             </span>
           )}
         </p>
         {secondary && (
-          <p className="text-[11px] text-[#475569] mt-1 font-medium truncate">{secondary}</p>
+          <p className="text-[11px] text-[var(--text-disabled)] mt-1 font-medium truncate">{secondary}</p>
         )}
       </div>
     </div>

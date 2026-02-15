@@ -25,7 +25,7 @@ export default function AdditionalDataSection({
     if (activity.avgHeartRate) rows.push({ label: "FC moy.", value: activity.avgHeartRate, unit: "bpm" });
     if (activity.maxHeartRate) rows.push({ label: "FC max.", value: activity.maxHeartRate, unit: "bpm" });
     if (activity.trimp) rows.push({ label: "TRIMP", value: activity.trimp, colorClass: getTrimpColor(activity.trimp) });
-    cards.push({ accentColor: "#ef4444", title: "Cardio", rows });
+    cards.push({ accentColor: "var(--status-error)", title: "Cardio", rows });
   }
 
   if (activity.avgSpeed || activity.maxSpeed) {
@@ -33,14 +33,14 @@ export default function AdditionalDataSection({
     if (activity.avgSpeed) rows.push({ label: "Vit. moy.", value: formatSpeed(activity.avgSpeed) });
     if (activity.maxSpeed) rows.push({ label: "Vit. max.", value: formatSpeed(activity.maxSpeed) });
     if (activity.avgSpeed) rows.push({ label: "Allure", value: formatPace(activity.avgSpeed), colorClass: "text-[var(--accent-primary)]" });
-    cards.push({ accentColor: "#3b82f6", title: "Vitesse", rows });
+    cards.push({ accentColor: "var(--status-info)", title: "Vitesse", rows });
   }
 
   if (activity.avgPower || activity.normalizedPower) {
     const rows: typeof cards[0]["rows"] = [];
     if (activity.avgPower) rows.push({ label: "Puiss. moy.", value: activity.avgPower, unit: "W" });
     if (activity.normalizedPower) rows.push({ label: "Puiss. norm.", value: activity.normalizedPower, unit: "W", colorClass: "text-amber-400" });
-    cards.push({ accentColor: "#f59e0b", title: "Puissance", rows });
+    cards.push({ accentColor: "var(--accent-secondary)", title: "Puissance", rows });
   }
 
   if (activity.avgCadence || activity.calories) {
@@ -66,8 +66,8 @@ export default function AdditionalDataSection({
       {cards.map((card) => (
         <div
           key={card.title}
-          className="relative rounded-xl border border-[#1e293b]/60 overflow-hidden"
-          style={{ background: "linear-gradient(180deg, #0f1520 0%, #0c1017 100%)" }}
+          className="relative rounded-xl border border-[var(--border-default)]/60 overflow-hidden"
+          style={{ background: `linear-gradient(180deg, var(--surface-raised) 0%, var(--surface-base) 100%)` }}
         >
           {/* Accent bar gauche */}
           <div
@@ -75,12 +75,12 @@ export default function AdditionalDataSection({
             style={{ backgroundColor: card.accentColor, opacity: 0.5 }}
           />
 
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#1e293b]/40">
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border-default)]/40">
             <div
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: card.accentColor }}
             />
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--text-tertiary)]">
               {card.title}
             </span>
           </div>
@@ -91,10 +91,10 @@ export default function AdditionalDataSection({
                 key={row.label}
                 className="flex justify-between items-center py-1.5 hover:bg-white/[0.02] -mx-1.5 px-1.5 rounded transition-colors duration-150"
               >
-                <span className="text-xs text-[#475569]">{row.label}</span>
+                <span className="text-xs text-[var(--text-disabled)]">{row.label}</span>
                 <span className={`text-sm font-bold font-mono ${row.colorClass || "text-white"}`}>
                   {row.value}
-                  {row.unit && <span className="text-[10px] text-[#475569] ml-0.5">{row.unit}</span>}
+                  {row.unit && <span className="text-[10px] text-[var(--text-disabled)] ml-0.5">{row.unit}</span>}
                 </span>
               </div>
             ))}

@@ -136,10 +136,10 @@ export const getActivityColor = (type: string): ActivityColors => {
 
 export const getTrimpColor = (trimp: number | null) => {
   if (!trimp) return "text-gray-400";
-  if (trimp < 50) return "text-[#8BC34A]";
-  if (trimp < 100) return "text-[#5CE1E6]";
-  if (trimp < 200) return "text-[#FFAB40]";
-  return "text-[#FF5252]";
+  if (trimp < 50) return "text-emerald-400";
+  if (trimp < 100) return "text-cyan-400";
+  if (trimp < 200) return "text-amber-400";
+  return "text-red-400";
 };
 
 export const getTrimpLevel = (trimp: number | null) => {
@@ -166,6 +166,8 @@ export interface Activity {
   avgPower: number | null;
   normalizedPower: number | null;
   trimp: number | null;
+  rpe: number | null;
+  feelingNotes: string | null;
   fileName: string | null;
   weather: string | null;
   createdAt: string;

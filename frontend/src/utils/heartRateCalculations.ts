@@ -76,6 +76,10 @@ export const calculateHRZones = (
       break;
     }
   }
+  // Si la FC dépasse la zone max, assigner la dernière zone (Z5)
+  if (avgHeartRate > zones[zones.length - 1].max) {
+    currentZone = zones[zones.length - 1];
+  }
 
   return { zones, currentZone };
 };
