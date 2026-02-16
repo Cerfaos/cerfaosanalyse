@@ -28,25 +28,25 @@ function ActivityTimelineTooltip({
   const day = payload[0].payload as ActivityTimelinePoint;
 
   return (
-    <div className="rounded-xl border border-[#8BC34A]/30 bg-[#0A191A]/95 backdrop-blur-sm px-4 py-3 text-xs shadow-xl">
-      <p className="font-bold text-sm text-white">{day.label}</p>
-      <p className="text-[#8BC34A] font-semibold">
+    <div className="rounded-xl border border-brand-primary/30 bg-surface-deep/95 backdrop-blur-sm px-4 py-3 text-xs shadow-xl">
+      <p className="font-bold text-sm text-[var(--text-primary)]">{day.label}</p>
+      <p className="text-brand-primary font-semibold">
         {day.count} activité{day.count > 1 ? "s" : ""}
       </p>
       <div className="mt-2 space-y-1">
-        <p className="text-white">
+        <p className="text-[var(--text-primary)]">
           Distance:{" "}
-          <span className="font-semibold text-[#5CE1E6]">
+          <span className="font-semibold text-brand-secondary">
             {day.distanceKm.toFixed(1)} km
           </span>
         </p>
-        <p className="text-white">
+        <p className="text-[var(--text-primary)]">
           Durée:{" "}
-          <span className="text-gray-300">{formatDuration(day.duration)}</span>
+          <span className="text-[var(--text-secondary)]">{formatDuration(day.duration)}</span>
         </p>
-        <p className="text-white">
+        <p className="text-[var(--text-primary)]">
           TRIMP:{" "}
-          <span className="font-semibold text-[#FFAB40]">{day.trimp}</span>
+          <span className="font-semibold text-metric-energy">{day.trimp}</span>
         </p>
       </div>
     </div>
@@ -78,15 +78,15 @@ export default function ActivityTimelineCard({
     <div className="glass-panel p-6 h-full min-w-0">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-tertiary)]">
             Charge journalière
           </p>
-          <h3 className="text-xl font-semibold text-white">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)]">
             Volumes d'activité
           </h3>
         </div>
         {data.length > 0 && (
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-[var(--text-tertiary)]">
             {data.length} jour{data.length > 1 ? "s" : ""}
           </span>
         )}
@@ -133,20 +133,20 @@ export default function ActivityTimelineCard({
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="#e2e8f0"
+                stroke="var(--text-tertiary)"
                 strokeOpacity={0.4}
               />
-              <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+              <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="var(--text-tertiary)" />
               <YAxis
                 yAxisId="distance"
-                stroke="#94a3b8"
+                stroke="var(--text-tertiary)"
                 tickFormatter={(value) => `${value} km`}
                 width={55}
               />
               <YAxis
                 yAxisId="trimp"
                 orientation="right"
-                stroke="#fdba74"
+                stroke="var(--accent-secondary-hover)"
                 tickFormatter={(value) => `${value}`}
                 width={45}
               />
@@ -159,7 +159,7 @@ export default function ActivityTimelineCard({
                 yAxisId="distance"
                 type="monotone"
                 dataKey="distanceKm"
-                stroke="#6366f1"
+                stroke="var(--status-info)"
                 fill="url(#distanceGradient)"
                 strokeWidth={2}
               />
@@ -167,7 +167,7 @@ export default function ActivityTimelineCard({
                 yAxisId="trimp"
                 type="monotone"
                 dataKey="trimp"
-                stroke="#f97316"
+                stroke="var(--accent-primary)"
                 fill="url(#trimpGradient)"
                 strokeWidth={2}
               />
@@ -175,7 +175,7 @@ export default function ActivityTimelineCard({
           </ResponsiveContainer>
         </div>
       ) : (
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-[var(--text-tertiary)]">
           Pas assez d'activités pour tracer un graphique sur cette période.
         </p>
       )}
@@ -183,14 +183,14 @@ export default function ActivityTimelineCard({
       {data.length > 0 && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="rounded-xl bg-white/5 p-4">
-            <p className="text-gray-400">Distance cumulée</p>
-            <p className="text-lg font-semibold text-white">
+            <p className="text-[var(--text-tertiary)]">Distance cumulée</p>
+            <p className="text-lg font-semibold text-[var(--text-primary)]">
               {totalDistance.toFixed(1)} km
             </p>
           </div>
           <div className="rounded-xl bg-white/5 p-4">
-            <p className="text-gray-400">Jour le plus long</p>
-            <p className="text-lg font-semibold text-white">
+            <p className="text-[var(--text-tertiary)]">Jour le plus long</p>
+            <p className="text-lg font-semibold text-[var(--text-primary)]">
               {bestDistanceDay
                 ? `${
                     bestDistanceDay.label
@@ -198,7 +198,7 @@ export default function ActivityTimelineCard({
                 : "—"}
             </p>
             {bestDistanceDay && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[var(--text-tertiary)]">
                 {bestDistanceDay.count} sortie
                 {bestDistanceDay.count > 1 ? "s" : ""} ·{" "}
                 {formatDuration(bestDistanceDay.duration)}
@@ -206,12 +206,12 @@ export default function ActivityTimelineCard({
             )}
           </div>
           <div className="rounded-xl bg-white/5 p-4">
-            <p className="text-gray-400">TRIMP cumulé</p>
-            <p className="text-lg font-semibold text-white">
+            <p className="text-[var(--text-tertiary)]">TRIMP cumulé</p>
+            <p className="text-lg font-semibold text-[var(--text-primary)]">
               {Math.round(totalTrimp)} pts
             </p>
             {bestTrimpDay && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[var(--text-tertiary)]">
                 Pic : {bestTrimpDay.label} ({bestTrimpDay.trimp} pts)
               </p>
             )}

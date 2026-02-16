@@ -15,11 +15,11 @@ import toast from 'react-hot-toast'
 
 // Zones de puissance avec couleurs adaptées au thème
 const POWER_ZONES = [
-  { zone: 1, name: 'Récupération active', min: 0, max: 55, color: '#6B7280' },
-  { zone: 2, name: 'Endurance', min: 56, max: 75, color: '#8BC34A' },
-  { zone: 3, name: 'Tempo', min: 76, max: 90, color: '#5CE1E6' },
-  { zone: 4, name: 'Seuil', min: 91, max: 105, color: '#FFAB40' },
-  { zone: 5, name: 'VO2max', min: 106, max: 120, color: '#FF5252' },
+  { zone: 1, name: 'Récupération active', min: 0, max: 55, color: 'var(--text-disabled)' },
+  { zone: 2, name: 'Endurance', min: 56, max: 75, color: 'var(--brand-primary)' },
+  { zone: 3, name: 'Tempo', min: 76, max: 90, color: 'var(--brand-secondary)' },
+  { zone: 4, name: 'Seuil', min: 91, max: 105, color: 'var(--metric-energy)' },
+  { zone: 5, name: 'VO2max', min: 106, max: 120, color: 'var(--metric-alert)' },
   { zone: 6, name: 'Anaérobie', min: 121, max: 150, color: '#8b5cf6' },
   { zone: 7, name: 'Neuromusculaire', min: 151, max: 300, color: '#ec4899' },
 ]
@@ -63,11 +63,11 @@ function FtpHistoryChart({ history, currentFtp }: FtpHistoryChartProps) {
         })}
         <div className="flex-1 flex flex-col items-center gap-1">
           <div
-            className="w-full bg-[#8BC34A] rounded-t"
+            className="w-full bg-[var(--brand-primary)] rounded-t"
             style={{ height: `${((currentFtp - minFtp) / range) * 80 + 20}%` }}
             title={`Actuel: ${currentFtp}W`}
           />
-          <span className="text-xs text-[#8BC34A] font-medium">Actuel</span>
+          <span className="text-xs text-[var(--brand-primary)] font-medium">Actuel</span>
         </div>
       </div>
     </div>

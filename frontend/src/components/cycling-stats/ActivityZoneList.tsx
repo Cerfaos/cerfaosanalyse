@@ -53,7 +53,7 @@ function ActivityZoneCard({ activity }: ActivityZoneCardProps) {
               {activity.type}
             </span>
             {activity.subSport && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-gray-200">
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--surface-input)] text-[var(--text-secondary)]">
                 {activity.subSport}
               </span>
             )}

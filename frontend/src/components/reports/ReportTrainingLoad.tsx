@@ -21,7 +21,7 @@ const metricConfig = {
     label: 'Forme',
     sublabel: 'CTL',
     description: 'Fitness accumulée sur 42 jours',
-    color: '#3B82F6',
+    color: 'var(--status-info)',
     gradient: 'from-blue-500 to-cyan-400',
     icon: Sparkles,
     goodDirection: 'up',
@@ -32,6 +32,7 @@ const metricConfig = {
     description: 'Charge aiguë sur 7 jours',
     color: '#A855F7',
     gradient: 'from-violet-500 to-purple-400',
+
     icon: Battery,
     goodDirection: 'neutral',
   },
@@ -39,7 +40,7 @@ const metricConfig = {
     label: 'Fraîcheur',
     sublabel: 'TSB',
     description: 'Équilibre forme-fatigue',
-    color: '#22C55E',
+    color: 'var(--status-success)',
     gradient: 'from-emerald-500 to-green-400',
     icon: Zap,
     goodDirection: 'up',
@@ -65,12 +66,12 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
   }
 
   const getTrendIcon = (value: number, goodDirection: string) => {
-    if (Math.abs(value) < 0.5) return <Minus className="w-4 h-4 text-gray-500" />
+    if (Math.abs(value) < 0.5) return <Minus className="w-4 h-4 text-[var(--text-disabled)]" />
     if (value > 0) {
-      const color = goodDirection === 'up' ? 'text-emerald-400' : goodDirection === 'down' ? 'text-orange-400' : 'text-gray-400'
+      const color = goodDirection === 'up' ? 'text-emerald-400' : goodDirection === 'down' ? 'text-orange-400' : 'text-[var(--text-tertiary)]'
       return <TrendingUp className={`w-4 h-4 ${color}`} />
     }
-    const color = goodDirection === 'down' ? 'text-emerald-400' : goodDirection === 'up' ? 'text-orange-400' : 'text-gray-400'
+    const color = goodDirection === 'down' ? 'text-emerald-400' : goodDirection === 'up' ? 'text-orange-400' : 'text-[var(--text-tertiary)]'
     return <TrendingDown className={`w-4 h-4 ${color}`} />
   }
 
@@ -90,10 +91,10 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
           <BarChart3 className="w-5 h-5 text-blue-400" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
             Charge d'Entraînement
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--text-disabled)]">
             Modèle CTL/ATL/TSB
           </p>
         </div>
@@ -123,7 +124,7 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className={`inline-flex p-2 rounded-xl bg-gradient-to-br ${config.gradient}`}>
-                    <Icon className="w-4 h-4 text-white" strokeWidth={2.5} />
+                    <Icon className="w-4 h-4 text-[var(--text-primary)]" strokeWidth={2.5} />
                   </div>
                   <div className="flex items-center gap-1.5">
                     {getTrendIcon(change, config.goodDirection)}
@@ -142,11 +143,11 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                     >
                       {value.toFixed(1)}
                     </span>
-                    <span className="text-sm text-gray-500 font-medium">
+                    <span className="text-sm text-[var(--text-disabled)] font-medium">
                       {config.sublabel}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-[var(--text-tertiary)] mt-1">
                     {config.label}
                   </p>
                 </div>
@@ -164,12 +165,13 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
               <LineChart data={chartData} margin={{ top: 10, right: 10, bottom: 10, left: -10 }}>
                 <defs>
                   <linearGradient id="ctlGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                    <stop offset="5%" stopColor="var(--status-info)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="var(--status-info)" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="atlGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#A855F7" stopOpacity={0.2} />
                     <stop offset="95%" stopColor="#A855F7" stopOpacity={0} />
+
                   </linearGradient>
                 </defs>
                 <CartesianGrid
@@ -179,14 +181,14 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                 />
                 <XAxis
                   dataKey="date"
-                  stroke="#4B5563"
+                  stroke="var(--text-disabled)"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                   interval="preserveStartEnd"
                 />
                 <YAxis
-                  stroke="#4B5563"
+                  stroke="var(--text-disabled)"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
@@ -201,12 +203,12 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                     padding: '12px 16px',
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                   }}
-                  labelStyle={{ color: '#9CA3AF', marginBottom: '8px', fontWeight: 500 }}
+                  labelStyle={{ color: 'var(--text-tertiary)', marginBottom: '8px', fontWeight: 500 }}
                   formatter={(value: number, name: string) => {
                     const colors: Record<string, string> = {
-                      CTL: '#3B82F6',
+                      CTL: 'var(--status-info)',
                       ATL: '#A855F7',
-                      TSB: '#22C55E',
+                      TSB: 'var(--status-success)',
                     }
                     return [
                       <span key="v" style={{ color: colors[name], fontWeight: 600 }}>
@@ -234,10 +236,10 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                 <Line
                   type="monotone"
                   dataKey="CTL"
-                  stroke="#3B82F6"
+                  stroke="var(--status-info)"
                   strokeWidth={2.5}
                   dot={false}
-                  activeDot={{ r: 5, fill: '#3B82F6', strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: 'var(--status-info)', strokeWidth: 0 }}
                 />
                 <Line
                   type="monotone"
@@ -250,10 +252,10 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                 <Line
                   type="monotone"
                   dataKey="TSB"
-                  stroke="#22C55E"
+                  stroke="var(--status-success)"
                   strokeWidth={2.5}
                   dot={false}
-                  activeDot={{ r: 5, fill: '#22C55E', strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: 'var(--status-success)', strokeWidth: 0 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -267,7 +269,7 @@ export function ReportTrainingLoad({ trainingLoad }: Props) {
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: config.color }}
                 />
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-[var(--text-tertiary)]">
                   {config.label} ({config.sublabel})
                 </span>
               </div>

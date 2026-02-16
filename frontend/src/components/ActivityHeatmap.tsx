@@ -127,17 +127,17 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
 
   const getIntensityColor = (trimp: number, hasActivity: boolean) => {
     // Pas d'activité = gris sombre
-    if (!hasActivity) return 'bg-gray-800 border-gray-700'
+    if (!hasActivity) return 'bg-[var(--surface-input)] border-[var(--text-disabled)]'
 
     // Activité présente mais TRIMP = 0 (pas de données cardio) = bleu
-    if (trimp === 0) return 'bg-blue-700 border-blue-600'
+    if (trimp === 0) return 'bg-[var(--chart-zone1)] border-[var(--chart-zone1)]/70'
 
-    // Gradient basé sur l'intensité TRIMP (couleurs du design Figma)
+    // Gradient basé sur l'intensité TRIMP
     if (trimp < 30) return 'bg-[#448AFF] border-[#448AFF]/70' // Recovery - Bleu
-    if (trimp < 70) return 'bg-[#5CE1E6] border-[#5CE1E6]/70' // Endurance - Cyan
-    if (trimp < 120) return 'bg-[#8BC34A] border-[#8BC34A]/70' // Tempo - Vert
-    if (trimp < 180) return 'bg-[#FFAB40] border-[#FFAB40]/70' // Threshold - Orange
-    if (trimp < 250) return 'bg-[#FF5252] border-[#FF5252]/70' // Anaerobic - Rouge
+    if (trimp < 70) return 'bg-brand-secondary border-brand-secondary/70' // Endurance - Cyan
+    if (trimp < 120) return 'bg-brand-primary border-brand-primary/70' // Tempo - Vert
+    if (trimp < 180) return 'bg-metric-energy border-metric-energy/70' // Threshold - Orange
+    if (trimp < 250) return 'bg-metric-alert border-metric-alert/70' // Anaerobic - Rouge
     return 'bg-[#FF1744] border-[#FF1744]/70' // Max effort - Rouge vif
   }
 
@@ -178,7 +178,7 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
   }
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-400">Chargement du calendrier...</div>
+    return <div className="text-center py-8 text-[var(--text-tertiary)]">Chargement du calendrier...</div>
   }
 
   return (
@@ -188,15 +188,15 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSelectedYear((y) => y - 1)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-[var(--text-primary)]"
             title="Année précédente"
           >
             ←
           </button>
-          <span className="text-2xl font-bold text-white">{selectedYear}</span>
+          <span className="text-2xl font-bold text-[var(--text-primary)]">{selectedYear}</span>
           <button
             onClick={() => setSelectedYear((y) => y + 1)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-[var(--text-primary)]"
             title="Année suivante"
           >
             →
@@ -205,16 +205,16 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
 
         <div className="flex flex-wrap items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-gray-400">Activités:</span>
-            <span className="font-bold text-lg text-[#8BC34A]">{stats.totalActivities}</span>
+            <span className="text-[var(--text-tertiary)]">Activités:</span>
+            <span className="font-bold text-lg text-brand-primary">{stats.totalActivities}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-gray-400">Jours actifs:</span>
-            <span className="font-bold text-lg text-[#5CE1E6]">{stats.activeDays}</span>
+            <span className="text-[var(--text-tertiary)]">Jours actifs:</span>
+            <span className="font-bold text-lg text-brand-secondary">{stats.activeDays}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-gray-400">Série max:</span>
-            <span className="font-bold text-lg text-[#FFAB40]">{stats.maxStreak} jours</span>
+            <span className="text-[var(--text-tertiary)]">Série max:</span>
+            <span className="font-bold text-lg text-metric-energy">{stats.maxStreak} jours</span>
           </div>
         </div>
       </div>
@@ -222,16 +222,16 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
       {/* Grille des mois */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {months.map((month) => (
-          <div key={month.monthIndex} className="bg-[#0A191A]/60 rounded-xl p-4 border border-[#8BC34A]/20">
+          <div key={month.monthIndex} className="bg-surface-deep/60 rounded-xl p-4 border border-[var(--brand-primary)]/20">
             {/* Nom du mois */}
-            <h4 className="text-sm font-bold uppercase tracking-wide text-white mb-3 text-center">
+            <h4 className="text-sm font-bold uppercase tracking-wide text-[var(--text-primary)] mb-3 text-center">
               {month.name}
             </h4>
 
             {/* Jours de la semaine */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {dayLabels.map((day) => (
-                <div key={day} className="text-xs text-center font-medium text-gray-400">
+                <div key={day} className="text-xs text-center font-medium text-[var(--text-tertiary)]">
                   {day}
                 </div>
               ))}
@@ -264,7 +264,7 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
                             </div>
                             {dayData ? (
                               <div className="space-y-0.5 text-xs">
-                                <div className="font-semibold text-[#8BC34A]">
+                                <div className="font-semibold text-[var(--brand-primary)]">
                                   {dayData.count} activité{dayData.count > 1 ? 's' : ''}
                                 </div>
                                 <div>Distance: {Math.round(dayData.distance / 1000)} km</div>
@@ -289,12 +289,12 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
                             flex items-center justify-center text-sm font-semibold
                             ${getIntensityColor(trimp, hasActivity)}
                             ${hasActivity
-                              ? 'hover:scale-110 hover:shadow-lg hover:border-[#8BC34A] hover:z-10'
-                              : 'hover:border-gray-500'
+                              ? 'hover:scale-110 hover:shadow-lg hover:border-[var(--brand-primary)] hover:z-10'
+                              : 'hover:border-[var(--text-disabled)]'
                             }
                           `}
                         >
-                          <span className="text-white">
+                          <span className="text-[var(--text-primary)]">
                             {day.dayOfMonth}
                           </span>
                         </div>
@@ -311,31 +311,31 @@ export default function ActivityHeatmap({ year = new Date().getFullYear() }: Act
       {/* Légende améliorée et compacte */}
       <div className="flex flex-col items-center justify-center gap-2 text-sm px-4">
         <div className="flex items-center gap-3 flex-wrap justify-center">
-          <span className="text-gray-400 text-xs font-medium">Légende :</span>
+          <span className="text-[var(--text-tertiary)] text-xs font-medium">Légende :</span>
 
           {/* Repos */}
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded border-2 bg-gray-800 border-gray-700" />
-            <span className="text-gray-400 text-xs">Repos</span>
+            <div className="w-4 h-4 rounded border-2 bg-[var(--surface-input)] border-[var(--text-disabled)]" />
+            <span className="text-[var(--text-tertiary)] text-xs">Repos</span>
           </div>
 
           {/* Sans cardio */}
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded border-2 bg-blue-700 border-blue-600" />
-            <span className="text-gray-400 text-xs">Sans FC</span>
+            <div className="w-4 h-4 rounded border-2 bg-[var(--chart-zone1)] border-[var(--chart-zone1)]/70" />
+            <span className="text-[var(--text-tertiary)] text-xs">Sans FC</span>
           </div>
 
           {/* Gradient d'intensité */}
-          <span className="text-gray-400 text-xs">•</span>
+          <span className="text-[var(--text-tertiary)] text-xs">•</span>
           <div className="flex items-center gap-0.5">
             <div className="w-4 h-4 rounded border bg-[#448AFF] border-[#448AFF]/70" title="TRIMP < 30 - Recovery" />
-            <div className="w-4 h-4 rounded border bg-[#5CE1E6] border-[#5CE1E6]/70" title="TRIMP 30-70 - Endurance" />
-            <div className="w-4 h-4 rounded border bg-[#8BC34A] border-[#8BC34A]/70" title="TRIMP 70-120 - Tempo" />
-            <div className="w-4 h-4 rounded border bg-[#FFAB40] border-[#FFAB40]/70" title="TRIMP 120-180 - Threshold" />
-            <div className="w-4 h-4 rounded border bg-[#FF5252] border-[#FF5252]/70" title="TRIMP 180-250 - Anaerobic" />
+            <div className="w-4 h-4 rounded border bg-brand-secondary border-brand-secondary/70" title="TRIMP 30-70 - Endurance" />
+            <div className="w-4 h-4 rounded border bg-brand-primary border-brand-primary/70" title="TRIMP 70-120 - Tempo" />
+            <div className="w-4 h-4 rounded border bg-metric-energy border-metric-energy/70" title="TRIMP 120-180 - Threshold" />
+            <div className="w-4 h-4 rounded border bg-metric-alert border-metric-alert/70" title="TRIMP 180-250 - Anaerobic" />
             <div className="w-4 h-4 rounded border bg-[#FF1744] border-[#FF1744]/70" title="TRIMP > 250 - Max" />
           </div>
-          <span className="text-gray-400 text-xs">Intensité TRIMP</span>
+          <span className="text-[var(--text-tertiary)] text-xs">Intensité TRIMP</span>
         </div>
       </div>
     </div>

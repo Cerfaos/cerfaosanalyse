@@ -33,12 +33,12 @@ export function PlayerControls({
     <>
       {/* Barre de progression totale */}
       <div className="mb-4">
-        <div className="flex justify-between text-xs md:text-sm text-gray-400 mb-1">
+        <div className="flex justify-between text-xs md:text-sm text-[var(--text-tertiary)] mb-1">
           <span>{formatTimeWithHours(totalElapsed)}</span>
           <span>{formatTimeWithHours(totalDuration)}</span>
         </div>
         <div className="h-1.5 md:h-2 bg-black/30 rounded-full overflow-hidden">
-          <div className="h-full bg-[#5CE1E6] rounded-full transition-all duration-100" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-[var(--brand-secondary)] rounded-full transition-all duration-100" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -56,7 +56,7 @@ export function PlayerControls({
           size="lg"
           onClick={onToggle}
           title={isPlaying ? "Pause (Espace)" : "Lecture (Espace)"}
-          className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-[#5CE1E6] hover:bg-[#4BC8CD] text-black"
+          className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-[var(--brand-secondary)] hover:bg-[var(--brand-secondary)]/80 text-black"
         >
           {isPlaying ? <Pause className="h-8 w-8 md:h-10 md:w-10" /> : <Play className="h-8 w-8 md:h-10 md:w-10 ml-1" />}
         </Button>
@@ -71,7 +71,7 @@ export function PlayerControls({
       </div>
 
       {/* Instructions - masquées sur mobile */}
-      <div className="hidden md:block mt-4 text-center text-sm text-gray-500">
+      <div className="hidden md:block mt-4 text-center text-sm text-[var(--text-disabled)]">
         <span className="mr-4">Espace: Play/Pause</span>
         <span className="mr-4">← →: Bloc</span>
         <span className="mr-4">N: Exercice suivant</span>

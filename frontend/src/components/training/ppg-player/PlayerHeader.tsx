@@ -32,10 +32,10 @@ export function PlayerHeader({
     <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
       <div>
         <div className="flex items-center gap-2">
-          <Dumbbell className="h-5 w-5 text-[#5CE1E6]" />
-          <h2 className="text-xl font-bold text-white">{sessionName}</h2>
+          <Dumbbell className="h-5 w-5 text-[var(--brand-secondary)]" />
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">{sessionName}</h2>
         </div>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-[var(--text-tertiary)]">
           Tour {currentRound} / {totalRounds} • Exercice {exerciseInRound} / {totalExercisesInRound}
         </p>
       </div>

@@ -107,7 +107,7 @@ export default function SimilarActivities({
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold text-white font-mono">
+                <span className="text-sm font-bold text-[var(--text-primary)] font-mono">
                   {new Date(activity.date).toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "short",
@@ -133,7 +133,7 @@ export default function SimilarActivities({
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">Distance</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-bold font-mono text-sm">
+                  <span className="text-[var(--text-primary)] font-bold font-mono text-sm">
                     {(activity.distance / 1000).toFixed(2)} km
                   </span>
                   {formatDiff(
@@ -147,7 +147,7 @@ export default function SimilarActivities({
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">Durée</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-bold font-mono text-sm">
+                  <span className="text-[var(--text-primary)] font-bold font-mono text-sm">
                     {formatDuration(activity.duration)}
                   </span>
                   {formatDiff(
@@ -159,7 +159,7 @@ export default function SimilarActivities({
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">Vitesse</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-bold font-mono text-sm">
+                  <span className="text-[var(--text-primary)] font-bold font-mono text-sm">
                     {activity.avgSpeed != null ? `${activity.avgSpeed.toFixed(1)} km/h` : "-"}
                   </span>
                   {formatDiff(
@@ -171,7 +171,7 @@ export default function SimilarActivities({
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-disabled)] mb-1">FC Moy.</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-white font-bold font-mono text-sm">
+                  <span className="text-[var(--text-primary)] font-bold font-mono text-sm">
                     {activity.avgHeartRate != null ? `${activity.avgHeartRate} bpm` : "-"}
                   </span>
                   {formatDiff(activity.comparison.hrDiff, "bpm", true)}

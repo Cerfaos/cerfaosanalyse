@@ -59,8 +59,8 @@ export interface DragData {
 }
 
 export const CATEGORY_COLORS = {
-  cycling: '#8BC34A',
-  ppg: '#5CE1E6',
+  cycling: 'var(--brand-primary)',
+  ppg: 'var(--brand-secondary)',
 };
 
 export function getCategoryColor(category: 'cycling' | 'ppg'): string {

@@ -34,15 +34,15 @@ export function Section({
             )}
             <div>
               {eyebrow && (
-                <p className="text-xs uppercase tracking-[0.4em] text-[#8BC34A] font-semibold mb-1">
+                <p className="text-xs uppercase tracking-[0.4em] text-[var(--brand-primary)] font-semibold mb-1">
                   {eyebrow}
                 </p>
               )}
-              <h2 className="text-2xl font-bold text-white mb-1">
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">
                 {title}
               </h2>
               {description && (
-                <p className="text-gray-400 max-w-2xl">
+                <p className="text-[var(--text-tertiary)] max-w-2xl">
                   {description}
                 </p>
               )}

@@ -23,18 +23,18 @@ export function LoadChart({ history, period }: LoadChartProps) {
       <div className="h-80 w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%" minWidth={260} minHeight={320}>
           <LineChart data={history}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" strokeOpacity={0.5} />
-            <XAxis dataKey="date" tickFormatter={formatDate} stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--text-disabled)" strokeOpacity={0.5} />
+            <XAxis dataKey="date" tickFormatter={formatDate} stroke="var(--text-tertiary)" />
+            <YAxis stroke="var(--text-tertiary)" />
             <Tooltip
               contentStyle={{
-                backgroundColor: "rgba(10, 25, 26, 0.95)",
-                border: "1px solid rgba(139, 195, 74, 0.3)",
+                backgroundColor: "var(--surface-deep)",
+                border: "1px solid var(--brand-primary-subtle)",
                 borderRadius: "12px",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
               }}
-              labelStyle={{ color: "#fff", fontWeight: "bold", marginBottom: "8px" }}
-              itemStyle={{ color: "#9CA3AF" }}
+              labelStyle={{ color: "var(--text-primary)", fontWeight: "bold", marginBottom: "8px" }}
+              itemStyle={{ color: "var(--text-tertiary)" }}
               labelFormatter={(value) =>
                 new Date(value).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
               }
@@ -47,19 +47,19 @@ export function LoadChart({ history, period }: LoadChartProps) {
                 return [labels[name] || value, name];
               }}
             />
-            <Legend wrapperStyle={{ color: "#9CA3AF" }} />
+            <Legend wrapperStyle={{ color: "var(--text-tertiary)" }} />
             <ReferenceLine
               y={0}
-              stroke="#8BC34A"
+              stroke="var(--brand-primary)"
               strokeDasharray="3 3"
               strokeOpacity={0.5}
-              label={{ value: "Équilibre", fill: "#8BC34A", fontSize: 10 }}
+              label={{ value: "Équilibre", fill: "var(--brand-primary)", fontSize: 10 }}
             />
-            <ReferenceLine y={-10} stroke="#FF5252" strokeDasharray="2 2" strokeOpacity={0.3} />
-            <ReferenceLine y={5} stroke="#5CE1E6" strokeDasharray="2 2" strokeOpacity={0.3} />
-            <Line type="monotone" dataKey="ctl" stroke="#5CE1E6" name="CTL (Forme)" strokeWidth={3} dot={false} />
-            <Line type="monotone" dataKey="atl" stroke="#FF5252" name="ATL (Fatigue)" strokeWidth={3} dot={false} />
-            <Line type="monotone" dataKey="tsb" stroke="#8BC34A" name="TSB (Équilibre)" strokeWidth={3} dot={false} />
+            <ReferenceLine y={-10} stroke="var(--metric-alert)" strokeDasharray="2 2" strokeOpacity={0.3} />
+            <ReferenceLine y={5} stroke="var(--brand-secondary)" strokeDasharray="2 2" strokeOpacity={0.3} />
+            <Line type="monotone" dataKey="ctl" stroke="var(--brand-secondary)" name="CTL (Forme)" strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="atl" stroke="var(--metric-alert)" name="ATL (Fatigue)" strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="tsb" stroke="var(--brand-primary)" name="TSB (Équilibre)" strokeWidth={3} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>

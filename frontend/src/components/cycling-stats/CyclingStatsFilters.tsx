@@ -49,8 +49,8 @@ export function CyclingStatsFilters({
               key={option.value}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 period === option.value
-                  ? 'bg-[#8BC34A] text-white shadow-md'
-                  : 'bg-[#0A191A]/60 border border-[#8BC34A]/20 text-gray-400 hover:text-white hover:border-[#8BC34A]/40'
+                  ? 'bg-brand-primary text-[var(--text-primary)] shadow-md'
+                  : 'bg-surface-deep/60 border border-[var(--brand-primary)]/20 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--brand-primary)]/40'
               }`}
               onClick={() => onPeriodChange(option.value)}
             >
@@ -72,8 +72,8 @@ export function CyclingStatsFilters({
                   onClick={() => onToggleType(type)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
                     selectedTypes.length === 0 || selectedTypes.includes(type)
-                      ? 'text-white shadow-sm'
-                      : 'bg-[#0A191A]/60 border border-gray-600 text-gray-400 hover:border-gray-400'
+                      ? 'text-[var(--text-primary)] shadow-sm'
+                      : 'bg-surface-deep/60 border border-[var(--text-disabled)] text-[var(--text-tertiary)] hover:border-[var(--text-tertiary)]'
                   }`}
                   style={{
                     backgroundColor:
@@ -97,7 +97,7 @@ export function CyclingStatsFilters({
               {selectedTypes.length > 0 && (
                 <button
                   onClick={onResetTypes}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 transition-all"
+                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--surface-input)] text-[var(--text-secondary)] hover:bg-[var(--surface-card)] transition-all"
                 >
                   Réinitialiser
                 </button>
@@ -115,8 +115,8 @@ export function CyclingStatsFilters({
                   onClick={() => onIndoorFilterChange(option.value)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     indoorFilter === option.value
-                      ? 'bg-[#5CE1E6] text-[#0A191A] shadow-sm'
-                      : 'bg-[#0A191A]/60 border border-[#5CE1E6]/20 text-gray-400 hover:border-[#5CE1E6]/40'
+                      ? 'bg-brand-secondary text-[var(--surface-deep)] shadow-sm'
+                      : 'bg-surface-deep/60 border border-[var(--brand-secondary)]/20 text-[var(--text-tertiary)] hover:border-[var(--brand-secondary)]/40'
                   }`}
                 >
                   {option.label}

@@ -16,12 +16,12 @@ export function MetricCards({ currentLoad }: MetricCardsProps) {
       <div className="glass-panel p-5 border">
         <div className="flex items-center justify-between mb-1">
           <p className="text-sm text-text-muted flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#5CE1E6]"></span>
+            <span className="w-3 h-3 rounded-full bg-brand-secondary"></span>
             CTL - Forme
           </p>
           <MetricInfo metric="ctl" />
         </div>
-        <p className="text-3xl font-semibold text-[#5CE1E6]">{currentLoad.ctl}</p>
+        <p className="text-3xl font-semibold text-brand-secondary">{currentLoad.ctl}</p>
         <p className="text-xs text-text-muted mt-1">Charge chronique sur 42 jours</p>
         <div className="mt-3 pt-3 border-t border-border-base/30">
           <p className="text-xs text-text-secondary">
@@ -37,12 +37,12 @@ export function MetricCards({ currentLoad }: MetricCardsProps) {
       <div className="glass-panel p-5 border">
         <div className="flex items-center justify-between mb-1">
           <p className="text-sm text-text-muted flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#FF5252]"></span>
+            <span className="w-3 h-3 rounded-full bg-metric-alert"></span>
             ATL - Fatigue
           </p>
           <MetricInfo metric="atl" />
         </div>
-        <p className="text-3xl font-semibold text-[#FF5252]">{currentLoad.atl}</p>
+        <p className="text-3xl font-semibold text-metric-alert">{currentLoad.atl}</p>
         <p className="text-xs text-text-muted mt-1">Charge aiguë sur 7 jours</p>
         <div className="mt-3 pt-3 border-t border-border-base/30">
           <p className="text-xs text-text-secondary">
@@ -59,7 +59,7 @@ export function MetricCards({ currentLoad }: MetricCardsProps) {
       <div className="glass-panel p-5 border">
         <div className="flex items-center justify-between mb-1">
           <p className="text-sm text-text-muted flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#8BC34A]"></span>
+            <span className="w-3 h-3 rounded-full bg-brand-primary"></span>
             TSB - Équilibre
           </p>
           <MetricInfo metric="tsb" />

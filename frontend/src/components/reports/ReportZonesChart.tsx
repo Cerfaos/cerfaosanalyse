@@ -43,10 +43,10 @@ export function ReportZonesChart({ zones }: Props) {
           <HeartPulse className="w-5 h-5 text-rose-400" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
             Zones Cardiaques
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--text-disabled)]">
             {formatDuration(totalSeconds)} d'effort analysé
           </p>
         </div>
@@ -82,7 +82,7 @@ export function ReportZonesChart({ zones }: Props) {
                 >
                   Z{zone.zone}
                 </span>
-                <span className="text-xl font-semibold text-white">
+                <span className="text-xl font-semibold text-[var(--text-primary)]">
                   {zone.percentage.toFixed(0)}%
                 </span>
               </div>
@@ -101,10 +101,10 @@ export function ReportZonesChart({ zones }: Props) {
 
               {/* Zone info */}
               <div>
-                <p className="text-sm font-medium text-gray-300 truncate">
+                <p className="text-sm font-medium text-[var(--text-secondary)] truncate">
                   {zone.name}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-[var(--text-disabled)] mt-0.5">
                   {formatDuration(zone.seconds)}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export function ReportZonesChart({ zones }: Props) {
                 type="number"
                 domain={[0, 100]}
                 tickFormatter={(v) => `${v}%`}
-                stroke="#4B5563"
+                stroke="var(--text-disabled)"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
@@ -135,7 +135,7 @@ export function ReportZonesChart({ zones }: Props) {
               <YAxis
                 type="category"
                 dataKey="name"
-                stroke="#4B5563"
+                stroke="var(--text-disabled)"
                 width={35}
                 fontSize={12}
                 tickLine={false}
@@ -150,12 +150,12 @@ export function ReportZonesChart({ zones }: Props) {
                   padding: '12px 16px',
                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                 }}
-                labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
+                labelStyle={{ color: 'var(--text-tertiary)', marginBottom: '4px' }}
                 formatter={(value: number, _name: string, props) => {
                   const payload = props?.payload as { fullName: string; seconds: number; zone: number } | undefined
                   if (!payload) return [value, '']
                   return [
-                    <span key="val" className="font-semibold text-white">
+                    <span key="val" className="font-semibold text-[var(--text-primary)]">
                       {value.toFixed(1)}% ({formatDuration(payload.seconds)})
                     </span>,
                     <span key="name" style={{ color: chartData[payload.zone - 1]?.color }}>
@@ -192,7 +192,7 @@ export function ReportZonesChart({ zones }: Props) {
                   className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                   style={{ backgroundColor: zone.color }}
                 />
-                <span className="text-gray-400 truncate">
+                <span className="text-[var(--text-tertiary)] truncate">
                   {zoneDescriptions[zone.zone]}
                 </span>
               </div>

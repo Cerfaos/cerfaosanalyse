@@ -17,8 +17,8 @@ export function PageHeader({
   title,
   description,
   icon,
-  gradient = 'from-[#8BC34A] to-[#5CE1E6]',
-  accentColor = '#8BC34A',
+  gradient = 'from-[var(--brand-primary)] to-[var(--brand-secondary)]',
+  accentColor = 'var(--brand-primary)',
   actions,
 }: PageHeaderProps) {
   const [imageError, setImageError] = useState(false)
@@ -73,10 +73,10 @@ export function PageHeader({
             >
               {eyebrow}
             </p>
-            <h1 className="text-3xl font-bold text-white mb-1">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-1">
               {title}
             </h1>
-            <p className="text-gray-400 max-w-2xl">
+            <p className="text-[var(--text-tertiary)] max-w-2xl">
               {description}
             </p>
           </div>

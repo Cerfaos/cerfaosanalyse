@@ -207,14 +207,14 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         ref={containerRef}
-        className={`${isFullscreen ? 'max-w-full w-full h-full rounded-none' : 'max-w-4xl'} p-0 bg-[#050d0e] border-[#8BC34A]/30 overflow-hidden`}
+        className={`${isFullscreen ? 'max-w-full w-full h-full rounded-none' : 'max-w-4xl'} p-0 bg-[var(--surface-deep)] border-[var(--brand-primary)]/30 overflow-hidden`}
       >
         <DialogTitle className="sr-only">{session.name} - Session Player</DialogTitle>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div>
-            <h2 className="text-xl font-bold text-white">{session.name}</h2>
-            <p className="text-sm text-gray-400">
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">{session.name}</h2>
+            <p className="text-sm text-[var(--text-tertiary)]">
               Bloc {currentBlockIndex + 1} / {timerBlocks.length}
             </p>
           </div>
@@ -272,16 +272,16 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
                   >
                     {zoneShort}
                   </span>
-                  <span className="text-gray-400">{zone.replace(zoneShort, '').trim()}</span>
+                  <span className="text-[var(--text-tertiary)]">{zone.replace(zoneShort, '').trim()}</span>
                 </div>
-                <div className="text-5xl font-bold text-white mb-2">
+                <div className="text-5xl font-bold text-[var(--text-primary)] mb-2">
                   {currentBlock.percentFtp}% FTP
                 </div>
                 <div className="text-3xl font-semibold" style={{ color: zoneColor }}>
                   {watts} W
                 </div>
                 {currentBlock.type && (
-                  <div className="mt-3 text-lg text-gray-300">
+                  <div className="mt-3 text-lg text-[var(--text-secondary)]">
                     {currentBlock.type === 'effort' ? 'Effort' : 'Récupération'}
                   </div>
                 )}
@@ -289,10 +289,10 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
 
               {/* Timer bloc */}
               <div className="text-right">
-                <div className="text-7xl font-mono font-bold text-white tabular-nums">
+                <div className="text-7xl font-mono font-bold text-[var(--text-primary)] tabular-nums">
                   {formatTime(remainingInBlock)}
                 </div>
-                <div className="text-lg text-gray-400 mt-2">
+                <div className="text-lg text-[var(--text-tertiary)] mt-2">
                   sur {formatTime(currentBlock.durationSeconds)}
                 </div>
               </div>
@@ -313,7 +313,7 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
           {/* Bloc suivant */}
           {nextBlock && (
             <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="text-sm text-gray-400 mb-1">Prochain bloc</div>
+              <div className="text-sm text-[var(--text-tertiary)] mb-1">Prochain bloc</div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span
@@ -322,15 +322,15 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
                   >
                     {nextZone?.split(' ')[0]}
                   </span>
-                  <span className="text-white font-medium">
+                  <span className="text-[var(--text-primary)] font-medium">
                     {nextBlock.percentFtp}% FTP
                   </span>
-                  <span className="text-gray-400">→</span>
+                  <span className="text-[var(--text-tertiary)]">→</span>
                   <span style={{ color: getIntensityZoneColor(nextBlock.percentFtp) }} className="font-medium">
                     {nextWatts} W
                   </span>
                 </div>
-                <span className="text-gray-400">
+                <span className="text-[var(--text-tertiary)]">
                   {formatTime(nextBlock.durationSeconds)}
                 </span>
               </div>
@@ -372,13 +372,13 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
 
           {/* Barre de progression totale */}
           <div className="mb-6">
-            <div className="flex justify-between text-sm text-gray-400 mb-2">
+            <div className="flex justify-between text-sm text-[var(--text-tertiary)] mb-2">
               <span>{formatTimeWithHours(totalElapsed)}</span>
               <span>{formatTimeWithHours(totalDuration)}</span>
             </div>
             <div className="h-2 bg-black/30 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#8BC34A] rounded-full transition-all duration-100"
+                className="h-full bg-[var(--brand-primary)] rounded-full transition-all duration-100"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -410,7 +410,7 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
               size="lg"
               onClick={actions.toggle}
               title={isPlaying ? 'Pause (Espace)' : 'Lecture (Espace)'}
-              className="h-20 w-20 rounded-full bg-[#8BC34A] hover:bg-[#7CB342] text-black"
+              className="h-20 w-20 rounded-full bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/80 text-black"
             >
               {isPlaying ? (
                 <Pause className="h-10 w-10" />
@@ -433,7 +433,7 @@ export function SessionPlayer({ session, ftp, open, onOpenChange }: SessionPlaye
           </div>
 
           {/* Instructions */}
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-[var(--text-disabled)]">
             <span className="mr-4">Espace: Play/Pause</span>
             <span className="mr-4">← →: Bloc précédent/suivant</span>
             <span>R: Recommencer</span>

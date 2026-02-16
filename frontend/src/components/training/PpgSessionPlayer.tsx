@@ -161,7 +161,7 @@ export function PpgSessionPlayer({ session, open, onOpenChange }: PpgSessionPlay
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         ref={containerRef}
-        className={`${isFullscreen ? "max-w-full w-full h-full rounded-none" : "max-w-4xl"} p-0 bg-[#050d0e] border-[#5CE1E6]/30 overflow-hidden`}
+        className={`${isFullscreen ? "max-w-full w-full h-full rounded-none" : "max-w-4xl"} p-0 bg-[var(--surface-deep)] border-[var(--brand-secondary)]/30 overflow-hidden`}
       >
         <DialogTitle className="sr-only">{session.name} - Session Player PPG</DialogTitle>
 

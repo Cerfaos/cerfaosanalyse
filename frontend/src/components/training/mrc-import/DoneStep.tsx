@@ -15,13 +15,13 @@ export function DoneStep({ filesCount, batchResult }: DoneStepProps) {
     <div className="space-y-5">
       <div className="flex flex-col items-center justify-center py-10">
         <div className="relative mb-6">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#8BC34A]/20 to-[#5CE1E6]/20 flex items-center justify-center">
-            <Check className="w-10 h-10 text-[#8BC34A]" />
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-primary/20 to-brand-secondary/20 flex items-center justify-center">
+            <Check className="w-10 h-10 text-brand-primary" />
           </div>
-          <div className="absolute inset-0 w-20 h-20 rounded-full bg-[#8BC34A]/20 animate-ping" />
+          <div className="absolute inset-0 w-20 h-20 rounded-full bg-brand-primary/20 animate-ping" />
         </div>
-        <h3 className="text-xl font-semibold text-white">Importation terminée</h3>
-        <p className="text-gray-400 mt-2">
+        <h3 className="text-xl font-semibold text-[var(--text-primary)]">Importation terminée</h3>
+        <p className="text-[var(--text-tertiary)] mt-2">
           {filesCount === 1
             ? 'Votre fichier a été importé avec succès'
             : `${batchResult?.success.length || filesCount} fichier(s) importé(s)`}
@@ -38,15 +38,15 @@ function BatchResultDisplay({ batchResult }: { batchResult: MrcBatchResult }) {
   return (
     <div className="space-y-3">
       {batchResult.success.length > 0 && (
-        <div className="rounded-xl bg-[#8BC34A]/10 border border-[#8BC34A]/30 p-4">
-          <p className="text-sm font-medium text-[#8BC34A] mb-3 flex items-center gap-2">
+        <div className="rounded-xl bg-brand-primary/10 border border-brand-primary/30 p-4">
+          <p className="text-sm font-medium text-brand-primary mb-3 flex items-center gap-2">
             <Check className="w-4 h-4" />
             {batchResult.success.length} fichier{batchResult.success.length > 1 ? 's' : ''} importé
             {batchResult.success.length > 1 ? 's' : ''}
           </p>
           <div className="space-y-1.5">
             {batchResult.success.map((item, index) => (
-              <div key={index} className="flex items-center gap-2 text-sm text-[#8BC34A]/80">
+              <div key={index} className="flex items-center gap-2 text-sm text-brand-primary/80">
                 <Check className="w-3.5 h-3.5" />
                 {item.name}
               </div>

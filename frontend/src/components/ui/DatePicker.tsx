@@ -20,10 +20,10 @@ export default function CustomDatePicker({
       <style>{`
         .react-datepicker {
           font-family: inherit;
-          background-color: #0A191A;
+          background-color: var(--surface-deep);
           border: 1px solid rgba(139, 195, 74, 0.3);
           border-radius: 0.75rem;
-          color: #fff;
+          color: var(--text-primary);
         }
         .react-datepicker__header {
           background-color: rgba(139, 195, 74, 0.1);
@@ -35,14 +35,14 @@ export default function CustomDatePicker({
         .react-datepicker__current-month,
         .react-datepicker-time__header,
         .react-datepicker-year-header {
-          color: #fff;
+          color: var(--text-primary);
           font-weight: 600;
         }
         .react-datepicker__day-name {
-          color: #8BC34A;
+          color: var(--brand-primary);
         }
         .react-datepicker__day {
-          color: #e2e8f0;
+          color: var(--text-secondary);
         }
         .react-datepicker__day:hover {
           background-color: rgba(139, 195, 74, 0.2);
@@ -50,13 +50,13 @@ export default function CustomDatePicker({
         }
         .react-datepicker__day--selected,
         .react-datepicker__day--keyboard-selected {
-          background-color: #8BC34A;
-          color: #000;
+          background-color: var(--brand-primary);
+          color: var(--text-inverse);
           font-weight: bold;
           border-radius: 0.3rem;
         }
         .react-datepicker__day--disabled {
-          color: #4b5563;
+          color: var(--text-disabled);
         }
         .react-datepicker__time-container {
           border-left: 1px solid rgba(139, 195, 74, 0.2);
@@ -65,21 +65,21 @@ export default function CustomDatePicker({
           border-radius: 0.3rem;
         }
         .react-datepicker__time-container .react-datepicker__time {
-          background-color: #0A191A;
+          background-color: var(--surface-deep);
           border-top-right-radius: 0.75rem;
           border-bottom-right-radius: 0.75rem;
         }
         .react-datepicker__time-name {
-          color: #8BC34A;
+          color: var(--brand-primary);
         }
         .react-datepicker__time-list-item {
-          color: #e2e8f0;
+          color: var(--text-secondary);
         }
         .react-datepicker__time-list-item:hover {
           background-color: rgba(139, 195, 74, 0.2) !important;
         }
         .react-datepicker__time-list-item--selected {
-          background-color: #8BC34A !important;
+          background-color: var(--brand-primary) !important;
           color: #000 !important;
           font-weight: bold;
         }
@@ -89,7 +89,7 @@ export default function CustomDatePicker({
         }
         .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle::before,
         .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle::after {
-          border-bottom-color: #0A191A;
+          border-bottom-color: var(--surface-deep);
         }
       `}</style>
       <DatePicker

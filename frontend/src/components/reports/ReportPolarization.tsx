@@ -23,7 +23,7 @@ const intensityConfig = {
   high: {
     label: 'Intensité',
     zones: 'Z4-Z5',
-    color: '#EF4444',
+    color: 'var(--status-error)',
     gradient: 'from-red-500 to-rose-400',
     description: 'Développement',
   },
@@ -39,9 +39,9 @@ function CircularGauge({ score }: { score: number }) {
 
   // Determine color based on score
   const getScoreColor = () => {
-    if (score >= 80) return '#8BC34A'
+    if (score >= 80) return 'var(--brand-primary)'
     if (score >= 60) return '#FACC15'
-    return '#EF4444'
+    return 'var(--status-error)'
   }
 
   const getScoreLabel = () => {
@@ -88,7 +88,7 @@ function CircularGauge({ score }: { score: number }) {
         >
           {score.toFixed(0)}
         </span>
-        <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+        <span className="text-xs text-[var(--text-tertiary)] font-medium uppercase tracking-wider">
           {getScoreLabel()}
         </span>
       </div>
@@ -102,20 +102,20 @@ export function ReportPolarization({ polarization }: Props) {
   const getTrendIcon = (diff: number) => {
     if (diff > 5) return <TrendingUp className="w-4 h-4 text-orange-400" />
     if (diff < -5) return <TrendingDown className="w-4 h-4 text-blue-400" />
-    return <Minus className="w-4 h-4 text-gray-500" />
+    return <Minus className="w-4 h-4 text-[var(--text-disabled)]" />
   }
 
   return (
     <section className="space-y-5">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-gradient-to-br from-[#8BC34A]/20 to-[#8BC34A]/5 border border-[#8BC34A]/30">
-          <Target className="w-5 h-5 text-[#8BC34A]" />
+        <div className="p-2 rounded-xl bg-gradient-to-br from-brand-primary/20 to-brand-primary/5 border border-brand-primary/30">
+          <Target className="w-5 h-5 text-brand-primary" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
             Index de Polarisation
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--text-disabled)]">
             Distribution 80/10/10 recommandée
           </p>
         </div>
@@ -126,7 +126,7 @@ export function ReportPolarization({ polarization }: Props) {
           {/* Score section */}
           <div className="lg:col-span-4 p-6 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-white/10">
             <CircularGauge score={polarization.score} />
-            <p className="text-center text-sm text-gray-400 mt-4 max-w-[200px]">
+            <p className="text-center text-sm text-[var(--text-tertiary)] mt-4 max-w-[200px]">
               {polarization.focus}
             </p>
           </div>
@@ -149,10 +149,10 @@ export function ReportPolarization({ polarization }: Props) {
                         style={{ backgroundColor: config.color }}
                       />
                       <div>
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-[var(--text-primary)]">
                           {config.label}
                         </span>
-                        <span className="text-xs text-gray-500 ml-2">
+                        <span className="text-xs text-[var(--text-disabled)] ml-2">
                           ({config.zones})
                         </span>
                       </div>
@@ -166,7 +166,7 @@ export function ReportPolarization({ polarization }: Props) {
                       </span>
                       <div className="flex items-center gap-1 text-xs">
                         {getTrendIcon(diff)}
-                        <span className={`${diff > 0 ? 'text-orange-400' : diff < 0 ? 'text-blue-400' : 'text-gray-500'}`}>
+                        <span className={`${diff > 0 ? 'text-orange-400' : diff < 0 ? 'text-blue-400' : 'text-[var(--text-disabled)]'}`}>
                           {diff > 0 ? '+' : ''}{diff.toFixed(1)}%
                         </span>
                       </div>
@@ -195,7 +195,7 @@ export function ReportPolarization({ polarization }: Props) {
                   </div>
 
                   {/* Target label */}
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-[var(--text-disabled)]">
                     <span>{config.description}</span>
                     <span>Cible: {target}%</span>
                   </div>
@@ -207,7 +207,7 @@ export function ReportPolarization({ polarization }: Props) {
 
         {/* Message footer */}
         <div className="px-6 py-4 bg-white/[0.02] border-t border-white/10">
-          <p className="text-sm text-gray-400 italic text-center">
+          <p className="text-sm text-[var(--text-tertiary)] italic text-center">
             {polarization.message}
           </p>
         </div>

@@ -40,10 +40,10 @@ function StatBar({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-gray-400" />
-          <span className="text-sm font-medium text-gray-300">{label}</span>
+          <Icon className="w-4 h-4 text-[var(--text-tertiary)]" />
+          <span className="text-sm font-medium text-[var(--text-secondary)]">{label}</span>
         </div>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-[var(--text-disabled)]">
           {format(total)} {unit}
         </span>
       </div>
@@ -69,10 +69,10 @@ function StatBar({
         <div className="flex items-center gap-1.5">
           <TreePine className="w-3 h-3 text-emerald-400" />
           <span className="text-emerald-400 font-medium">{format(outdoor)}</span>
-          <span className="text-gray-500">({outdoorPercent.toFixed(0)}%)</span>
+          <span className="text-[var(--text-disabled)]">({outdoorPercent.toFixed(0)}%)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-gray-500">({indoorPercent.toFixed(0)}%)</span>
+          <span className="text-[var(--text-disabled)]">({indoorPercent.toFixed(0)}%)</span>
           <span className="text-violet-400 font-medium">{format(indoor)}</span>
           <Home className="w-3 h-3 text-violet-400" />
         </div>
@@ -99,10 +99,10 @@ export function ReportIndoorOutdoor({ indoor, outdoor, total }: Props) {
           </div>
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
             Intérieur vs Extérieur
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--text-disabled)]">
             Comparaison de vos entraînements
           </p>
         </div>
@@ -148,8 +148,8 @@ export function ReportIndoorOutdoor({ indoor, outdoor, total }: Props) {
                     </span>
                   </div>
                 </div>
-                <span className="text-sm text-gray-400 mt-2">Extérieur</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-sm text-[var(--text-tertiary)] mt-2">Extérieur</span>
+                <span className="text-xs text-[var(--text-disabled)]">
                   {outdoor.activities} activité{outdoor.activities > 1 ? 's' : ''}
                 </span>
               </div>
@@ -191,8 +191,8 @@ export function ReportIndoorOutdoor({ indoor, outdoor, total }: Props) {
                     </span>
                   </div>
                 </div>
-                <span className="text-sm text-gray-400 mt-2">Intérieur</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-sm text-[var(--text-tertiary)] mt-2">Intérieur</span>
+                <span className="text-xs text-[var(--text-disabled)]">
                   {indoor.activities} activité{indoor.activities > 1 ? 's' : ''}
                 </span>
               </div>
@@ -202,11 +202,11 @@ export function ReportIndoorOutdoor({ indoor, outdoor, total }: Props) {
             <div className="flex items-center justify-center gap-6 pt-4 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span className="text-xs text-gray-400">Extérieur (route, trail...)</span>
+                <span className="text-xs text-[var(--text-tertiary)]">Extérieur (route, trail...)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-violet-500" />
-                <span className="text-xs text-gray-400">Intérieur (home trainer...)</span>
+                <span className="text-xs text-[var(--text-tertiary)]">Intérieur (home trainer...)</span>
               </div>
             </div>
           </div>
@@ -215,7 +215,7 @@ export function ReportIndoorOutdoor({ indoor, outdoor, total }: Props) {
         {/* Detailed stats */}
         <div className="lg:col-span-7">
           <div className="rounded-2xl bg-gradient-to-br from-white/[0.06] to-transparent border border-white/10 p-6 space-y-6">
-            <h4 className="font-medium text-white">Répartition détaillée</h4>
+            <h4 className="font-medium text-[var(--text-primary)]">Répartition détaillée</h4>
 
             <StatBar
               label="Distance"

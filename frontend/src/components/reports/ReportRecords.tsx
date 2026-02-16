@@ -31,9 +31,9 @@ function RecordCard({ record, isNew }: { record: ReportRecord; isNew: boolean })
             }`}
           >
             {isNew ? (
-              <Star className="w-5 h-5 text-white" strokeWidth={2.5} />
+              <Star className="w-5 h-5 text-[var(--text-primary)]" strokeWidth={2.5} />
             ) : (
-              <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
+              <TrendingUp className="w-5 h-5 text-[var(--text-primary)]" strokeWidth={2.5} />
             )}
           </div>
 
@@ -53,12 +53,12 @@ function RecordCard({ record, isNew }: { record: ReportRecord; isNew: boolean })
             </div>
 
             {/* Record name */}
-            <h4 className="font-semibold text-white mb-1">
+            <h4 className="font-semibold text-[var(--text-primary)] mb-1">
               {record.recordTypeName}
             </h4>
 
             {/* Activity type & date */}
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-disabled)]">
               <span className="px-2 py-0.5 rounded-md bg-white/5">
                 {record.activityType}
               </span>
@@ -78,7 +78,7 @@ function RecordCard({ record, isNew }: { record: ReportRecord; isNew: boolean })
             >
               {record.value.toFixed(record.unit === 'km/h' || record.unit === 'km' ? 1 : 0)}
             </span>
-            <span className="text-sm text-gray-400">{record.unit}</span>
+            <span className="text-sm text-[var(--text-tertiary)]">{record.unit}</span>
           </div>
           {record.improvement !== null && record.improvement !== undefined && (
             <div className="flex items-center justify-end gap-1 mt-1">
@@ -105,19 +105,19 @@ export function ReportRecords({ records }: Props) {
           <Award className="w-5 h-5 text-amber-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-white tracking-tight">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
             Records Personnels
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--text-disabled)]">
             {hasRecords
               ? `${totalRecords} record${totalRecords > 1 ? 's' : ''} battu${totalRecords > 1 ? 's' : ''} cette période`
               : 'Aucun record battu cette période'}
           </p>
         </div>
         {hasRecords && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#8BC34A]/10 border border-[#8BC34A]/30">
-            <Sparkles className="w-4 h-4 text-[#8BC34A]" />
-            <span className="text-sm font-semibold text-[#8BC34A]">{totalRecords}</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-primary/10 border border-brand-primary/30">
+            <Sparkles className="w-4 h-4 text-brand-primary" />
+            <span className="text-sm font-semibold text-brand-primary">{totalRecords}</span>
           </div>
         )}
       </div>
@@ -136,7 +136,7 @@ export function ReportRecords({ records }: Props) {
           <div className="inline-flex p-4 rounded-full bg-white/5 mb-4">
             <Award className="w-8 h-8 text-gray-600" />
           </div>
-          <p className="text-gray-400">
+          <p className="text-[var(--text-tertiary)]">
             Continuez à vous entraîner pour battre vos records !
           </p>
           <p className="text-sm text-gray-600 mt-2">

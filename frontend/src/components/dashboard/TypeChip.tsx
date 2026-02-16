@@ -18,8 +18,8 @@ export default function TypeChip({
       onClick={onClick}
       className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-300 group ${
         selected
-          ? "border-[#8BC34A]/70 bg-[#8BC34A]/10 text-white shadow-md hover:shadow-lg"
-          : "border-[#8BC34A]/20 bg-[#0A191A]/60 text-gray-400 hover:border-[#8BC34A]/40 hover:bg-[#8BC34A]/5 opacity-60 hover:opacity-100"
+          ? "border-[var(--brand-primary)]/70 bg-[var(--brand-primary)]/10 text-white shadow-md hover:shadow-lg"
+          : "border-[var(--brand-primary)]/20 bg-[var(--surface-deep)]/60 text-[var(--text-tertiary)] hover:border-[var(--brand-primary)]/40 hover:bg-[var(--brand-primary)]/5 opacity-60 hover:opacity-100"
       }`}
     >
       <span
@@ -31,13 +31,13 @@ export default function TypeChip({
       </span>
       <div className="flex flex-col text-sm">
         <span className="font-semibold">{label}</span>
-        <span className="text-[11px] uppercase tracking-wide text-gray-400">
+        <span className="text-[11px] uppercase tracking-wide text-[var(--text-tertiary)]">
           {count} activité{count > 1 ? "s" : ""}
         </span>
       </div>
       {selected && (
         <div className="ml-auto">
-          <div className="w-2 h-2 bg-[#8BC34A] rounded-full animate-pulse" />
+          <div className="w-2 h-2 bg-[var(--brand-primary)] rounded-full animate-pulse" />
         </div>
       )}
     </button>

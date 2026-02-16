@@ -99,6 +99,21 @@
   --chart-zone4: #f8712f;
   --chart-zone5: #ef4444;
 
+  /* -- Brand Colors (Identité App) -- */
+  --brand-primary: #8BC34A;
+  --brand-primary-subtle: rgba(139, 195, 74, 0.15);
+  --brand-secondary: #5CE1E6;
+  --brand-secondary-subtle: rgba(92, 225, 230, 0.15);
+
+  /* -- Metric Colors (Visualisation données) -- */
+  --metric-energy: #FFAB40;
+  --metric-energy-subtle: rgba(255, 171, 64, 0.15);
+  --metric-alert: #FF5252;
+  --metric-alert-subtle: rgba(255, 82, 82, 0.15);
+
+  /* -- Extended Surfaces -- */
+  --surface-deep: #0A191A;
+
   /* -- Radius -- */
   --radius-xs: 0.25rem;
   --radius-sm: 0.5rem;
@@ -225,6 +240,18 @@
   --shadow-md: 0 8px 24px rgba(26, 46, 40, 0.08);
   --shadow-lg: 0 16px 48px rgba(26, 46, 40, 0.12);
   --shadow-glow: 0 0 24px rgba(124, 179, 66, 0.2);
+
+  --brand-primary: #689F38;
+  --brand-primary-subtle: rgba(104, 159, 56, 0.12);
+  --brand-secondary: #00ACC1;
+  --brand-secondary-subtle: rgba(0, 172, 193, 0.12);
+
+  --metric-energy: #F57C00;
+  --metric-energy-subtle: rgba(245, 124, 0, 0.12);
+  --metric-alert: #E53935;
+  --metric-alert-subtle: rgba(229, 57, 53, 0.12);
+
+  --surface-deep: #E8EEEB;
 }
 
 /* =============================================================================
@@ -260,6 +287,16 @@
   --color-chart-3: var(--chart-zone4);
   --color-chart-4: var(--chart-zone5);
   --color-chart-5: var(--chart-zone1);
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-subtle: var(--brand-primary-subtle);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-secondary-subtle: var(--brand-secondary-subtle);
+  --color-metric-energy: var(--metric-energy);
+  --color-metric-energy-subtle: var(--metric-energy-subtle);
+  --color-metric-alert: var(--metric-alert);
+  --color-metric-alert-subtle: var(--metric-alert-subtle);
+  --color-surface-deep: var(--surface-deep);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);

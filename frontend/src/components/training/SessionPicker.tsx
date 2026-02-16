@@ -93,7 +93,7 @@ export function SessionPicker({
 
       {/* Ajouter une séance */}
       <div>
-        <h4 className="font-medium text-gray-300 mb-3">Ajouter une séance</h4>
+        <h4 className="font-medium text-[var(--text-secondary)] mb-3">Ajouter une séance</h4>
 
         {/* Onglets */}
         <div className="flex gap-2 mb-3">
@@ -153,7 +153,7 @@ interface PlannedSessionsListProps {
 function PlannedSessionsList({ plannedForDate, findFullSession, canPlay, onPlay, onRemove }: PlannedSessionsListProps) {
   return (
     <div>
-      <h4 className="font-medium text-gray-300 mb-3">Séances planifiées</h4>
+      <h4 className="font-medium text-[var(--text-secondary)] mb-3">Séances planifiées</h4>
       <div className="space-y-2 max-h-40 overflow-y-auto">
         {plannedForDate.map((planned) => {
           const session = findFullSession(planned);
@@ -166,11 +166,11 @@ function PlannedSessionsList({ plannedForDate, findFullSession, canPlay, onPlay,
             >
               <div className="flex items-center gap-2">
                 {session.category === 'cycling' ? (
-                  <Bike className="h-4 w-4 text-[#8BC34A]" />
+                  <Bike className="h-4 w-4 text-[var(--brand-primary)]" />
                 ) : (
-                  <Dumbbell className="h-4 w-4 text-[#5CE1E6]" />
+                  <Dumbbell className="h-4 w-4 text-[var(--brand-secondary)]" />
                 )}
-                <span className="font-medium text-white">{session.name}</span>
+                <span className="font-medium text-[var(--text-primary)]">{session.name}</span>
                 {planned.completed && (
                   <span className="text-xs text-green-500 font-medium">✓ Fait</span>
                 )}
@@ -212,8 +212,8 @@ function TabButton({ active, onClick, label }: TabButtonProps) {
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
         active
-          ? 'bg-[#8BC34A] text-black'
-          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+          ? 'bg-[var(--brand-primary)] text-black'
+          : 'bg-white/10 text-[var(--text-secondary)] hover:bg-white/20'
       }`}
     >
       {label}
@@ -245,20 +245,20 @@ function FilterBar({
   return (
     <div className="flex flex-wrap gap-2 mb-3">
       <div className="relative flex-1 min-w-[150px]">
-        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-disabled)]" />
         <input
           type="text"
           placeholder="Rechercher..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-8 pr-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#8BC34A]/50"
+          className="w-full pl-8 pr-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-[var(--text-primary)] placeholder-[var(--text-disabled)] focus:outline-none focus:border-[var(--brand-primary)]/50"
         />
       </div>
 
       <select
         value={categoryFilter}
         onChange={(e) => onCategoryChange(e.target.value as CategoryFilter)}
-        className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-[#8BC34A]/50"
+        className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand-primary)]/50"
       >
         <option value="all">Toutes catégories</option>
         <option value="cycling">🚴 Vélo</option>
@@ -269,7 +269,7 @@ function FilterBar({
         <select
           value={weekFilter ?? ''}
           onChange={(e) => onWeekChange(e.target.value ? Number(e.target.value) : null)}
-          className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-[#8BC34A]/50"
+          className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand-primary)]/50"
         >
           <option value="">Toutes semaines</option>
           {availableWeeks.map((week) => (
@@ -292,7 +292,7 @@ interface SessionsListProps {
 function SessionsList({ sessions, totalCount, onAdd }: SessionsListProps) {
   if (sessions.length === 0) {
     return (
-      <p className="text-gray-500 text-sm py-4 text-center">
+      <p className="text-[var(--text-disabled)] text-sm py-4 text-center">
         {totalCount === 0
           ? 'Créez d\'abord des séances dans l\'onglet "Mes séances".'
           : 'Aucune séance ne correspond aux filtres.'}
@@ -318,7 +318,7 @@ interface TemplatesListProps {
 function TemplatesList({ templates, totalCount, onAdd }: TemplatesListProps) {
   if (templates.length === 0) {
     return (
-      <p className="text-gray-500 text-sm py-4 text-center">
+      <p className="text-[var(--text-disabled)] text-sm py-4 text-center">
         {totalCount === 0
           ? 'Aucun modèle disponible.'
           : 'Aucun modèle ne correspond aux filtres.'}
@@ -343,18 +343,18 @@ interface SessionCardProps {
 function SessionCard({ session, onClick }: SessionCardProps) {
   return (
     <div
-      className="p-3 cursor-pointer bg-white/5 border border-white/10 rounded-lg hover:border-[#8BC34A]/50 transition-colors"
+      className="p-3 cursor-pointer bg-white/5 border border-white/10 rounded-lg hover:border-[var(--brand-primary)]/50 transition-colors"
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
         {session.category === 'cycling' ? (
-          <Bike className="h-4 w-4 text-[#8BC34A]" />
+          <Bike className="h-4 w-4 text-[var(--brand-primary)]" />
         ) : (
-          <Dumbbell className="h-4 w-4 text-[#5CE1E6]" />
+          <Dumbbell className="h-4 w-4 text-[var(--brand-secondary)]" />
         )}
-        <span className="font-medium text-sm text-white truncate">{session.name}</span>
+        <span className="font-medium text-sm text-[var(--text-primary)] truncate">{session.name}</span>
       </div>
-      <p className="text-xs text-gray-400 mt-1">
+      <p className="text-xs text-[var(--text-tertiary)] mt-1">
         {formatDuration(session.duration)} • TSS {session.tss || 0}
       </p>
     </div>
@@ -369,23 +369,23 @@ interface TemplateCardProps {
 function TemplateCard({ template, onClick }: TemplateCardProps) {
   return (
     <div
-      className="p-3 cursor-pointer bg-white/5 border border-white/10 rounded-lg hover:border-[#8BC34A]/50 transition-colors"
+      className="p-3 cursor-pointer bg-white/5 border border-white/10 rounded-lg hover:border-[var(--brand-primary)]/50 transition-colors"
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
         {template.category === 'cycling' ? (
-          <Bike className="h-4 w-4 text-[#8BC34A]" />
+          <Bike className="h-4 w-4 text-[var(--brand-primary)]" />
         ) : (
-          <Dumbbell className="h-4 w-4 text-[#5CE1E6]" />
+          <Dumbbell className="h-4 w-4 text-[var(--brand-secondary)]" />
         )}
-        <span className="font-medium text-sm text-white truncate">{template.name}</span>
+        <span className="font-medium text-sm text-[var(--text-primary)] truncate">{template.name}</span>
       </div>
       <div className="flex items-center gap-2 mt-1">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-[var(--text-tertiary)]">
           {formatDuration(template.duration)} • TSS {template.tss || 0}
         </p>
         {template.week && (
-          <span className="text-xs px-1.5 py-0.5 bg-white/10 rounded text-gray-300">
+          <span className="text-xs px-1.5 py-0.5 bg-white/10 rounded text-[var(--text-secondary)]">
             S{template.week}
           </span>
         )}
