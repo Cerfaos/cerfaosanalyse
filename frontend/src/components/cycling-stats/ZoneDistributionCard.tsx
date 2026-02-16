@@ -31,7 +31,7 @@ export function ZoneDistributionCard({ zones }: ZoneDistributionCardProps) {
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
               }}
               labelStyle={{ color: 'var(--text-primary)', fontWeight: 'bold', marginBottom: '4px' }}
-              itemStyle={{ color: 'var(--text-tertiary)' }
+              itemStyle={{ color: 'var(--text-tertiary)' }}
               formatter={(value: number) => [`${value.toFixed(1)}%`, 'Temps']}
             />
             <Bar dataKey="percentage" radius={[8, 8, 0, 0]}>
