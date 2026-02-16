@@ -34,7 +34,7 @@ export function NextBlockPreview({ nextBlock, currentExerciseName, currentRound 
 
   return (
     <div className="mb-4 p-3 md:p-4 rounded-xl bg-white/5 border border-white/10">
-      <div className="text-xs md:text-sm text-gray-400 mb-1">{getLabel()}</div>
+      <div className="text-xs md:text-sm text-[var(--text-tertiary)] mb-1">{getLabel()}</div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -43,12 +43,12 @@ export function NextBlockPreview({ nextBlock, currentExerciseName, currentRound 
           >
             {PHASE_CONFIG[nextBlock.phase].label}
           </span>
-          <span className="text-white text-sm md:text-base font-medium">{getBlockName()}</span>
+          <span className="text-[var(--text-primary)] text-sm md:text-base font-medium">{getBlockName()}</span>
           {nextBlock.phase === "exercise" && nextBlock.exercise.reps && (
-            <span className="text-xs md:text-sm text-gray-400">× {nextBlock.exercise.reps} reps</span>
+            <span className="text-xs md:text-sm text-[var(--text-tertiary)]">× {nextBlock.exercise.reps} reps</span>
           )}
         </div>
-        <span className="text-sm text-gray-400">{formatTime(nextBlock.durationSeconds)}</span>
+        <span className="text-sm text-[var(--text-tertiary)]">{formatTime(nextBlock.durationSeconds)}</span>
       </div>
     </div>
   );

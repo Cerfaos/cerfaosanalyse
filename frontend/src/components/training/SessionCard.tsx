@@ -44,8 +44,8 @@ export function SessionCard({
 }: SessionCardProps) {
   void _weight // Unused but kept for API compatibility
   const CategoryIcon = session.category === 'cycling' ? Bike : Dumbbell
-  // Utilise les couleurs du thème: primary (#8BC34A) pour cycling, secondary (#5CE1E6) pour PPG
-  const categoryColor = session.category === 'cycling' ? '#8BC34A' : '#5CE1E6'
+  // Utilise les couleurs du thème: primary pour cycling, secondary pour PPG
+  const categoryColor = session.category === 'cycling' ? 'var(--brand-primary)' : 'var(--brand-secondary)'
 
   // Version compacte pour le calendrier
   if (compact) {
@@ -106,7 +106,7 @@ export function SessionCard({
               size="icon"
               onClick={() => onPlay(session)}
               title="Lancer la séance"
-              className="text-[#8BC34A] hover:text-[#8BC34A] hover:bg-[#8BC34A]/10"
+              className="text-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10"
             >
               <PlayCircle className="h-5 w-5" />
             </Button>
@@ -117,7 +117,7 @@ export function SessionCard({
               size="icon"
               onClick={() => onPlay(session)}
               title="Lancer la séance"
-              className="text-[#5CE1E6] hover:text-[#5CE1E6] hover:bg-[#5CE1E6]/10"
+              className="text-[var(--brand-secondary)] hover:text-[var(--brand-secondary)] hover:bg-[var(--brand-secondary)]/10"
             >
               <PlayCircle className="h-5 w-5" />
             </Button>

@@ -25,10 +25,10 @@ export function MonthlyStatsCards({ stats }: MonthlyStatsCardsProps) {
               </div>
               <span className="text-xs font-medium text-emerald-400/80 uppercase tracking-wider">Plus actif</span>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{stats.maxActivitiesMonth.monthName}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] mb-1">{stats.maxActivitiesMonth.monthName}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-semibold text-emerald-400">{stats.maxActivitiesMonth.activities}</span>
-              <span className="text-sm text-gray-400">activités</span>
+              <span className="text-sm text-[var(--text-tertiary)]">activités</span>
             </div>
           </div>
         </div>
@@ -43,7 +43,7 @@ export function MonthlyStatsCards({ stats }: MonthlyStatsCardsProps) {
               </div>
               <span className="text-xs font-medium text-blue-400/80 uppercase tracking-wider">Plus grande distance</span>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{stats.maxDistanceMonth.monthName}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] mb-1">{stats.maxDistanceMonth.monthName}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-semibold text-blue-400">{formatDistance(stats.maxDistanceMonth.distance)}</span>
             </div>
@@ -60,10 +60,10 @@ export function MonthlyStatsCards({ stats }: MonthlyStatsCardsProps) {
               </div>
               <span className="text-xs font-medium text-amber-400/80 uppercase tracking-wider">Charge max</span>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{stats.maxTrimpMonth.monthName}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] mb-1">{stats.maxTrimpMonth.monthName}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-semibold text-amber-400">{stats.maxTrimpMonth.trimp.toLocaleString('fr-FR')}</span>
-              <span className="text-sm text-gray-400">TRIMP</span>
+              <span className="text-sm text-[var(--text-tertiary)]">TRIMP</span>
             </div>
           </div>
         </div>
@@ -78,10 +78,10 @@ export function MonthlyStatsCards({ stats }: MonthlyStatsCardsProps) {
               </div>
               <span className="text-xs font-medium text-orange-400/80 uppercase tracking-wider">Plus de D+</span>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{stats.maxElevationMonth.monthName}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] mb-1">{stats.maxElevationMonth.monthName}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-semibold text-orange-400">{stats.maxElevationMonth.elevation.toLocaleString('fr-FR')}</span>
-              <span className="text-sm text-gray-400">m</span>
+              <span className="text-sm text-[var(--text-tertiary)]">m</span>
             </div>
           </div>
         </div>
@@ -94,8 +94,8 @@ export function MonthlyStatsCards({ stats }: MonthlyStatsCardsProps) {
             <Target className="w-5 h-5 text-violet-400" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">Moyenne mensuelle</p>
-            <p className="text-xl font-bold text-white">{stats.avgActivitiesPerMonth} <span className="text-sm font-normal text-gray-400">activités/mois</span></p>
+            <p className="text-sm text-[var(--text-tertiary)]">Moyenne mensuelle</p>
+            <p className="text-xl font-bold text-[var(--text-primary)]">{stats.avgActivitiesPerMonth} <span className="text-sm font-normal text-[var(--text-tertiary)]">activités/mois</span></p>
           </div>
         </div>
         <div className="rounded-xl bg-gradient-to-r from-white/[0.04] to-white/[0.02] border border-white/10 p-4 flex items-center gap-4">
@@ -103,8 +103,8 @@ export function MonthlyStatsCards({ stats }: MonthlyStatsCardsProps) {
             <BarChart3 className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">Distance moyenne</p>
-            <p className="text-xl font-bold text-white">{stats.avgDistancePerMonth} <span className="text-sm font-normal text-gray-400">km/mois</span></p>
+            <p className="text-sm text-[var(--text-tertiary)]">Distance moyenne</p>
+            <p className="text-xl font-bold text-[var(--text-primary)]">{stats.avgDistancePerMonth} <span className="text-sm font-normal text-[var(--text-tertiary)]">km/mois</span></p>
           </div>
         </div>
       </div>

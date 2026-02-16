@@ -40,8 +40,8 @@ export function FiltersSection({
     <div className="glass-panel p-6 space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-gray-400">Filtres intelligents</p>
-          <h3 className="text-xl font-semibold text-white">Affinez vos statistiques</h3>
+          <p className="text-xs uppercase tracking-[0.4em] text-[var(--text-tertiary)]">Filtres intelligents</p>
+          <h3 className="text-xl font-semibold text-[var(--text-primary)]">Affinez vos statistiques</h3>
         </div>
         <button
           onClick={resetFilters}
@@ -52,7 +52,7 @@ export function FiltersSection({
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-white mb-4">Période</p>
+        <p className="text-sm font-semibold text-[var(--text-primary)] mb-4">Période</p>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {periodOptions.map((option) => (
             <PeriodCard
@@ -104,12 +104,12 @@ function CustomPeriodSelector({
 }: CustomPeriodSelectorProps) {
   return (
     <div className="rounded-2xl border border-panel-border bg-bg-subtle/40 dark:bg-dark-border/20 p-4">
-      <p className="text-sm font-semibold text-white mb-3">Sélectionner le mois et l'année</p>
+      <p className="text-sm font-semibold text-[var(--text-primary)] mb-3">Sélectionner le mois et l'année</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <select
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-          className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-white font-medium text-sm focus:outline-none focus:border-brand transition-colors"
+          className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-[var(--text-primary)] font-medium text-sm focus:outline-none focus:border-brand transition-colors"
         >
           {monthNames.map((month, index) => (
             <option key={index} value={index}>
@@ -120,7 +120,7 @@ function CustomPeriodSelector({
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-          className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-white font-medium text-sm focus:outline-none focus:border-brand transition-colors"
+          className="px-4 py-2.5 rounded-xl border-2 border-panel-border bg-white dark:bg-dark-surface text-[var(--text-primary)] font-medium text-sm focus:outline-none focus:border-brand transition-colors"
         >
           {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
             <option key={year} value={year}>
@@ -152,13 +152,13 @@ function ActivityTypeFilters({
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-sm font-semibold text-white">Types d'activités</p>
-          <p className="text-xs text-gray-400">Touchez pour afficher/masquer une discipline</p>
+          <p className="text-sm font-semibold text-[var(--text-primary)]">Types d'activités</p>
+          <p className="text-xs text-[var(--text-tertiary)]">Touchez pour afficher/masquer une discipline</p>
         </div>
         {selectedTypes.length > 0 && (
           <button
             onClick={() => setSelectedTypes([])}
-            className="text-xs text-[#8BC34A] hover:text-[#8BC34A]-dark dark:text-[#8BC34A] dark:hover:text-[#8BC34A]-light font-medium"
+            className="text-xs text-[var(--brand-primary)] hover:text-[var(--brand-primary)] font-medium"
           >
             Tout afficher
           </button>

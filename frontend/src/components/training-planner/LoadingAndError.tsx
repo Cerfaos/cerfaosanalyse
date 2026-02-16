@@ -9,8 +9,8 @@ export function LoadingSkeleton() {
   return (
     <div className="glass-panel p-8 md:p-12">
       <div className="flex flex-col items-center justify-center gap-4">
-        <Loader2 className="h-12 w-12 text-[#8BC34A] animate-spin" />
-        <p className="text-gray-400 animate-pulse">Chargement des données...</p>
+        <Loader2 className="h-12 w-12 text-brand-primary animate-spin" />
+        <p className="text-[var(--text-tertiary)] animate-pulse">Chargement des données...</p>
       </div>
     </div>
   );
@@ -30,7 +30,7 @@ export function ErrorDisplay({ message, onRetry }: ErrorDisplayProps) {
         </div>
         <div className="flex-1">
           <h4 className="font-medium text-red-400 mb-1">Une erreur s'est produite</h4>
-          <p className="text-sm text-gray-400">{message}</p>
+          <p className="text-sm text-[var(--text-tertiary)]">{message}</p>
           {onRetry && (
             <Button variant="outline" size="sm" onClick={onRetry} className="mt-3">
               Réessayer

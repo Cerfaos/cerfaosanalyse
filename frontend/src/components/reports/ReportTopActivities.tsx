@@ -11,7 +11,7 @@ const categoryConfig = {
   distance: {
     title: 'Plus longue distance',
     icon: Route,
-    color: '#3B82F6',
+    color: 'var(--status-info)',
     gradient: 'from-blue-500 to-cyan-400',
     getValue: (a: ReportActivity) => formatDistance(a.distance),
     unit: '',
@@ -71,21 +71,21 @@ function ActivityCard({
             strokeWidth={2.5}
           />
         ) : (
-          <span className="text-sm font-bold text-gray-500">{rank}</span>
+          <span className="text-sm font-bold text-[var(--text-disabled)]">{rank}</span>
         )}
       </div>
 
       {/* Activity info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-white truncate">{activity.type}</span>
+          <span className="font-medium text-[var(--text-primary)] truncate">{activity.type}</span>
           {activity.subSport && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-400">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-[var(--text-tertiary)]">
               {activity.subSport}
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-[var(--text-disabled)] mt-0.5">
           {formatDate(activity.date)}
         </p>
       </div>
@@ -99,9 +99,9 @@ function ActivityCard({
           {config.getValue(activity)}
         </span>
         {config.unit && (
-          <span className="text-sm text-gray-500">{config.unit}</span>
+          <span className="text-sm text-[var(--text-disabled)]">{config.unit}</span>
         )}
-        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
+        <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-[var(--text-tertiary)] transition-colors" />
       </div>
     </Link>
   )
@@ -125,9 +125,9 @@ function CategorySection({
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-white/10">
         <div className={`p-2 rounded-xl bg-gradient-to-br ${config.gradient}`}>
-          <Icon className="w-4 h-4 text-white" strokeWidth={2.5} />
+          <Icon className="w-4 h-4 text-[var(--text-primary)]" strokeWidth={2.5} />
         </div>
-        <h4 className="font-medium text-white">{title}</h4>
+        <h4 className="font-medium text-[var(--text-primary)]">{title}</h4>
       </div>
 
       {/* Activities list */}
@@ -163,10 +163,10 @@ export function ReportTopActivities({ topActivities }: Props) {
           <Trophy className="w-5 h-5 text-amber-400" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-white tracking-tight">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
             Top Activités
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--text-disabled)]">
             Vos meilleures performances de la période
           </p>
         </div>

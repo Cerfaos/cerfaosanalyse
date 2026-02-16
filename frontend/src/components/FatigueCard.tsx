@@ -67,7 +67,7 @@ function TrendMetric({
 
   return (
     <div className="flex flex-col">
-      <span className="text-xs text-gray-400 mb-1">{label}</span>
+      <span className="text-xs text-[var(--text-tertiary)] mb-1">{label}</span>
       <span className={`text-2xl font-bold ${color}`}>{formattedValue}</span>
     </div>
   );
@@ -108,10 +108,10 @@ export default function FatigueCard() {
     <div className="glass-panel p-6 h-full flex flex-col">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-tertiary)]">
             État de forme
           </p>
-          <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] flex items-center gap-2">
             {config.label} <span className="text-2xl">{config.icon}</span>
           </h3>
         </div>
@@ -144,14 +144,14 @@ export default function FatigueCard() {
       <div className="space-y-4 flex-1">
         {analysis.recommendations.length > 0 && (
           <div className="bg-white/5 rounded-xl p-4">
-            <p className="text-sm font-medium text-gray-300 mb-2">
+            <p className="text-sm font-medium text-[var(--text-secondary)] mb-2">
               Recommandations
             </p>
             <ul className="space-y-2">
               {analysis.recommendations.map((rec, i) => (
                 <li
                   key={i}
-                  className="text-sm text-gray-400 flex items-start gap-2"
+                  className="text-sm text-[var(--text-tertiary)] flex items-start gap-2"
                 >
                   <span className="text-primary mt-1">•</span>
                   {rec}

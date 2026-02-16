@@ -293,7 +293,7 @@ export function PlanningCalendar() {
       {/* Calendrier */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 text-[#8BC34A] animate-spin" />
+          <Loader2 className="h-8 w-8 text-[var(--brand-primary)] animate-spin" />
         </div>
       ) : (
         <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">

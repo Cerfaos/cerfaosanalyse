@@ -90,7 +90,7 @@ export function BlockEditor({ blocks, onChange, category, ftp, weight }: BlockEd
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                 editorMode === 'simple'
                   ? 'bg-white dark:bg-dark-surface text-primary shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-[var(--text-disabled)] hover:text-[var(--text-secondary)]'
               }`}
               onClick={() => setEditorMode('simple')}
             >
@@ -102,7 +102,7 @@ export function BlockEditor({ blocks, onChange, category, ftp, weight }: BlockEd
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                 editorMode === 'interval'
                   ? 'bg-white dark:bg-dark-surface text-primary shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-[var(--text-disabled)] hover:text-[var(--text-secondary)]'
               }`}
               onClick={() => setEditorMode('interval')}
             >

@@ -42,7 +42,7 @@ export function PmcExplanation() {
 
           {/* CTL */}
           <div className="space-y-2">
-            <h4 className="font-semibold text-[#5CE1E6] flex items-center gap-2">
+            <h4 className="font-semibold text-[var(--brand-secondary)] flex items-center gap-2">
               <span>📈</span> CTL - Chronic Training Load (Forme)
             </h4>
             <p className="text-sm text-text-secondary leading-relaxed">
@@ -68,7 +68,7 @@ export function PmcExplanation() {
 
           {/* ATL */}
           <div className="space-y-2">
-            <h4 className="font-semibold text-[#FF5252] flex items-center gap-2">
+            <h4 className="font-semibold text-[var(--metric-alert)] flex items-center gap-2">
               <span>🔥</span> ATL - Acute Training Load (Fatigue)
             </h4>
             <p className="text-sm text-text-secondary leading-relaxed">
@@ -90,7 +90,7 @@ export function PmcExplanation() {
 
           {/* TSB */}
           <div className="space-y-2">
-            <h4 className="font-semibold text-[#8BC34A] flex items-center gap-2">
+            <h4 className="font-semibold text-[var(--brand-primary)] flex items-center gap-2">
               <span>⚖️</span> TSB - Training Stress Balance (Équilibre)
             </h4>
             <p className="text-sm text-text-secondary leading-relaxed">

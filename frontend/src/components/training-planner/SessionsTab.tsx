@@ -53,8 +53,8 @@ export function SessionsTab({
     return (
       <div className="glass-panel p-12 text-center">
         <div className="text-6xl mb-4">🚴</div>
-        <h3 className="text-xl font-semibold text-white mb-2">Aucune séance créée</h3>
-        <p className="text-gray-400 mb-6">Créez votre première séance d'entraînement ou utilisez un modèle.</p>
+        <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">Aucune séance créée</h3>
+        <p className="text-[var(--text-tertiary)] mb-6">Créez votre première séance d'entraînement ou utilisez un modèle.</p>
         <div className="flex justify-center gap-4">
           <Button onClick={onCreateSession}>
             <Plus className="h-4 w-4 mr-2" />
@@ -100,8 +100,8 @@ export function SessionsTab({
       {cyclingSessions.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Bike className="h-5 w-5 text-[#8BC34A]" />
-            <h3 className="text-lg font-semibold text-white">Cyclisme ({cyclingSessions.length})</h3>
+            <Bike className="h-5 w-5 text-brand-primary" />
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Cyclisme ({cyclingSessions.length})</h3>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {cyclingSessions.map((session) => (
@@ -123,8 +123,8 @@ export function SessionsTab({
       {ppgSessions.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Dumbbell className="h-5 w-5 text-[#5CE1E6]" />
-            <h3 className="text-lg font-semibold text-white">PPG ({ppgSessions.length})</h3>
+            <Dumbbell className="h-5 w-5 text-brand-secondary" />
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">PPG ({ppgSessions.length})</h3>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {ppgSessions.map((session) => (

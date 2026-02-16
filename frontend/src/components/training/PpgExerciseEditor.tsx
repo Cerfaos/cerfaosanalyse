@@ -75,16 +75,16 @@ export function PpgExerciseEditor({ exercises, onChange }: PpgExerciseEditorProp
           <h4 className="font-medium text-text-primary">Exercices</h4>
           {/* Nombre de tours du circuit */}
           {exercises.length > 0 && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-[#5CE1E6]/10 border border-[#5CE1E6]/30 rounded-lg">
-              <Repeat className="h-4 w-4 text-[#5CE1E6]" />
-              <span className="text-sm text-[#5CE1E6] font-medium">Tours :</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--brand-secondary)]/10 border border-[var(--brand-secondary)]/30 rounded-lg">
+              <Repeat className="h-4 w-4 text-[var(--brand-secondary)]" />
+              <span className="text-sm text-[var(--brand-secondary)] font-medium">Tours :</span>
               <input
                 type="number"
                 min={1}
                 max={10}
                 value={circuitRounds}
                 onChange={handleRoundsChange}
-                className="h-7 w-14 text-center bg-transparent border border-[#5CE1E6]/30 rounded-md text-white focus:outline-none focus:border-[#5CE1E6]"
+                className="h-7 w-14 text-center bg-transparent border border-[var(--brand-secondary)]/30 rounded-md text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand-secondary)]"
               />
             </div>
           )}

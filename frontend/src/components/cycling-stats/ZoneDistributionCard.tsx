@@ -20,18 +20,18 @@ export function ZoneDistributionCard({ zones }: ZoneDistributionCardProps) {
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={zones}>
-            <XAxis dataKey="name" stroke="#94a3b8" />
-            <YAxis stroke="#94a3b8" tickFormatter={(value) => `${value}%`} />
+            <XAxis dataKey="name" stroke="var(--text-tertiary)" />
+            <YAxis stroke="var(--text-tertiary)" tickFormatter={(value) => `${value}%`} />
             <Tooltip
               cursor={{ fill: 'transparent' }}
               contentStyle={{
-                backgroundColor: 'rgba(10, 25, 26, 0.95)',
-                border: '1px solid rgba(139, 195, 74, 0.3)',
+                backgroundColor: 'var(--surface-deep)',
+                border: '1px solid var(--brand-primary-subtle)',
                 borderRadius: '12px',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
               }}
-              labelStyle={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}
-              itemStyle={{ color: '#9CA3AF' }}
+              labelStyle={{ color: 'var(--text-primary)', fontWeight: 'bold', marginBottom: '4px' }}
+              itemStyle={{ color: 'var(--text-tertiary)' }
               formatter={(value: number) => [`${value.toFixed(1)}%`, 'Temps']}
             />
             <Bar dataKey="percentage" radius={[8, 8, 0, 0]}>
@@ -46,12 +46,12 @@ export function ZoneDistributionCard({ zones }: ZoneDistributionCardProps) {
         {zones.map((zone) => (
           <div
             key={zone.zone}
-            className="p-3 rounded-xl border border-[#8BC34A]/20 bg-[#0A191A]/40 hover:border-[#8BC34A]/40 transition-colors"
+            className="p-3 rounded-xl border border-[var(--brand-primary)]/20 bg-surface-deep/40 hover:border-[var(--brand-primary)]/40 transition-colors"
           >
-            <p className="text-sm font-semibold text-white">{zone.name}</p>
-            <p className="text-xs text-gray-400">{zone.description}</p>
-            <p className="text-lg font-display mt-2 text-[#8BC34A]">{zone.percentage.toFixed(1)}%</p>
-            <p className="text-xs text-gray-500">{formatDuration(zone.seconds)}</p>
+            <p className="text-sm font-semibold text-[var(--text-primary)]">{zone.name}</p>
+            <p className="text-xs text-[var(--text-tertiary)]">{zone.description}</p>
+            <p className="text-lg font-display mt-2 text-brand-primary">{zone.percentage.toFixed(1)}%</p>
+            <p className="text-xs text-[var(--text-disabled)]">{formatDuration(zone.seconds)}</p>
           </div>
         ))}
       </div>

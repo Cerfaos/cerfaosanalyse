@@ -19,10 +19,10 @@ interface ZoneConfig {
 }
 
 const zones: ZoneConfig[] = [
-  { key: 'zone1', name: 'Z1 - Récupération', color: '#94A3B8', description: '50-60% FCmax' },
-  { key: 'zone2', name: 'Z2 - Endurance', color: '#22C55E', description: '60-70% FCmax' },
-  { key: 'zone3', name: 'Z3 - Tempo', color: '#F59E0B', description: '70-80% FCmax' },
-  { key: 'zone4', name: 'Z4 - Seuil', color: '#EF4444', description: '80-90% FCmax' },
+  { key: 'zone1', name: 'Z1 - Récupération', color: 'var(--text-tertiary)', description: '50-60% FCmax' },
+  { key: 'zone2', name: 'Z2 - Endurance', color: 'var(--chart-zone2)', description: '60-70% FCmax' },
+  { key: 'zone3', name: 'Z3 - Tempo', color: 'var(--chart-zone3)', description: '70-80% FCmax' },
+  { key: 'zone4', name: 'Z4 - Seuil', color: 'var(--chart-zone5)', description: '80-90% FCmax' },
   { key: 'zone5', name: 'Z5 - VO2max', color: '#8B5CF6', description: '90-100% FCmax' },
 ]
 
@@ -295,10 +295,10 @@ export default function ZoneProgressionChart() {
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} stackOffset={displayMode === 'percentage' ? 'expand' : 'none'}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="period" stroke="#9CA3AF" tick={{ fontSize: 12 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
+            <XAxis dataKey="period" stroke="var(--text-tertiary)" tick={{ fontSize: 12 }} />
             <YAxis
-              stroke="#9CA3AF"
+              stroke="var(--text-tertiary)"
               tick={{ fontSize: 12 }}
               tickFormatter={(value) => (displayMode === 'percentage' ? `${Math.round(value * 100)}%` : formatDuration(value))}
             />

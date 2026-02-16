@@ -75,10 +75,10 @@ export function ReportByType({ byType, activitiesCount }: Props) {
             <TrendingUp className="w-5 h-5 text-violet-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white tracking-tight">
+            <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
               Répartition par Type
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[var(--text-disabled)]">
               {byType.length} type{byType.length > 1 ? 's' : ''} d'activité
             </p>
           </div>
@@ -88,11 +88,11 @@ export function ReportByType({ byType, activitiesCount }: Props) {
         <div className="hidden sm:flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
             <Route className="w-3.5 h-3.5 text-blue-400" />
-            <span className="text-sm font-medium text-gray-300">{formatDistance(totalDistance)}</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)]">{formatDistance(totalDistance)}</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
             <Clock className="w-3.5 h-3.5 text-purple-400" />
-            <span className="text-sm font-medium text-gray-300">{formatDuration(totalDuration)}</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)]">{formatDuration(totalDuration)}</span>
           </div>
         </div>
       </div>
@@ -145,13 +145,13 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                             <div style={{ color: data.color, fontWeight: 600, marginBottom: '8px' }}>
                               {data.name}
                             </div>
-                            <div style={{ color: '#ffffff', fontWeight: 600, marginBottom: '4px' }}>
+                            <div style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '4px' }}>
                               {data.value} activité{data.value > 1 ? 's' : ''}
                             </div>
-                            <div style={{ color: '#9ca3af', fontSize: '12px' }}>
+                            <div style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>
                               <div>{formatDistance(data.distance)} • {formatDuration(data.duration)}</div>
                               <div>{Math.round(data.trimp)} TRIMP</div>
-                              <div style={{ marginTop: '4px', color: '#6b7280' }}>
+                              <div style={{ marginTop: '4px', color: 'var(--text-disabled)' }}>
                                 🏠 {data.indoor} intérieur • 🌲 {data.outdoor} extérieur
                               </div>
                             </div>
@@ -164,10 +164,10 @@ export function ReportByType({ byType, activitiesCount }: Props) {
 
                 {/* Center content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-3xl font-bold text-white">
+                  <span className="text-3xl font-bold text-[var(--text-primary)]">
                     {activitiesCount.total}
                   </span>
-                  <span className="text-xs text-gray-500 uppercase tracking-wider">
+                  <span className="text-xs text-[var(--text-disabled)] uppercase tracking-wider">
                     Total
                   </span>
                 </div>
@@ -187,11 +187,11 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                         className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
-                      <span className="text-sm text-gray-400 truncate max-w-[100px]">
+                      <span className="text-sm text-[var(--text-tertiary)] truncate max-w-[100px]">
                         {item.name}
                       </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-300">{pct}%</span>
+                    <span className="text-sm font-medium text-[var(--text-secondary)]">{pct}%</span>
                   </div>
                 )
               })}
@@ -242,8 +242,8 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                           <Icon className="w-5 h-5" style={{ color }} />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-white">{type.type}</h4>
-                          <p className="text-xs text-gray-500">
+                          <h4 className="font-semibold text-[var(--text-primary)]">{type.type}</h4>
+                          <p className="text-xs text-[var(--text-disabled)]">
                             {type.count} sortie{type.count > 1 ? 's' : ''} • {percentage}%
                           </p>
                         </div>
@@ -263,37 +263,37 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
                         <Route className="w-4 h-4 text-blue-400" />
                         <div>
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-[var(--text-primary)]">
                             {formatDistance(type.distance)}
                           </div>
-                          <div className="text-xs text-gray-500">Total</div>
+                          <div className="text-xs text-[var(--text-disabled)]">Total</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
                         <Clock className="w-4 h-4 text-purple-400" />
                         <div>
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-[var(--text-primary)]">
                             {formatDuration(type.duration)}
                           </div>
-                          <div className="text-xs text-gray-500">Total</div>
+                          <div className="text-xs text-[var(--text-disabled)]">Total</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
                         <Zap className="w-4 h-4 text-yellow-400" />
                         <div>
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-[var(--text-primary)]">
                             {Math.round(type.trimp)}
                           </div>
-                          <div className="text-xs text-gray-500">TRIMP</div>
+                          <div className="text-xs text-[var(--text-disabled)]">TRIMP</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
                         <Flame className="w-4 h-4 text-orange-400" />
                         <div>
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-[var(--text-primary)]">
                             {formatDuration(avgDuration)}
                           </div>
-                          <div className="text-xs text-gray-500">Moy/sortie</div>
+                          <div className="text-xs text-[var(--text-disabled)]">Moy/sortie</div>
                         </div>
                       </div>
                     </div>
@@ -304,12 +304,12 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center gap-1.5">
                             <TreePine className="w-3.5 h-3.5 text-emerald-400" />
-                            <span className="text-gray-400">Extérieur</span>
+                            <span className="text-[var(--text-tertiary)]">Extérieur</span>
                             <span className="font-medium text-emerald-400">{type.outdoor}</span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-medium text-violet-400">{type.indoor}</span>
-                            <span className="text-gray-400">Intérieur</span>
+                            <span className="text-[var(--text-tertiary)]">Intérieur</span>
                             <Home className="w-3.5 h-3.5 text-violet-400" />
                           </div>
                         </div>
@@ -348,7 +348,7 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                       <div className="text-lg font-bold text-emerald-400">
                         {activitiesCount.outdoor}
                       </div>
-                      <div className="text-xs text-gray-500">Extérieur</div>
+                      <div className="text-xs text-[var(--text-disabled)]">Extérieur</div>
                     </div>
                   </div>
                   <div className="w-px h-10 bg-white/10" />
@@ -360,23 +360,23 @@ export function ReportByType({ byType, activitiesCount }: Props) {
                       <div className="text-lg font-bold text-violet-400">
                         {activitiesCount.indoor}
                       </div>
-                      <div className="text-xs text-gray-500">Intérieur</div>
+                      <div className="text-xs text-[var(--text-disabled)]">Intérieur</div>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-white">
+                    <div className="text-sm font-semibold text-[var(--text-primary)]">
                       {Math.round(totalTrimp)} TRIMP
                     </div>
-                    <div className="text-xs text-gray-500">Charge totale</div>
+                    <div className="text-xs text-[var(--text-disabled)]">Charge totale</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-white">
+                    <div className="text-sm font-semibold text-[var(--text-primary)]">
                       {formatDistance(totalDistance)}
                     </div>
-                    <div className="text-xs text-gray-500">Distance totale</div>
+                    <div className="text-xs text-[var(--text-disabled)]">Distance totale</div>
                   </div>
                 </div>
               </div>

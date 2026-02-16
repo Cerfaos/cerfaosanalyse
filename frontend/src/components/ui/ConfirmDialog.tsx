@@ -85,12 +85,12 @@ export function ConfirmDialog({
       <div
         ref={dialogRef}
         tabIndex={-1}
-        className="relative w-full max-w-md rounded-2xl bg-[#1a1f2e] border border-white/10 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md rounded-2xl bg-[var(--surface-raised)] border border-white/10 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="absolute right-4 top-4 p-1 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-colors"
           aria-label="Fermer"
         >
           <X className="w-5 h-5" />
@@ -105,13 +105,13 @@ export function ConfirmDialog({
           {/* Title */}
           <h2
             id="dialog-title"
-            className="text-xl font-bold text-white text-center mb-2"
+            className="text-xl font-bold text-[var(--text-primary)] text-center mb-2"
           >
             {title}
           </h2>
 
           {/* Message */}
-          <p className="text-gray-400 text-center mb-6">
+          <p className="text-[var(--text-tertiary)] text-center mb-6">
             {message}
           </p>
 

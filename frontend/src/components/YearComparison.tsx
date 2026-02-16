@@ -382,14 +382,14 @@ export default function YearComparison() {
             {selectedYear !== comparedYear && (
               <Bar
                 dataKey="previousYear"
-                fill="#64748b"
+                fill="var(--text-disabled)"
                 name="previousYear"
                 radius={[4, 4, 0, 0]}
               />
             )}
             <Bar
               dataKey="currentYear"
-              fill="#f8712f"
+              fill="var(--accent-primary)"
               name="currentYear"
               radius={[4, 4, 0, 0]}
             />
@@ -400,11 +400,11 @@ export default function YearComparison() {
       <div className="text-center text-sm text-[var(--text-tertiary)]">
         {selectedYear !== comparedYear ? (
           <>
-            {getMetricLabel()} par mois — <span className="text-[#f8712f] font-medium">{selectedYear}</span> vs <span className="text-[#64748b] font-medium">{comparedYear}</span>
+            {getMetricLabel()} par mois — <span className="text-[var(--accent-primary)] font-medium">{selectedYear}</span> vs <span className="text-[var(--text-disabled)] font-medium">{comparedYear}</span>
           </>
         ) : (
           <>
-            {getMetricLabel()} par mois — <span className="text-[#f8712f] font-medium">{selectedYear}</span>
+            {getMetricLabel()} par mois — <span className="text-[var(--accent-primary)] font-medium">{selectedYear}</span>
             <span className="block mt-1 text-xs opacity-75">Sélectionnez une autre année pour comparer</span>
           </>
         )}

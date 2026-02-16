@@ -79,7 +79,7 @@ export function SessionGraph({ blocks, ftp, height = 'h-24', showLabels = true, 
   if (!blocks || blocks.length === 0) {
     return (
       <div className={`${height} bg-black/30 rounded-xl border border-white/10 flex items-center justify-center`}>
-        <span className="text-sm text-gray-500">Aucun bloc défini</span>
+        <span className="text-sm text-[var(--text-disabled)]">Aucun bloc défini</span>
       </div>
     )
   }
@@ -139,11 +139,11 @@ export function SessionGraph({ blocks, ftp, height = 'h-24', showLabels = true, 
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded" style={{ backgroundColor: block.color }} />
                       <span className="font-bold text-white">{block.zoneShort}</span>
-                      <span className="text-gray-300">{block.percentFtp}% FTP</span>
+                      <span className="text-[var(--text-secondary)]">{block.percentFtp}% FTP</span>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-[11px]">
-                      <span className="text-[#8BC34A] font-medium">{block.watts}W</span>
-                      <span className="text-[#5CE1E6]">{formatDurationShort(block.totalBlockDuration)}</span>
+                      <span className="text-[var(--brand-primary)] font-medium">{block.watts}W</span>
+                      <span className="text-[var(--brand-secondary)]">{formatDurationShort(block.totalBlockDuration)}</span>
                     </div>
                   </TooltipContent>
                 </TooltipRoot>
@@ -165,12 +165,12 @@ export function SessionGraph({ blocks, ftp, height = 'h-24', showLabels = true, 
                       className="w-2 h-2 rounded-sm"
                       style={{ backgroundColor: block?.color }}
                     />
-                    <span className="text-gray-400">{zone}</span>
+                    <span className="text-[var(--text-tertiary)]">{zone}</span>
                   </span>
                 )
               })}
             </div>
-            <span className="text-gray-500">
+            <span className="text-[var(--text-disabled)]">
               {Math.floor(totalDuration / 60)} min
             </span>
           </div>

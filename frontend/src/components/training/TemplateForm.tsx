@@ -121,8 +121,8 @@ export function TemplateForm({ template, onSave, onCancel }: TemplateFormProps) 
             }
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
               formData.category === 'cycling'
-                ? 'border-[#8BC34A] bg-[#8BC34A]/10 text-[#8BC34A]'
-                : 'border-border hover:border-[#8BC34A]/50'
+                ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]'
+                : 'border-border hover:border-[var(--brand-primary)]/50'
             }`}
           >
             <Bike className="h-5 w-5" />
@@ -135,8 +135,8 @@ export function TemplateForm({ template, onSave, onCancel }: TemplateFormProps) 
             }
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
               formData.category === 'ppg'
-                ? 'border-[#5CE1E6] bg-[#5CE1E6]/10 text-[#5CE1E6]'
-                : 'border-border hover:border-[#5CE1E6]/50'
+                ? 'border-[var(--brand-secondary)] bg-[var(--brand-secondary)]/10 text-[var(--brand-secondary)]'
+                : 'border-border hover:border-[var(--brand-secondary)]/50'
             }`}
           >
             <Dumbbell className="h-5 w-5" />

@@ -18,11 +18,11 @@ export function MonthlyDetailTable({ monthlyBreakdown, stats }: MonthlyDetailTab
       <div className="p-5 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-white/10">
-            <BarChart3 className="w-4 h-4 text-white" />
+            <BarChart3 className="w-4 h-4 text-[var(--text-primary)]" />
           </div>
-          <h4 className="text-lg font-semibold text-white">Détail mensuel</h4>
+          <h4 className="text-lg font-semibold text-[var(--text-primary)]">Détail mensuel</h4>
         </div>
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-[var(--text-tertiary)]">
           {stats.totalActivities} activités sur l'année
         </div>
       </div>
@@ -30,12 +30,12 @@ export function MonthlyDetailTable({ monthlyBreakdown, stats }: MonthlyDetailTab
         <table className="w-full">
           <thead>
             <tr className="bg-white/[0.02]">
-              <th className="text-left p-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Mois</th>
-              <th className="text-left p-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Activités</th>
-              <th className="text-right p-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Distance</th>
-              <th className="text-right p-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Durée</th>
-              <th className="text-right p-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">D+</th>
-              <th className="text-right p-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">TRIMP</th>
+              <th className="text-left p-4 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Mois</th>
+              <th className="text-left p-4 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Activités</th>
+              <th className="text-right p-4 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Distance</th>
+              <th className="text-right p-4 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Durée</th>
+              <th className="text-right p-4 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">D+</th>
+              <th className="text-right p-4 text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">TRIMP</th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +57,7 @@ export function MonthlyDetailTable({ monthlyBreakdown, stats }: MonthlyDetailTab
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${month.activities > 0 ? 'bg-emerald-400' : 'bg-gray-600'}`} />
-                      <span className="font-medium text-white">{month.monthName}</span>
+                      <span className="font-medium text-[var(--text-primary)]">{month.monthName}</span>
                     </div>
                   </td>
                   <td className="p-4">
@@ -72,7 +72,7 @@ export function MonthlyDetailTable({ monthlyBreakdown, stats }: MonthlyDetailTab
                           />
                         </div>
                       </div>
-                      <span className={`text-sm font-semibold min-w-[24px] ${isMaxActivities ? 'text-emerald-400' : 'text-gray-300'}`}>
+                      <span className={`text-sm font-semibold min-w-[24px] ${isMaxActivities ? 'text-emerald-400' : 'text-[var(--text-secondary)]'}`}>
                         {month.activities}
                       </span>
                       {isMaxActivities && (
@@ -80,16 +80,16 @@ export function MonthlyDetailTable({ monthlyBreakdown, stats }: MonthlyDetailTab
                       )}
                     </div>
                   </td>
-                  <td className={`p-4 text-right text-sm ${isMaxDistance ? 'text-blue-400 font-semibold' : 'text-gray-300'}`}>
+                  <td className={`p-4 text-right text-sm ${isMaxDistance ? 'text-blue-400 font-semibold' : 'text-[var(--text-secondary)]'}`}>
                     {month.distance > 0 ? formatDistance(month.distance) : '-'}
                   </td>
-                  <td className="p-4 text-right text-sm text-gray-300">
+                  <td className="p-4 text-right text-sm text-[var(--text-secondary)]">
                     {month.duration > 0 ? formatDuration(month.duration) : '-'}
                   </td>
-                  <td className="p-4 text-right text-sm text-gray-300">
+                  <td className="p-4 text-right text-sm text-[var(--text-secondary)]">
                     {month.elevation > 0 ? `${month.elevation.toLocaleString('fr-FR')} m` : '-'}
                   </td>
-                  <td className={`p-4 text-right text-sm ${isMaxTrimp ? 'text-amber-400 font-semibold' : 'text-gray-300'}`}>
+                  <td className={`p-4 text-right text-sm ${isMaxTrimp ? 'text-amber-400 font-semibold' : 'text-[var(--text-secondary)]'}`}>
                     {month.trimp > 0 ? month.trimp.toLocaleString('fr-FR') : '-'}
                   </td>
                 </tr>
@@ -97,9 +97,9 @@ export function MonthlyDetailTable({ monthlyBreakdown, stats }: MonthlyDetailTab
             })}
           </tbody>
           <tfoot>
-            <tr className="bg-gradient-to-r from-[#8BC34A]/10 to-transparent">
+            <tr className="bg-gradient-to-r from-brand-primary/10 to-transparent">
               <td className="p-4">
-                <span className="font-bold text-white">Total annuel</span>
+                <span className="font-bold text-[var(--text-primary)]">Total annuel</span>
               </td>
               <td className="p-4">
                 <span className="font-bold text-emerald-400">{stats.totalActivities}</span>

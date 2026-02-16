@@ -54,11 +54,11 @@ export default function GpsMapSection({
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748b]">
+          <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--text-tertiary)]">
             Tracé GPS
           </span>
         </div>
-        <span className="text-xs font-bold text-[#475569] bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06]">
+        <span className="text-xs font-bold text-[var(--text-disabled)] bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06]">
           {gpsData.length} points
         </span>
       </div>
@@ -66,7 +66,7 @@ export default function GpsMapSection({
       {/* Map sans bordure interne */}
       <div className="h-80">
         <MapContainer
-          center={[gpsData[0].lat, gpsData[0].lon]}
+          center={gpsData.length > 0 ? [gpsData[0].lat, gpsData[0].lon] : [0, 0]}
           zoom={13}
           style={{ height: "100%", width: "100%" }}
           scrollWheelZoom={true}
@@ -95,7 +95,7 @@ export default function GpsMapSection({
       <div className="relative px-6 py-3">
         {/* Gradient line top */}
         <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[var(--accent-primary)]/20 to-transparent" />
-        <div className="flex items-center gap-2 text-xs text-[#475569]">
+        <div className="flex items-center gap-2 text-xs text-[var(--text-disabled)]">
           <span className="w-2 h-2 bg-[var(--accent-primary)] rounded-full animate-pulse" />
           Distance totale :{" "}
           <span className="font-bold text-white font-mono">

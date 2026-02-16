@@ -27,13 +27,13 @@ export function ReportMonthlyComparison({ monthlyBreakdown }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25">
-            <Calendar className="w-5 h-5 text-white" />
+            <Calendar className="w-5 h-5 text-[var(--text-primary)]" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white tracking-tight">
+            <h3 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
               Analyse Mensuelle
             </h3>
-            <p className="text-sm text-gray-400">{stats.activeMonths} mois actifs sur 12</p>
+            <p className="text-sm text-[var(--text-tertiary)]">{stats.activeMonths} mois actifs sur 12</p>
           </div>
         </div>
 
@@ -45,9 +45,9 @@ export function ReportMonthlyComparison({ monthlyBreakdown }: Props) {
         }`}>
           {stats.trend > 0 ? <TrendingUp className="w-4 h-4 text-emerald-400" /> :
            stats.trend < 0 ? <TrendingDown className="w-4 h-4 text-red-400" /> :
-           <Minus className="w-4 h-4 text-gray-400" />}
+           <Minus className="w-4 h-4 text-[var(--text-tertiary)]" />}
           <span className={`text-sm font-semibold ${
-            stats.trend > 0 ? 'text-emerald-400' : stats.trend < 0 ? 'text-red-400' : 'text-gray-400'
+            stats.trend > 0 ? 'text-emerald-400' : stats.trend < 0 ? 'text-red-400' : 'text-[var(--text-tertiary)]'
           }`}>
             {stats.trend > 0 ? '+' : ''}{stats.trendPercent}% S2 vs S1
           </span>

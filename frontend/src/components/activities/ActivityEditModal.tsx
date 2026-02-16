@@ -89,8 +89,8 @@ export default function ActivityEditModal({
         avgCadence: activity.avgCadence?.toString() || "",
         avgPower: activity.avgPower?.toString() || "",
         normalizedPower: activity.normalizedPower?.toString() || "",
-        rpe: "",
-        feelingNotes: "",
+        rpe: activity.rpe?.toString() || "",
+        feelingNotes: activity.feelingNotes || "",
       });
     }
   }, [activity]);

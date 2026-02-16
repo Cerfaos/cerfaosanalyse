@@ -57,39 +57,39 @@ export function CurrentPhaseCard({
               {phaseConfig.label}
             </span>
             {currentPhase === "circuit_rest" ? (
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-[var(--text-tertiary)]">
                 Prochain tour: {currentRound + 1} / {totalRounds}
               </span>
             ) : (
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-[var(--text-tertiary)]">
                 Tour {currentRound} / {totalRounds}
               </span>
             )}
           </div>
 
-          <div className="text-2xl md:text-4xl font-bold text-white mb-1 md:mb-2">{currentExercise.name}</div>
+          <div className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-1 md:mb-2">{currentExercise.name}</div>
 
           {currentPhase === "exercise" && (
-            <div className="text-lg md:text-xl text-gray-300">
+            <div className="text-lg md:text-xl text-[var(--text-secondary)]">
               {currentExercise.reps ? (
                 <span className="text-xl md:text-2xl font-semibold" style={{ color: phaseConfig.color }}>
                   {currentExercise.reps} répétitions
                 </span>
               ) : (
-                <span className="text-gray-400">Durée: {currentExercise.duration}</span>
+                <span className="text-[var(--text-tertiary)]">Durée: {currentExercise.duration}</span>
               )}
             </div>
           )}
 
-          {currentExercise.notes && <div className="mt-2 text-xs md:text-sm text-gray-400 italic">{currentExercise.notes}</div>}
+          {currentExercise.notes && <div className="mt-2 text-xs md:text-sm text-[var(--text-tertiary)] italic">{currentExercise.notes}</div>}
 
           {currentExercise.hrTarget && <div className="mt-1 text-xs md:text-sm text-red-400">Zone cible: {currentExercise.hrTarget} bpm</div>}
         </div>
 
         {/* Timer */}
         <div className="text-center md:text-right">
-          <div className="text-5xl md:text-7xl font-mono font-bold text-white tabular-nums">{formatTime(remainingInBlock)}</div>
-          <div className="text-sm md:text-lg text-gray-400 mt-1">sur {formatTime(currentBlock.durationSeconds)}</div>
+          <div className="text-5xl md:text-7xl font-mono font-bold text-[var(--text-primary)] tabular-nums">{formatTime(remainingInBlock)}</div>
+          <div className="text-sm md:text-lg text-[var(--text-tertiary)] mt-1">sur {formatTime(currentBlock.durationSeconds)}</div>
         </div>
       </div>
 

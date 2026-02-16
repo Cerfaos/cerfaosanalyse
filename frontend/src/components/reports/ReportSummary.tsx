@@ -107,10 +107,10 @@ export function ReportSummary({ summary }: Props) {
   return (
     <section className="space-y-5">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-gradient-to-br from-[#8BC34A]/20 to-[#8BC34A]/5 border border-[#8BC34A]/30">
-          <Activity className="w-5 h-5 text-[#8BC34A]" />
+        <div className="p-2 rounded-xl bg-gradient-to-br from-brand-primary/20 to-brand-primary/5 border border-brand-primary/30">
+          <Activity className="w-5 h-5 text-brand-primary" />
         </div>
-        <h3 className="text-xl font-semibold text-white tracking-tight">
+        <h3 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">
           Résumé de la Période
         </h3>
       </div>
@@ -138,22 +138,22 @@ export function ReportSummary({ summary }: Props) {
 
               {/* Icon container */}
               <div className={`inline-flex p-2.5 rounded-xl bg-gradient-to-br ${metric.gradient} mb-4 shadow-lg`}>
-                <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
+                <Icon className="w-5 h-5 text-[var(--text-primary)]" strokeWidth={2.5} />
               </div>
 
               {/* Value */}
               <div className="relative">
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-bold text-white tracking-tight">
+                  <span className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
                     {value}
                   </span>
                   {unit && (
-                    <span className="text-sm font-medium text-gray-400">
+                    <span className="text-sm font-medium text-[var(--text-tertiary)]">
                       {unit}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mt-1 font-medium">
+                <p className="text-sm text-[var(--text-disabled)] mt-1 font-medium">
                   {metric.label}
                 </p>
               </div>
