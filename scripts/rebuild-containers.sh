@@ -2,6 +2,12 @@
 # Script pour reconstruire et redémarrer les conteneurs après modifications
 set -euo pipefail
 
+# Chemin explicite vers podman (évite les problèmes de PATH après redémarrage)
+PODMAN="${PODMAN:-/usr/bin/podman}"
+if [[ ! -x "$PODMAN" ]]; then
+    PODMAN=$(command -v podman 2>/dev/null || echo "/usr/bin/podman")
+fi
+
 # Couleurs pour les logs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -13,6 +19,9 @@ NC='\033[0m' # No Color
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${PROJECT_DIR}/.env"
 
+# Options (modifiées par argument parsing)
+USE_NO_CACHE=false
+
 log() { printf "${BLUE}[%s]${NC} %s\n" "$(date '+%H:%M:%S')" "$*"; }
 log_success() { printf "${GREEN}[%s] ✓${NC} %s\n" "$(date '+%H:%M:%S')" "$*"; }
 log_warn() { printf "${YELLOW}[%s] ⚠${NC} %s\n" "$(date '+%H:%M:%S')" "$*"; }
@@ -23,7 +32,7 @@ check_prerequisites() {
     log "Vérification des prérequis..."
     local missing=()
 
-    command -v podman &>/dev/null || missing+=("podman")
+    $PODMAN --version &>/dev/null || missing+=("podman")
     command -v curl &>/dev/null || missing+=("curl")
 
     if [[ ${#missing[@]} -gt 0 ]]; then
@@ -62,8 +71,8 @@ detect_local_ip() {
 # Arrêter et supprimer les conteneurs existants
 cleanup_containers() {
     log "Arrêt et suppression des conteneurs existants..."
-    podman stop cycliste-backend cycliste-frontend 2>/dev/null || true
-    podman rm -f cycliste-backend cycliste-frontend 2>/dev/null || true
+    $PODMAN stop --timeout 5 cycliste-backend cycliste-frontend 2>/dev/null || true
+    $PODMAN rm -f cycliste-backend cycliste-frontend 2>/dev/null || true
     log_success "Nettoyage terminé"
 }
 
@@ -72,11 +81,12 @@ build_backend() {
     log "Construction de l'image backend..."
     cd "$PROJECT_DIR"
 
-    if podman build \
-        --no-cache \
-        -t cerfaosanalyse_backend:latest \
-        -f backend/Dockerfile \
-        ./backend; then
+    local build_args=(-t cerfaosanalyse_backend:latest -f backend/Dockerfile)
+    if $USE_NO_CACHE; then
+        build_args+=(--no-cache)
+    fi
+
+    if $PODMAN build "${build_args[@]}" ./backend; then
         log_success "Image backend construite"
     else
         log_error "Échec de la construction du backend"
@@ -89,12 +99,12 @@ build_frontend() {
     log "Construction de l'image frontend..."
     cd "$PROJECT_DIR"
 
-    if podman build \
-        --no-cache \
-        -t cerfaosanalyse_frontend:latest \
-        --build-arg "VITE_API_URL=${VITE_API_URL}" \
-        -f frontend/Dockerfile \
-        ./frontend; then
+    local build_args=(-t cerfaosanalyse_frontend:latest --build-arg "VITE_API_URL=${VITE_API_URL}" -f frontend/Dockerfile)
+    if $USE_NO_CACHE; then
+        build_args+=(--no-cache)
+    fi
+
+    if $PODMAN build "${build_args[@]}" ./frontend; then
         log_success "Image frontend construite"
     else
         log_error "Échec de la construction du frontend"
@@ -114,7 +124,7 @@ ensure_directories() {
 start_backend() {
     log "Démarrage du conteneur backend..."
 
-    podman run -d --name cycliste-backend \
+    $PODMAN run -d --name cycliste-backend --replace \
         -p 3333:3333 \
         -v "${PROJECT_DIR}/backend/tmp:/app/build/tmp:Z" \
         -v "${PROJECT_DIR}/backend/public/uploads:/app/build/public/uploads:Z" \
@@ -148,7 +158,7 @@ wait_for_backend() {
 
     log_error "Le backend n'a pas démarré après ${max_attempts}s"
     log "Logs du backend:"
-    podman logs --tail 50 cycliste-backend
+    $PODMAN logs --tail 50 cycliste-backend
     exit 1
 }
 
@@ -156,7 +166,7 @@ wait_for_backend() {
 start_frontend() {
     log "Démarrage du conteneur frontend..."
 
-    podman run -d --name cycliste-frontend \
+    $PODMAN run -d --name cycliste-frontend --replace \
         -p 8080:80 \
         -v "${PROJECT_DIR}/frontend/public/icons:/usr/share/nginx/html/icons:Z" \
         cerfaosanalyse_frontend:latest
@@ -173,7 +183,7 @@ verify_services() {
     echo "┌─────────────────────────────────────────────────────┐"
     echo "│  État des conteneurs                                │"
     echo "├─────────────────────────────────────────────────────┤"
-    podman ps --filter "name=cycliste" --format "│  {{.Names}}: {{.Status}}" | head -2
+    $PODMAN ps --filter "name=cycliste" --format "│  {{.Names}}: {{.Status}}" | head -2
     echo "└─────────────────────────────────────────────────────┘"
     echo ""
 
@@ -217,6 +227,20 @@ show_summary() {
 
 # Fonction principale
 main() {
+    # Parser les arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --no-cache) USE_NO_CACHE=true; shift ;;
+            -h|--help)
+                echo "Usage: $0 [options]"
+                echo "  --no-cache    Forcer la reconstruction complète sans cache"
+                echo "  -h, --help    Afficher cette aide"
+                exit 0
+                ;;
+            *) shift ;;
+        esac
+    done
+
     echo ""
     echo "╔═════════════════════════════════════════════════════╗"
     echo "║  Centre d'Analyse Cycliste - Reconstruction         ║"
