@@ -21,8 +21,14 @@ export function ActivityZoneList({ activities }: ActivityZoneListProps) {
   return (
     <Card
       title="Analyse par sortie"
-      description="Temps passé dans chaque zone, TRIMP et zone dominante pour vos dernières activités."
+      description="Détail individuel de chaque activité avec répartition des zones cardiaques."
     >
+      <p className="text-xs text-text-muted leading-relaxed mb-4">
+        La barre colorée représente le temps passé dans chaque zone (Z1 à Z5). Les données proviennent
+        soit d'un enregistrement cardio continu (trace complète), soit d'une estimation à partir de la
+        FC moyenne lorsque la trace n'est pas disponible. Le badge "Source" indique la fiabilité des données
+        pour chaque sortie.
+      </p>
       {activities.length === 0 ? (
         <p className="text-center text-text-secondary py-6">Aucune activité sur cette période.</p>
       ) : (

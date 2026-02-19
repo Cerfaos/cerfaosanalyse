@@ -15,8 +15,14 @@ export function PolarizationCard({ polarization, sampling }: PolarizationCardPro
   return (
     <Card
       title="Index de polarisation 80/10/10"
-      description="Idéal: 80% en endurance (Z1-Z2), 10% tempo (Z3), 10% haute intensité (Z4-Z5)."
+      description="Mesure l'équilibre de votre entraînement entre endurance, tempo et haute intensité."
     >
+      <p className="text-xs text-text-muted leading-relaxed mb-4">
+        Le modèle polarisé (80/10/10) est la répartition adoptée par les athlètes d'endurance
+        de haut niveau. Un score de 100% signifie que votre distribution est parfaitement alignée.
+        En dessous de 70%, votre entraînement est significativement déséquilibré — souvent trop
+        de temps en Z3 (zone grise) au détriment de l'endurance fondamentale ou de l'intensité.
+      </p>
       <div className="flex flex-col gap-4">
         <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-brand/20">
           <p className="text-sm text-text-secondary">Score</p>

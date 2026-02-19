@@ -15,8 +15,14 @@ export function ZoneDistributionCard({ zones }: ZoneDistributionCardProps) {
   return (
     <Card
       title="Répartition des zones"
-      description="Temps passé dans chaque zone sur la période sélectionnée"
+      description="Temps passé dans chaque zone sur la période sélectionnée."
     >
+      <p className="text-xs text-text-muted leading-relaxed mb-4">
+        L'idéal est de concentrer ~80% du temps en Z1-Z2 (endurance fondamentale), ~10% en Z3 (tempo)
+        et ~10% en Z4-Z5 (haute intensité). Si votre Z3 est trop élevée, vous passez trop de temps
+        en "zone grise" — un effort trop dur pour récupérer mais pas assez intense pour progresser.
+        Trop de temps en Z4-Z5 peut indiquer un risque de surentraînement.
+      </p>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={zones}>

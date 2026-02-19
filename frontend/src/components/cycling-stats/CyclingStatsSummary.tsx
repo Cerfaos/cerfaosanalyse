@@ -33,7 +33,7 @@ export function CyclingStatsSummary({ stats, durationHours }: CyclingStatsSummar
           {stats?.summary.avgHeartRate ? `${stats.summary.avgHeartRate} bpm` : '--'}
         </p>
         <p className="text-xs text-text-muted">
-          Vitesse moyenne {stats?.summary.avgSpeed ? `${stats.summary.avgSpeed} km/h` : '--'}
+          Moyenne pondérée sur toutes les sorties
         </p>
       </div>
       <div className="rounded-2xl border border-border-base bg-panel-bg p-4 shadow-sm space-y-1">
@@ -42,8 +42,7 @@ export function CyclingStatsSummary({ stats, durationHours }: CyclingStatsSummar
           {stats?.summary.totalTrimp ?? '--'}
         </p>
         <p className="text-xs text-text-muted">
-          Score de polarisation{' '}
-          {stats?.polarization ? `${stats.polarization.score.toFixed(1)}%` : '--'}
+          Durée × intensité cardiaque cumulées
         </p>
       </div>
     </div>

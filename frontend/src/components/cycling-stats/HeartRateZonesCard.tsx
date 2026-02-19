@@ -13,8 +13,14 @@ export function HeartRateZonesCard({ zones }: HeartRateZonesCardProps) {
   return (
     <Card
       title="Zones de fréquence cardiaque"
-      description="Plages Karvonen calculées depuis votre profil, utilisées pour les analyses ci-dessous."
+      description="Plages calculées avec la méthode Karvonen à partir de votre FC repos et FC max."
     >
+      <p className="text-xs text-text-muted leading-relaxed mb-4">
+        Chaque zone correspond à un pourcentage de votre fréquence cardiaque de réserve (FC max − FC repos).
+        Z1 (récupération) et Z2 (endurance) développent votre base aérobie ; Z3 (tempo) améliore le seuil ;
+        Z4 (seuil anaérobie) et Z5 (VO₂max) travaillent la puissance maximale. Les plages en BPM sont
+        personnalisées selon votre profil.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {zones.map((zone) => (
           <div
